@@ -1,0 +1,45 @@
+header {
+	flex: 0 0 60px;
+	background:#EEEEEE;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	align-items: center;
+}
+#logo_text {
+	font-family: "Segoe UI";
+	font-size: 20pt;
+	margin: 0px 10px 0px 25px;
+	white-space: nowrap;
+}
+#logo_image {
+	margin: 0px 10px 0px 0px;
+	width:40px;
+	height:40px;
+	content: url("img/logo_coffee.png");
+}
+#account_text {
+	font-family: "Segoe UI";
+	font-size:14pt;
+	margin: 0px 0px 0px 0px;
+	white-space: nowrap;
+}
+#account_butons_wrapper {
+	margin: 0px 20px 0px 15px;
+}
+#account_butons_wrapper > :not(:last-child) {
+	margin-right: 10px;
+}
+.account_button {
+	width:25px;
+	height:25px;
+}
+.account_button:hover {
+	cursor: pointer;
+}
+#account_button_vk {
+	content: url("img/logo_vk.png");
+}
+#account_button_google {
+	content: url("img/logo_google.png");
+}

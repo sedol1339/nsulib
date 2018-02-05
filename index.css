@@ -1,0 +1,267 @@
+
+main {
+	flex: 1 0 0px;
+	display: flex;
+	flex-flow: row nowrap;
+}
+#aside1 {
+	flex: 0 0 220px;
+	display: flex;
+	flex-flow: column nowrap;
+}
+main > article {
+	flex: 1 0 0px;
+}
+#aside2 {
+	flex: 0 0 200px;
+}
+/*@media all and (max-width: 600px) {
+	main {
+		flex-flow: column wrap;
+	}
+	#aside1 {
+		order: 1;
+		flex: 1 0 0px;
+		width: 200px;
+	}
+	#aside2 {
+		order: 2;
+		flex: 1 0 0px;
+		width: 200px;
+	}
+	main > article {
+		order: 3;
+		flex: 1 1 100vh;
+	}
+}
+@media all and (max-width: 450px) {
+	header {
+		flex: 0 0 30px;
+	}
+	main {
+		flex-flow: column nowrap;
+	}
+	#aside1 {
+		order: 1;
+		flex: 0 0 auto;
+	}
+	#aside2 {
+		order: 2;
+		flex: 0 0 auto;
+	}
+	main > article {
+		order: 3;
+		flex: 1 0 auto;
+	}
+}*/
+
+#aside1_search_box {
+	flex: 0 0 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	border-bottom: 1px solid #CCCCCC;
+}
+#aside1_search_box > :first-child {
+	margin: 6px 6px 6px 6px;
+}
+#aside1_search_box > :not(:first-child) {
+	margin: 0px 6px 6px 6px;
+}
+.erase_image {
+	flex: 0 0 auto;
+	display: block;
+	width: 12px;
+	height: 12px;
+	margin-left: 5px;
+	content:url("img/erase.png");
+}
+.erase_image:hover {
+	cursor: pointer;
+	content:url("img/erase_dark.png");
+}
+#aside1_results_box {
+	flex: 1 0 0px;
+	display: flex;
+	flex-flow: column nowrap;
+	overflow: auto;
+}
+#aside1_footer {
+	flex: 0 0 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	border-top: 1px solid #CCCCCC;
+}
+.aside1_footer_button {
+	margin: 6px;
+	min-width: 120px;
+}
+.aside1_footer_button_text {
+	line-height: 25px;
+	font-size: 10pt; 
+	margin: auto 10px auto 10px;
+	white-space: nowrap;
+}
+.aside1_search_box_button {
+	min-height: 10px;
+	flex: 1 0 25px;
+}
+.aside1_search_box_button_text {
+	font-size: 8pt;
+	text-align: center;
+	margin: 6px 6px 6px 6px;
+}
+.teacher_image {
+	width:10px;
+	height:12px;
+	display:inline-block;
+	vertical-align:-20%;
+	margin-right:3px;
+	content:url("img/logo_teacher.png");
+}
+.result_noliterature {
+	flex: 0 0 auto;
+	border-bottom: 1px solid #CCCCCC;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	background:#F8F8F8;
+}
+.result_noliterature:hover {
+	background:#E5E5E5;
+	cursor: pointer;
+}
+.result_noliterature_text {
+	font-size: 8pt;
+	margin: 3px 6px 3px 6px;
+}
+.image_methodic {
+	flex: 0 0 auto;
+	display: block;
+	width: 15px;
+	height: 15px;
+	margin: 3px;
+	content:url("img/logo_methodic.png");
+}
+.image_abstract {
+	flex: 0 0 auto;
+	display: block;
+	width: 15px;
+	height: 15px;
+	margin: 3px;
+	content:url("img/logo_abstract.png");
+}
+#result_literature_header {
+	flex: 0 0 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	height: 25px;
+}
+.result_literature_header_text {
+	font-size: 8pt;
+	margin: auto;
+}
+.result_literature {
+	flex: 0 0 auto;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+}
+.result_literature:hover {
+	background:#E5E5E5;
+	cursor: pointer;
+}
+.result_literature_text {
+	margin: 5px;
+	font-size: 8pt;
+}
+#result_infobox {
+	flex: 0 0 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	height: 25px;
+}
+.result_infobox_text {
+	font-size: 8pt;
+	margin: auto;
+}
+#article_frame {
+	width: 100%;
+	height: 100%;
+}
+#aside2_stub {
+	flex: 0 0 auto;
+	display: flex;
+	flex-flow: column nowrap;
+	margin: 12px;
+	text-align: center;
+}
+#aside2_info_box {
+	flex: 0 0 auto;
+	display: flex;
+	flex-flow: column nowrap;
+}
+#aside2_info_box_text {
+	font-size: 8pt;
+	flex: 0 0 auto;
+	margin: 12px;
+	line-height: 1.75em;
+}
+#aside2_info_box_buttons {
+	flex: 0 0 auto;
+	display: flex;
+	flex-flow: row nowrap;
+	align-self: center;
+	margin-bottom: 12px;
+}
+#aside2_info_box_buttons > :not(:last-child) {
+	margin-right: 10px;
+}
+.aside2_info_box_button {
+	margin: 0px auto 0px auto;
+	min-width: 70px;
+}
+.aside2_info_box_button_text {
+	line-height: 25px;
+	font-size: 10pt; 
+	margin: auto 10px auto 10px;
+	white-space: nowrap;
+}
+article {
+	border-left: 1px solid #CCCCCC;
+	border-right: 1px solid #CCCCCC;
+}
+.search_box_list {
+	width: 100%;
+	height: auto;
+	overflow: auto;
+	position: absolute;
+	left: calc(100% + 12px);
+	top: 0px;
+	z-index: 2;
+	border-radius: 4px;
+	display: none;
+	flex-flow: column nowrap;
+
+}
+.search_box_list_element {
+	background: #E5E5E5;
+	box-sizing: border-box;
+	width: 100%;
+	flex: 0 0 auto;
+	min-height: 20px;
+}
+
+.search_box_list_element:hover {
+	background:#DDDDDD;
+	cursor: pointer;
+}
+
+.search_box_list > :not(:last-child) {
+	border-bottom: 1px solid #CCCCCC;
+}
+
+.search_box_list_element_text {
+	font-size: 8pt;
+	text-align: center;
+	margin: 6px 6px 6px 6px;
+}

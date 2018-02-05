@@ -1,0 +1,77 @@
+@import "normalize.css";
+a {
+	color: inherit;
+	text-decoration: inherit;
+}
+
+@keyframes pulse {  
+  0% { opacity: 0.6; }
+  50% { opacity: 1.0; }
+  100% { opacity: 0.6; }
+}
+
+.button_hint {
+	animation-name: pulse;  
+	animation-iteration-count: infinite;  
+	animation-timing-function: cubic-bezier(.5, 0, 1, 1);
+	animation-duration: 0.2s;
+	box-shadow: 0 0 2px 1px rgba(204, 48, 48, 0.8);
+}
+
+/*::-webkit-scrollbar {
+	width: 12px;
+}
+::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+	border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+	border-radius: 8px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}*/
+
+:root {
+	--main-bg-color: brown;
+	/*background-color: var(--main-bg-color);*/
+	font-size: 8pt;
+	overflow:hidden;
+}
+body {
+	width: calc(100vw - 1px);
+	height: calc(100vh - 1px);
+	display: flex;
+	flex-flow: column nowrap;
+}
+.rowwrapper {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+}
+.horizontal_wrapper {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	position: relative;
+}
+.text_faint_style {
+	color: #999;
+}
+.common_button {
+	display: flex;
+	justify-content: center;
+	background:#E5E5E5;
+	border-radius: 4px;
+	position: relative;
+}
+.common_button:hover {
+	background:#DDDDDD;
+	cursor: pointer;
+}
+.common_button:active > p {
+	/*position:relative;
+	top:1px;*/
+}
+.dummy_shade {
+	background:#000;
+	opacity:0.45;
+}
