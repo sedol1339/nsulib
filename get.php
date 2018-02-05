@@ -1,6 +1,6 @@
 ﻿<?php
 	
-	//get.php?action=materials?s=9&t=324
+	//get.php?action=materials?s=9&t=325
 	//get.php?action=list&target=t&s=32
 	
 	//Определение действия, подготовка соединения с БД
