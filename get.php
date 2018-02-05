@@ -11,7 +11,7 @@
 		$action = $_GET['action'];
 	}
 	
-	$mysqli = new mysqli("localhost:3307", "root", "usbw", "library");
+	$mysqli = new mysqli("localhost:3307", "user", "usbw", "library");
 	
 	if (!$mysqli->set_charset("utf8")) {
 		echo "Ошибка при загрузке набора символов utf8: " . $mysqli->error; exit;
