@@ -1,0 +1,8 @@
+Это информационный файл, содержащий информацию о конфигурации сервера.
+
+php.ini:
+upload_max_filesize = 1000M
+post_max_size = 1000M
+
+httpd.conf:
+AddDefaultCharset utf-8 // надо ли?

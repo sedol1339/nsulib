@@ -81,7 +81,7 @@
 		</div>
 		<div id=info>
 			<!--<div id=info_filename>Файл: Difgem_Lera.pdf</div>-->
-			<input id=info_filename type="file" name="f">
+			<input id=info_filename type="file" name="file">
 			<div id=main_info>
 				<div class=info_box_wrapper>
 					<div>Факультет:</div>

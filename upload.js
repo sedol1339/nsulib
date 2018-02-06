@@ -80,11 +80,12 @@ ui.button_publish_or_edit_click = function(event) {
 	var formData = new FormData();
 	formData.append('file', ui.selected_file.files[0]);
 	formData.append("someKey", "someValue");
-	requests.query_upload.onprogress = function(event) {
+	requests.query_upload.upload.onprogress = function(event) {
 		console.log( 'Загружено на сервер ' + event.loaded + ' байт из ' + event.total );
 	};
 	requests.query_upload.onload = function(event) {
 		console.log( 'Данные полностью загружены на сервер!' );
+		console.log( 'Ответ: ', requests.query_upload.responseText);
 	};
 	requests.query_upload.onerror = function(event) {
 		console.log( 'Произошла ошибка при загрузке данных на сервер!' );
