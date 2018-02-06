@@ -80,7 +80,8 @@
 			</table>
 		</div>
 		<div id=info>
-			<div id=info_filename>Файл: Difgem_Lera.pdf</div>
+			<!--<div id=info_filename>Файл: Difgem_Lera.pdf</div>-->
+			<input id=info_filename type="file" name="f">
 			<div id=main_info>
 				<div class=info_box_wrapper>
 					<div>Факультет:</div>
@@ -140,8 +141,8 @@
 			</div>
 			<div id=info_file_about>Файл PDF, 86 страниц, размер 34 Мб</div>
 			<div id=info_placeholder></div>
-			<div class=common_button id=add_file_button>Добавить файл</div>
-			<div class=common_button id=publish_file_button style="display:none;">Опубликовать файл</div>
+			<!--<div class=common_button id=add_file_button>Добавить файл</div>-->
+			<div class=common_button id=publish_file_button <!--style="display:none;-->">Опубликовать файл</div>
 			<div class=common_button id=quit_button>Выйти в главное меню</div>
 		</div>
 	</main>

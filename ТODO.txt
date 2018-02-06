@@ -1,3 +1,6 @@
+06.02	https://stackoverflow.com/questions/29659154/what-is-the-best-way-to-upload-files-in-a-modern-browser
+		https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_and_retrieving_form_data
+
 06.02	Удаленный доступ к БД установлен (вместо адреса vh216217.eurodir.ru указан адрес vh216217.eurodir.ru:3306)
 
 06.02	TODO Не получается организовать удаленный доступ к БД на хостинге, исправить
