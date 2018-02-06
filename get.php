@@ -5,20 +5,22 @@
 	
 	//Определение действия, подготовка соединения с БД
 	
+	error_reporting(0);
+	
 	if (!isset($_GET['action'])) {
 		echo "Action not specified"; exit;
 	} else {
 		$action = $_GET['action'];
 	}
 	
-	$mysqli = new mysqli("vh216217.eurodir.ru", "vh216217_user", "usbw", "vh216217_library");
-	
-	if (!$mysqli->set_charset("utf8")) {
-		echo "Ошибка при загрузке набора символов utf8: " . $mysqli->error; exit;
-	}
+	$mysqli = new mysqli("vh216217.eurodir.ru:3306", "vh216217_user", "usbw", "vh216217_library");
 	
 	if ($mysqli->connect_errno) {
 		echo "Не удалось подключиться к MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error; exit;
+	}
+	
+	if (!$mysqli->set_charset("utf8")) {
+		echo "Ошибка при загрузке набора символов utf8: " . $mysqli->error; exit;
 	}
 	
 	//Действия
