@@ -40,44 +40,15 @@
 				</div>
 			</div>
 			<table id=materials_table>
-				<tr>
-					<td>Lektsii_T-2_V_Bondar_1972.djvu</td>
-					<td>Загрузил: Oleg S</td>
-					<td>22.03.2017 5:53PM</td>
-					<td>удалить</td>
-				</tr>
-				<tr>
-					<td>Госэкзамен (2010).pdf</td>
-					<td>Загрузил: Oleg S</td>
-					<td>20.03.2017 11:42PM</td>
-					<td>удалить</td>
-				</tr>
-				<tr>
-					<td>ВЫЧМЕТ. V семестр,  лекции, 2007.pdf</td>
-					<td>Загрузил: Oleg S</td>
-					<td>20.03.2017 9:27PM</td>
-					<td>удалить</td>
-				</tr>
-				<tr>
-					<td>ВЫЧМЕТ. V семестр, вопросы на экзамен</td>
-					<td>Загрузил: Oleg S</td>
-					<td>20.03.2017 9:27PM</td>
-					<td>удалить</td>
-				</tr>
-				<tr>
-					<td>ВЫЧМЕТ. V семестр, задачи на экзамен</td>
-					<td>Загрузил: Oleg S</td>
-					<td>20.03.2017 9:27PM</td>
-					<td>удалить</td>
-				</tr>
-				<tr>
-					<td>Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</td>
-					<td>Загрузил: Oleg S</td>
-					<td>20.03.2017 9:27PM</td>
+				<tr id=dummy_material class=material_entry style="display:none;">
+					<td>Название</td>
+					<td>Загрузил</td>
+					<td>Дата загрузки</td>
 					<td>удалить</td>
 				</tr>
 				<!--<div style="width:800px;height:100px;background:red;"> </div>-->
 			</table>
+			<div id=no_materials style="display:none;">Нет материалов</div>
 		</div>
 		<div id=info>
 			<!--<div id=info_filename>Файл: Difgem_Lera.pdf</div>-->
