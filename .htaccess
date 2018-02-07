@@ -1,1 +1,6 @@
 AddDefaultCharset UTF-8
+Options -Indexes
+<Files ".login_data">
+Order Allow,Deny
+Deny from all
+</Files>
