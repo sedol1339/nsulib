@@ -1,3 +1,5 @@
+07.02	TODO прогресс-бар загрузки, проверка и запись данных в БД, получение обновленного списка материалов
+
 07.02	Загрузка файлов: добавлены функции ui.show_materials и requests.receive_materials
 
 06.02	https://stackoverflow.com/questions/29659154/what-is-the-best-way-to-upload-files-in-a-modern-browser
