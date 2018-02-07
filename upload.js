@@ -16,6 +16,7 @@ var data = {
 
 var requests = { //functions and variables about xml-http-requests
 	query_upload: null,
+	query_get_materials: null,
 };
 
 function init() {
@@ -80,7 +81,7 @@ ui.recalculate_css = function(event) {
 ui.button_publish_or_edit_click = function(event) {
 	if (requests.query_upload != null) requests.query_upload.abort();
 	requests.query_upload = new XMLHttpRequest();
-	requests.query_upload.open("POST", "post.php", true);
+	requests.query_upload.open("POST", "uploadScript.php", true);
 	
 	var formData = new FormData();
 	formData.append('file', ui.selected_file.files[0]);
@@ -131,12 +132,18 @@ ui.show_materials = function() {
 }
 
 requests.receive_materials = function() {
-	//TODO
-	data.materials = { };
+	/*data.materials = { };
 	data.materials["3231"] = { "name": "Lektsii_T-2_V_Bondar_1972.djvu", "uploader": "Oleg S", "uploaded": "22.03.2017 5:53PM" };
 	data.materials["4351"] = { "name": "Госэкзамен (2010).pdf", "uploader": "Oleg S", "uploaded": "20.03.2017 11:42PM" };
 	data.materials["5661"] = { "name": "ВЫЧМЕТ. V семестр,  лекции, 2007.pdf", "uploader": "Oleg S", "uploaded": "20.03.2017 9:27PM" };
 	data.materials["4389"] = { "name": "ВЫЧМЕТ. V семестр, вопросы на экзамен", "uploader": "Oleg S", "uploaded": "20.03.2017 9:27PM" };
 	data.materials["5869"] = { "name": "ВЫЧМЕТ. V семестр, задачи на экзамен", "uploader": "Oleg S", "uploaded": "20.03.2017 9:27PM" };
-	data.materials["3654"] = { "name": "Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику", "uploader": "Oleg S", "uploaded": "20.03.2017 9:27PM" };
+	data.materials["3654"] = { "name": "Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику", "uploader": "Oleg S", "uploaded": "20.03.2017 9:27PM" };*/
+	if (requests.query_get_materials != null) requests.query_get_materials.abort();
+	requests.query_get_materials = new XMLHttpRequest();
+	requests.query_get_materials.open("GET", "/uploadScript.php", true);
+	requests.query_get_materials.onload = function() {
+		data.materials = JSON.parse(requests.query_get_materials.responseText);
+	}
+	requests.query_get_materials.send();
 }	
