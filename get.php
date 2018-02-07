@@ -13,7 +13,9 @@
 		$action = $_GET['action'];
 	}
 	
-	$mysqli = new mysqli("vh216217.eurodir.ru:3306", "vh216217_user", "usbw", "vh216217_library");
+	include('.login_data');
+	
+	$mysqli = new mysqli($db_host, $db_user, $db_password, $db_schema);
 	
 	if ($mysqli->connect_errno) {
 		echo "Не удалось подключиться к MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error; exit;
