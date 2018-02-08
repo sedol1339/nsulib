@@ -151,7 +151,7 @@ main {
 	line-height: 50px;
 	font-size: 10pt;
 }
-#info_filename {
+#input_file {
 	font-size: 10pt;
 	padding: 10px;
 	border-bottom:1px solid #CCCCCC;

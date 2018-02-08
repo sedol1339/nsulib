@@ -51,66 +51,53 @@
 			<div id=no_materials style="display:none;">Нет материалов</div>
 		</div>
 		<div id=info>
-			<!--<div id=info_filename>Файл: Difgem_Lera.pdf</div>-->
-			<input id=info_filename type="file" name="file">
+			<input id=input_file type="file" name="file">
 			<div id=main_info>
 				<div class=info_box_wrapper>
 					<div>Факультет:</div>
-					<select>
-						<option value="1">Механико-математический</option>
-						<option value="2">Информационных технологий</option>
-					</select>
+					<select id=input_f></select>
 					<div class=question_mark data-tooltip="Укажите факультет"></div>
 				</div>
 				<div class=info_box_wrapper>
 					<div>Предмет:</div>
-					<select>
-						<option value="1">Диф. геом.</option>
-					</select>
+					<select id=input_s></select>
 					<div class=question_mark data-tooltip="Укажите предмет"></div>
 				</div>
 				<div class=info_box_wrapper>
 					<div>Преподав.:</div>
-					<select>
-						<option value="1">Базайкин А. Б.</option>
+					<select id=input_t>
 					</select>
 					<div class=question_mark data-tooltip="Укажите преподавателя"></div>
 				</div>
 				<div class=info_box_wrapper>
 					<div>Тип:</div>
-					<select>
-						<option value="1">Конспект</option>
-						<option value="1">Учебное пособие</option>
-						<option value="1">Учебный материал</option>
-						<option value="1">Литература</option>
-					</select>
+					<select id=input_type></select>
 					<div class=question_mark data-tooltip="Преподавательский - автором материала является преподаватель. Подходит для методичек, презентаций, учебных материалов. Если материал состоит из нескольких файлов (например, презентации лекций), выкладывайте архивом. Данный материал будет показан в первом разделе результатов поиска.&#10;&#10;Студенческий - автором материала является студент. Подходит для конспектов, выполненных заданий. Данный материал будет показан во втором разделе результатов поиска.&#10;&#10;Литература - данный материал рекомендован как литература к данному предмету."></div>
 				</div>
 			</div>
 			<div id=additional_info>
 				<div class=info_box_wrapper>
 					<div>Автор:</div>
-					<textarea rows=1 style="resize: none;">Лера Иванова</textarea>
+					<textarea id=input_author rows=1 style="resize: none;"></textarea>
 					<div class=question_mark data-tooltip="Опциональное поле.&#10;&#10;Тот, кто создал данный материал. Для литературы - авторы книги."></div>
 				</div>
 				<div class=info_box_wrapper>
 					<div>Год:</div>
-					<select>
-						<option value="1">2015</option>
+					<select id=input_year>
 					</select>
 					<div class=question_mark data-tooltip="Опциональное поле.&#10;&#10;Год создания материала."></div>
 				</div>
 				<div class=info_box_wrapper>
 					<div>Название:</div>
-					<textarea rows=1 style="resize: none;">Конспект</textarea>
+					<textarea id=input_title rows=1 style="resize: none;"></textarea>
 					<div class=question_mark data-tooltip="Опциональное поле."></div>
 				</div>
 				<div class=info_box_wrapper>
 					<div>Описание:</div>
-					<textarea rows=6 style="resize: none;" placeholder="Если хотите, опишите загружаемый файл..."></textarea>
+					<textarea id=input_description rows=6 style="resize: none;" placeholder="Если хотите, опишите загружаемый файл..."></textarea>
 				</div>
 			</div>
-			<div id=info_file_about>Файл PDF, 86 страниц, размер 34 Мб</div>
+			<div id=info_file_about></div>
 			<div id=info_placeholder></div>
 			<!--<div class=common_button id=add_file_button>Добавить файл</div>-->
 			<div class=common_button id=publish_file_button <!--style="display:none;-->">Опубликовать файл</div>
