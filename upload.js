@@ -84,16 +84,24 @@ function init() {
 }
 
 ui.materials_filter_show_or_hide = function(event, to_do) {
+	var show = function() {
+		ui.materials_filter_box.style.display = '';
+		ui.materials_filter.classList.add("materials_header_filter_darken");
+	};
+	var hide = function() {
+		ui.materials_filter_box.style.display = 'none';
+		ui.materials_filter.classList.remove("materials_header_filter_darken");
+	}
 	if (to_do == "switch") {
 		if (materials_filter_box.style.display == 'none') {
-			materials_filter_box.style.display = '';
+			show();
 		} else {
-			materials_filter_box.style.display = 'none';
+			hide();
 		}
 	} else if (to_do == "hide") {
-			materials_filter_box.style.display = 'none';
+		hide();
 	} else if (to_do == "show") {
-			materials_filter_box.style.display = '';
+		show();
 	}
 }
 
