@@ -74,6 +74,7 @@ function init() {
 	ui.filters.f.addEventListener('change', function(event) {ui.event_filter_selection(event, "f")});
 	ui.filters.s.addEventListener('change', function(event) {ui.event_filter_selection(event, "s")});
 	ui.filters.t.addEventListener('change', function(event) {ui.event_filter_selection(event, "t")});
+	ui.filters.uploaded.addEventListener('change', function(event) {ui.event_filter_selection(event, "uploaded")});
 	ui.update_filter_list("f");
 	ui.update_filter_list("s");
 	ui.update_filter_list("t");
@@ -91,6 +92,8 @@ ui.materials_filter_show_or_hide = function(event, to_do) {
 	var hide = function() {
 		ui.materials_filter_box.style.display = 'none';
 		ui.materials_filter.classList.remove("materials_header_filter_darken");
+		
+		requests.receive_materials(true);
 	}
 	if (to_do == "switch") {
 		if (materials_filter_box.style.display == 'none') {
@@ -149,13 +152,13 @@ ui.get_selected_filter_value = function(letter) {
 ui.event_main_selection = function(event, letter) {
 	if (ui.get_selected_value(letter) == 0) {
 		//если выбрано пустое значение, сбрасываем нижние списки
-		if (letter == "s" || letter == "f") {
-			data.lists.t = {0: ""};
-			ui.update_list("t");
-		};
 		if (letter == "f") {
 			data.lists.s = {0: ""};
 			ui.update_list("s");
+		};
+		if (letter == "s" || letter == "f") {
+			data.lists.t = {0: ""};
+			ui.update_list("t");
 		};
 		return;
 	};
@@ -174,6 +177,12 @@ ui.event_main_selection = function(event, letter) {
 }
 
 ui.event_filter_selection = function(event, letter) {
+	if (letter == "uploaded") {
+		return;
+	};
+	if (letter == "t") {
+		return;
+	};
 	if (ui.get_selected_filter_value(letter) == 0) {
 		//если выбрано пустое значение, сбрасываем нижние списки
 		if (letter == "s" | letter == "f") {
@@ -210,7 +219,7 @@ ui.update_list = function(letter) {
 ui.update_filter_list = function(letter) {
 	var local_list = ui.filters[letter];
 	var local_data = data.filters[letter];
-	ui.fill_select_tag_and_select_if_one_option(local_list, local_data);
+	var selected = ui.fill_select_tag_and_select_if_one_option(local_list, local_data);
 	ui.filters[letter].disabled = false;
 }
 
@@ -250,10 +259,13 @@ ui.fill_select_tag_and_select_if_one_option = function(local_list, local_data) {
 	//если в списке только одно значение, возможно кроме пустого, устанавливаем его
 	if (Object.keys(local_data).length == 1) {
 		local_list.value = local_list.lastElementChild.value;
+		return false;
 	};
 	if (Object.keys(local_data).length == 2 & local_list.firstElementChild.textContent == "") {
 		local_list.value = local_list.lastElementChild.value;
+		return true;
 	};
+	return false;
 }
 
 function get_cookie(name) {
@@ -407,9 +419,17 @@ requests.build_url = function(url, parameters) {
 };
 
 requests.receive_materials = function(show) {
+	var url_params = { };
+	url_params["f"] = ui.get_selected_filter_value("f");
+	url_params["s"] = ui.get_selected_filter_value("s");
+	url_params["t"] = ui.get_selected_filter_value("t");
+	url_params["uploaded"] = ui.get_selected_filter_value("uploaded");
+	
 	if (requests.query_get_materials != null) requests.query_get_materials.abort();
 	requests.query_get_materials = new XMLHttpRequest();
-	requests.query_get_materials.open("GET", "/uploadGetMaterials.php", true);
+	
+	var _url = requests.build_url("/uploadGetMaterials.php", url_params);
+	requests.query_get_materials.open("GET", _url, true);
 	requests.query_get_materials.onload = function() {
 		data.materials = JSON.parse(requests.query_get_materials.responseText);
 		if (show) {
@@ -426,8 +446,10 @@ requests.get_list = function(target, f_id, s_id, t_id, function_params) {
 	if (f_id != undefined) url_params["f"] = f_id;
 	if (s_id != undefined) url_params["s"] = s_id;
 	if (t_id != undefined) url_params["t"] = t_id;
+	
 	if (requests.queries_lists[target] != null) requests.queries_lists[target].abort();
 	requests.queries_lists[target] = new XMLHttpRequest();
+	
 	var _url = requests.build_url("/get.php", url_params);
 	requests.queries_lists[target].open("GET", _url, true);
 	requests.queries_lists[target].onload = function() {
@@ -445,8 +467,10 @@ requests.get_filter_list = function(target, f_id, s_id, t_id, function_params) {
 	if (f_id != undefined) url_params["f"] = f_id;
 	if (s_id != undefined) url_params["s"] = s_id;
 	if (t_id != undefined) url_params["t"] = t_id;
+	
 	if (requests.queries_filters[target] != null) requests.queries_filters[target].abort();
 	requests.queries_filters[target] = new XMLHttpRequest();
+	
 	var _url = requests.build_url("/get.php", url_params);
 	requests.queries_filters[target].open("GET", _url, true);
 	requests.queries_filters[target].onload = function() {
