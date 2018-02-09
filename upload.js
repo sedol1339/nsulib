@@ -13,9 +13,9 @@ var ui = {
 		s: document.getElementById('input_s'),
 		t: document.getElementById('input_t'),
 		type: document.getElementById('input_type'),
+		title: document.getElementById('input_title'),
 		author: document.getElementById('input_author'),
 		year: document.getElementById('input_year'),
-		title: document.getElementById('input_title'),
 		description: document.getElementById('input_description'),
 	},
 	file_about: document.getElementById('info_file_about'),
@@ -52,14 +52,23 @@ function init() {
 	ui.update_list("t");
 	requests.get_list("f", undefined, undefined, undefined, { update_ui: true } );
 	ui.fill_additional_lists();
+	requests.receive_materials();
+	
 }
 
 ui.file_selected = function() {
 	var file = ui.input.file.files[0];
 	var text_area = ui.file_about;
-	var text_type = file.name.split('.').pop();
-	var text_size = humanFileSize(file.size, true);
-	text_area.innerHTML = "Файл " + text_type + ", размер " + text_size;
+	var lastDotPosition = file.name.lastIndexOf(".");
+	if (lastDotPosition < 1 | lastDotPosition == file.name.length - 1) {
+		var file_name = file.name;
+		var file_ext = file.name;
+	} else {
+		var file_name = file.name.substr(0, lastDotPosition);
+		var file_ext = file.name.substr(lastDotPosition + 1, file.name.length);
+	}
+	text_area.textContent = "Файл " + file_ext + ", размер " + humanFileSize(file.size, true);
+	ui.input.title.value = file_name;
 }
 
 function humanFileSize(bytes, si) {
@@ -79,6 +88,7 @@ function humanFileSize(bytes, si) {
 }
 
 ui.get_selected_value = function(letter) {
+	if (ui.input[letter].selectedIndex == -1) return 0;
 	return ui.input[letter].options[ui.input[letter].selectedIndex].value;
 }
 
@@ -196,25 +206,58 @@ ui.recalculate_css = function(event) {
 }
 
 ui.button_publish_or_edit_click = function(event) {
-	if (requests.query_upload != null) requests.query_upload.abort();
-	requests.query_upload = new XMLHttpRequest();
-	requests.query_upload.open("POST", "uploadScript.php", true);
 	
-	var formData = new FormData();
-	//TODO
-	formData.append('file', ui.selected_file.files[0]);
-	formData.append("someKey", "someValue");
-	requests.query_upload.upload.onprogress = function(event) {
-		console.log( 'Загружено на сервер ' + event.loaded + ' байт из ' + event.total );
-	};
-	requests.query_upload.onload = function(event) {
-		console.log( 'Данные полностью загружены на сервер!' );
-		console.log( 'Ответ: ', requests.query_upload.responseText);
-	};
-	requests.query_upload.onerror = function(event) {
-		console.log( 'Произошла ошибка при загрузке данных на сервер!' );
-	};
-	requests.query_upload.send(formData);
+	var mode = "upload";
+	
+	if (mode == "upload") {	
+	
+		if (ui.input.file.files[0] == null) { window.alert("Не выбран файл"); return; }
+		
+		var blank_fields_exist = false;
+		var error_message = "Не заполнены следующие поля:\n";
+		
+		if (ui.get_selected_value("f") == 0) { blank_fields_exist = true; error_message += "Факультет\n"; }
+		if (ui.get_selected_value("s") == 0) { blank_fields_exist = true; error_message += "Предмет\n"; }
+		if (ui.get_selected_value("t") == 0) { blank_fields_exist = true; error_message += "Преподаватель\n"; }
+		if (ui.get_selected_value("type") == 0) { blank_fields_exist = true; error_message += "Тип\n"; }
+		if (ui.input.title.value.length == 0) { blank_fields_exist = true; error_message += "Название\n"; }
+		
+		if (blank_fields_exist) {
+			window.alert(error_message);
+			return;
+		}
+		
+		//TODO проверка имени файла (на сервере и на клиенте)
+		
+		var formData = new FormData();
+		formData.append('file', ui.input.file.files[0]);
+		formData.append('f', ui.get_selected_value("f"));
+		formData.append('s', ui.get_selected_value("s"));
+		formData.append('t', ui.get_selected_value("t"));
+		formData.append('type', ui.get_selected_value("type"));
+		formData.append('title', ui.input.title.value);
+		
+		formData.append('author', ui.input.author.value);
+		formData.append('year', ui.get_selected_value("year"));
+		formData.append('description', ui.input.description.value);
+		
+		if (requests.query_upload != null) requests.query_upload.abort();
+		requests.query_upload = new XMLHttpRequest();
+		requests.query_upload.open("POST", "uploadScript.php", true);
+		
+		requests.query_upload.upload.onprogress = function(event) {
+			console.log( 'Загружено на сервер ' + event.loaded + ' байт из ' + event.total );
+		};
+		requests.query_upload.onload = function(event) {
+			console.log( 'Данные полностью загружены на сервер!' );
+			console.log( 'Ответ: ', requests.query_upload.responseText);
+		};
+		requests.query_upload.onerror = function(event) {
+			console.log( 'Произошла ошибка при загрузке данных на сервер!' );
+		};
+		requests.query_upload.send(formData);
+		
+	}
 }
 
 ui.button_quit_click = function(event) {
@@ -262,19 +305,15 @@ requests.build_url = function(url, parameters) {
 	return url;
 };
 
-requests.receive_materials = function() {
-	/*data.materials = { };
-	data.materials["3231"] = { "name": "Lektsii_T-2_V_Bondar_1972.djvu", "uploader": "Oleg S", "uploaded": "22.03.2017 5:53PM" };
-	data.materials["4351"] = { "name": "Госэкзамен (2010).pdf", "uploader": "Oleg S", "uploaded": "20.03.2017 11:42PM" };
-	data.materials["5661"] = { "name": "ВЫЧМЕТ. V семестр,  лекции, 2007.pdf", "uploader": "Oleg S", "uploaded": "20.03.2017 9:27PM" };
-	data.materials["4389"] = { "name": "ВЫЧМЕТ. V семестр, вопросы на экзамен", "uploader": "Oleg S", "uploaded": "20.03.2017 9:27PM" };
-	data.materials["5869"] = { "name": "ВЫЧМЕТ. V семестр, задачи на экзамен", "uploader": "Oleg S", "uploaded": "20.03.2017 9:27PM" };
-	data.materials["3654"] = { "name": "Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику", "uploader": "Oleg S", "uploaded": "20.03.2017 9:27PM" };*/
+requests.receive_materials = function(show) {
 	if (requests.query_get_materials != null) requests.query_get_materials.abort();
 	requests.query_get_materials = new XMLHttpRequest();
-	requests.query_get_materials.open("GET", "/uploadScript.php", true);
+	requests.query_get_materials.open("GET", "/uploadGetMaterials.php", true);
 	requests.query_get_materials.onload = function() {
 		data.materials = JSON.parse(requests.query_get_materials.responseText);
+		if (show) {
+			ui.show_materials();
+		}
 	}
 	requests.query_get_materials.send();
 }

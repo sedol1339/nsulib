@@ -74,6 +74,11 @@
 					<select id=input_type></select>
 					<div class=question_mark data-tooltip="Преподавательский - автором материала является преподаватель. Подходит для методичек, презентаций, учебных материалов. Если материал состоит из нескольких файлов (например, презентации лекций), выкладывайте архивом. Данный материал будет показан в первом разделе результатов поиска.&#10;&#10;Студенческий - автором материала является студент. Подходит для конспектов, выполненных заданий. Данный материал будет показан во втором разделе результатов поиска.&#10;&#10;Литература - данный материал рекомендован как литература к данному предмету."></div>
 				</div>
+				<div class=info_box_wrapper>
+					<div>Название:</div>
+					<textarea id=input_title rows=1 style="resize: none;"></textarea>
+					<div class=question_mark data-tooltip="Назовите загружаемый файл."></div>
+				</div>
 			</div>
 			<div id=additional_info>
 				<div class=info_box_wrapper>
@@ -86,11 +91,6 @@
 					<select id=input_year>
 					</select>
 					<div class=question_mark data-tooltip="Опциональное поле.&#10;&#10;Год создания материала."></div>
-				</div>
-				<div class=info_box_wrapper>
-					<div>Название:</div>
-					<textarea id=input_title rows=1 style="resize: none;"></textarea>
-					<div class=question_mark data-tooltip="Опциональное поле."></div>
 				</div>
 				<div class=info_box_wrapper>
 					<div>Описание:</div>
