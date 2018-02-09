@@ -52,7 +52,7 @@ function init() {
 	ui.update_list("t");
 	requests.get_list("f", undefined, undefined, undefined, { update_ui: true } );
 	ui.fill_additional_lists();
-	requests.receive_materials();
+	requests.receive_materials(true);
 	
 }
 
