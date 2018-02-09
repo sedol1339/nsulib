@@ -395,7 +395,7 @@ ui.show_materials = function() {
 		for (var id in data.materials) {
 			var entry = data.materials[id];
 			var new_elem = material_dummy.cloneNode(true);
-			new_elem.children[0].textContent = entry.name;
+			new_elem.children[0].textContent = entry.title;
 			new_elem.children[1].textContent = entry.uploader;
 			new_elem.children[2].textContent = entry.uploaded;
 			new_elem.removeAttribute("id");
