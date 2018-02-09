@@ -79,6 +79,7 @@ main {
 	flex-flow: row nowrap;
 	justify-content: space-between;
 	align-items: center;
+	position:relative;
 }
 #materials_header_text {
 	font-family: "Segoe UI";
@@ -105,6 +106,20 @@ main {
 	content: url("img/filter.png");
 	margin-right: 10px;
 	margin-top: 2px;
+}
+#materials_filter_box {
+	width: 250px;
+	height: auto;
+	position: absolute;
+	top: 100%;
+	right: 0px;
+	border-left: ridge;
+	border-right: ridge;
+	border-bottom: ridge;
+	border-top: 1px solid #CCCCCC;
+	background: white;
+	padding-bottom: 10px;
+	/*transition: height 0.3s ease-in-out;*/
 }
 #materials_table {
 	border-collapse:collapse;

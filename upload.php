@@ -38,6 +38,24 @@
 					<p id=materials_filter_text>Фильтры</p>
 					<div id=materials_filter_image></div>
 				</div>
+				<div id=materials_filter_box style="display:none;">
+					<div class=info_box_wrapper>
+						<div>Факультет:</div>
+						<select id=filter_f></select>
+					</div>
+					<div class=info_box_wrapper>
+						<div>Предмет:</div>
+						<select id=filter_s></select>
+					</div>
+					<div class=info_box_wrapper>
+						<div>Преподав.:</div>
+						<select id=filter_t></select>
+					</div>
+					<div class=info_box_wrapper>
+						<div>Загружено:</div>
+						<select id=filter_uploaded></select>
+					</div>
+				</div>
 			</div>
 			<table id=materials_table>
 				<tr id=dummy_material class=material_entry style="display:none;">
@@ -65,8 +83,7 @@
 				</div>
 				<div class=info_box_wrapper>
 					<div>Преподав.:</div>
-					<select id=input_t>
-					</select>
+					<select id=input_t></select>
 					<div class=question_mark data-tooltip="Укажите преподавателя"></div>
 				</div>
 				<div class=info_box_wrapper>
