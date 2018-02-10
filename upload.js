@@ -71,7 +71,7 @@ function init() {
 	ui.fill_additional_lists();
 	
 	ui.materials_filter.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "switch")});
-	ui.materials_table.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide")});
+	ui.materials_table.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide", true)});
 	ui.materials_filter_button_ok.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide")});
 	
 	ui.filters.f.addEventListener('change', function(event) {ui.event_filter_selection(event, "f")});
@@ -85,7 +85,7 @@ function init() {
 	requests.get_filter_list("f", undefined, undefined, undefined, { update_ui: true, update_ui_custom_function: ui.set_default_filters } );
 }
 
-ui.materials_filter_show_or_hide = function(event, to_do) {
+ui.materials_filter_show_or_hide = function(event, to_do, no_update) {
 	var show = function() {
 		ui.materials_filter_box.style.display = '';
 		ui.materials_filter.classList.add("materials_header_filter_darken");
@@ -94,7 +94,7 @@ ui.materials_filter_show_or_hide = function(event, to_do) {
 		ui.materials_filter_box.style.display = 'none';
 		ui.materials_filter.classList.remove("materials_header_filter_darken");
 		
-		requests.receive_materials(true);
+		if (no_update != true) { requests.receive_materials(true); }
 	}
 	if (to_do == "switch") {
 		if (materials_filter_box.style.display == 'none') {
