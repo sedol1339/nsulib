@@ -33,7 +33,7 @@
 	<main id=main_container> <!-- for js -->
 		<div id=materials>
 			<div id=materials_header>
-				<p id=materials_header_text>Ваши материалы:</p>
+				<p id=materials_header_text>Ваши материалы<span id=materials_amount></span>:</p>
 				<div id=materials_header_filter class=rowwrapper>
 					<p id=materials_filter_text>Фильтры</p>
 					<div id=materials_filter_image></div>
@@ -55,18 +55,28 @@
 						<div>Загружено:</div>
 						<select id=filter_uploaded></select>
 					</div>
+					<div class=info_box_wrapper>
+						<button id=filter_button_ok>OK</button>
+					</div>
 				</div>
 			</div>
-			<table id=materials_table>
-				<tr id=dummy_material class=material_entry style="display:none;">
-					<td>Название</td>
-					<td>Загрузил</td>
-					<td>Дата загрузки</td>
-					<td>удалить</td>
-				</tr>
-				<!--<div style="width:800px;height:100px;background:red;"> </div>-->
-			</table>
+			<div style="overflow-y:scroll;">
+				<table id=materials_table>
+					<tbody>
+						<tr id=dummy_material class=material_entry style="display:none;">
+							<td>Название</td>
+							<td>Загрузил</td>
+							<td>Дата загрузки</td>
+							<td>удалить</td>
+						</tr>
+					</tbody>
+					<!--<div style="width:800px;height:100px;background:red;"> </div>-->
+				</table>
+			</div>
 			<div id=no_materials style="display:none;">Нет материалов</div>
+			<div id=receiving_materials_status style="display:none;">
+				Получение списка материалов<span class="loader_dot">.</span><span class="loader_dot">.</span><span class="loader_dot">.</span>
+			</div>
 		</div>
 		<div id=info>
 			<input id=input_file type="file" name="file">

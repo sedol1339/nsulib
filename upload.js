@@ -7,8 +7,10 @@ var ui = {
 	button_publish_or_edit: document.getElementById('publish_file_button'),
 	button_quit: document.getElementById('quit_button'),
 	materials_table: document.getElementById('materials_table'),
+	materials_table_tbody: document.getElementById('materials_table').getElementsByTagName('tbody')[0],
 	materials_filter: document.getElementById('materials_header_filter'),
 	materials_filter_box: document.getElementById('materials_filter_box'),
+	materials_filter_button_ok: document.getElementById('filter_button_ok'),
 	filters: {
 		f: document.getElementById('filter_f'),
 		s: document.getElementById('filter_s'),
@@ -70,6 +72,7 @@ function init() {
 	
 	ui.materials_filter.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "switch")});
 	ui.materials_table.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide")});
+	ui.materials_filter_button_ok.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide")});
 	
 	ui.filters.f.addEventListener('change', function(event) {ui.event_filter_selection(event, "f")});
 	ui.filters.s.addEventListener('change', function(event) {ui.event_filter_selection(event, "s")});
@@ -78,10 +81,8 @@ function init() {
 	ui.update_filter_list("f");
 	ui.update_filter_list("s");
 	ui.update_filter_list("t");
-	requests.get_filter_list("f", undefined, undefined, undefined, { update_ui: true } );
 	ui.fill_additional_filter_lists();
-	
-	requests.receive_materials(true);
+	requests.get_filter_list("f", undefined, undefined, undefined, { update_ui: true, update_ui_custom_function: ui.set_default_filters } );
 }
 
 ui.materials_filter_show_or_hide = function(event, to_do) {
@@ -221,6 +222,14 @@ ui.update_filter_list = function(letter) {
 	var local_data = data.filters[letter];
 	var selected = ui.fill_select_tag_and_select_if_one_option(local_list, local_data);
 	ui.filters[letter].disabled = false;
+}
+
+ui.set_default_filters = function() {
+	//не трогать, говнокод, собран из палок и земли, при прикосновении ломается
+	ui.filters.uploaded.value = "ALL_TIME";
+	ui.filters.f.value = "1";
+	ui.event_filter_selection(null, "f"); //для обновления списка предметов
+	requests.receive_materials(true);
 }
 
 ui.fill_additional_lists = function() {
@@ -380,7 +389,7 @@ ui.button_quit_click = function(event) {
 ui.show_materials = function() {
 	var material_dummy = document.getElementById('dummy_material');
 	var items_to_remove = [];
-	var entries = ui.materials_table.getElementsByClassName('material_entry');
+	var entries = ui.materials_table_tbody.getElementsByClassName('material_entry');
 	Array.prototype.forEach.call(entries, function(item, i, arr) {
 		if (item != material_dummy) items_to_remove.push(item);
 	});
@@ -392,6 +401,7 @@ ui.show_materials = function() {
 		console.log(1);
 	} else {
 		document.getElementById('no_materials').style.display='none';
+		document.getElementById('materials_amount').textContent = " (" + Object.keys(data.materials).length + ")";
 		for (var id in data.materials) {
 			var entry = data.materials[id];
 			var new_elem = material_dummy.cloneNode(true);
@@ -400,9 +410,10 @@ ui.show_materials = function() {
 			new_elem.children[2].textContent = entry.uploaded;
 			new_elem.removeAttribute("id");
 			new_elem.style.display='';
-			ui.materials_table.appendChild(new_elem);
+			ui.materials_table_tbody.appendChild(new_elem);
 		}
 	}
+	document.getElementById('receiving_materials_status').style.display='none';
 }
 
 requests.build_url = function(url, parameters) {
@@ -419,6 +430,11 @@ requests.build_url = function(url, parameters) {
 };
 
 requests.receive_materials = function(show) {
+	if (show) {
+		document.getElementById('receiving_materials_status').style.display='';
+		document.getElementById('no_materials').style.display='none';
+	}
+	
 	var url_params = { };
 	url_params["f"] = ui.get_selected_filter_value("f");
 	url_params["s"] = ui.get_selected_filter_value("s");
@@ -478,6 +494,9 @@ requests.get_filter_list = function(target, f_id, s_id, t_id, function_params) {
 		data.filters[target][0] = "";
 		if (function_params.update_ui == true) {
 			ui.update_filter_list(target);
+		}
+		if (function_params.update_ui_custom_function != undefined) {
+			function_params.update_ui_custom_function();
 		}
 	}
 	requests.queries_filters[target].send();

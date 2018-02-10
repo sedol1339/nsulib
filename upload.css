@@ -1,9 +1,3 @@
-
-main {
-	flex: 1 0 0px;
-	display: flex;
-	flex-flow: row nowrap;
-}
 #guide_box_wrapper {
 	z-index:2;
 	position:absolute;
@@ -68,7 +62,7 @@ main {
 	flex-flow: column nowrap;
 }
 #info {
-	flex: 0 0 250px;
+	flex: 0 0 300px;
 	display: flex;
 	flex-flow: column nowrap;
 }
@@ -164,7 +158,7 @@ main {
 	max-width:1%;
 	white-space:nowrap;
 }
-#no_materials {
+#no_materials, #receiving_materials_status {
 	height: 50px;
 	text-align: center;
 	vertical-align: middle;
