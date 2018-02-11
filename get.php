@@ -33,33 +33,43 @@
 		if (isset($_GET['s']) && is_numeric($_GET['s'])) { $s = (int) $_GET['s']; } else { $s = 0; }
 		if (isset($_GET['t']) && is_numeric($_GET['t'])) { $t = (int) $_GET['t']; } else { $t = 0; }
 		
+		$uploaded = $_GET['uploaded'];
+		if($uploaded != 'TODAY' && $uploaded != 'THIS_WEEK' && $uploaded != 'ALL_TIME') {
+			$uploaded = 'ALL_TIME';
+		}
+		
 		$results = array();
 		
-		$sql = "SELECT id, faculty, subject, teacher, type, title, author, uploaded, file FROM materials WHERE true";
+		$sql = "SELECT materials.id AS id, faculty, subject, teacher, type, title, uploaded, materials.uploader AS uploader_id, accounts.name AS uploader FROM materials, accounts WHERE materials.uploader=accounts.id";
+		
 		if ($f != 0) { $sql .= " AND faculty = $f"; }
 		if ($s != 0) { $sql .= " AND subject = $s"; }
 		if ($t != 0) { $sql .= " AND teacher = $t"; }
+	
+		if ($uploaded == 'TODAY') { $sql .= " AND uploaded >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)"; }
+		else if ($uploaded == 'THIS_WEEK') { $sql .= " AND uploaded >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"; }
 		
 		if (!$result = $mysqli->query($sql)) {
 			echo "Запрос $sql не удался: (" . $mysqli->errno . ") " . $mysqli->error; exit;
 		} else {
 			while ($row = $result->fetch_assoc()) {
-				/*$a = array();
-				$a["id"] = $row["id"];
-				$a["faculty"] = $row["faculty"];
+				$a = array();
+				/*$a["faculty"] = $row["faculty"];
 				$a["subject"] = $row["subject"];
 				$a["teacher"] = $row["teacher"];
 				$a["type"] = $row["type"];
 				$a["name"] = $row["title"];
 				$a["author"] = $row["author"];
 				$a["date"] = $row["uploaded"];
-				array_push($results, $a);*/
-				$a = array();
+				$a["file"] = $row["file"];*/
 				$a["faculty"] = $row["faculty"];
 				$a["subject"] = $row["subject"];
 				$a["teacher"] = $row["teacher"];
 				$a["type"] = $row["type"];
-				$a["name"] = $row["title"];
+				$a["title"] = $row["title"];
+				$a["uploaded"] = $row["uploaded"];
+				$a["uploader_id"] = $row["uploader_id"];
+				$a["uploader"] = $row["uploader"];
 				$a["author"] = $row["author"];
 				$a["date"] = $row["uploaded"];
 				$a["file"] = $row["file"];

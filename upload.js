@@ -435,7 +435,7 @@ requests.receive_materials = function(show) {
 		document.getElementById('no_materials').style.display='none';
 	}
 	
-	var url_params = { };
+	var url_params = { "action": "materials" };
 	url_params["f"] = ui.get_selected_filter_value("f");
 	url_params["s"] = ui.get_selected_filter_value("s");
 	url_params["t"] = ui.get_selected_filter_value("t");
@@ -444,7 +444,7 @@ requests.receive_materials = function(show) {
 	if (requests.query_get_materials != null) requests.query_get_materials.abort();
 	requests.query_get_materials = new XMLHttpRequest();
 	
-	var _url = requests.build_url("/uploadGetMaterials.php", url_params);
+	var _url = requests.build_url("/get.php", url_params);
 	requests.query_get_materials.open("GET", _url, true);
 	requests.query_get_materials.onload = function() {
 		data.materials = JSON.parse(requests.query_get_materials.responseText);

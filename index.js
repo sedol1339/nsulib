@@ -258,14 +258,14 @@ ui.results_update = function() {
 				var new_elem = literature_dummy.cloneNode(true);
 				new_elem.removeAttribute("id");
 				new_elem.setAttribute('data-id', id);
-				new_elem.getElementsByClassName('result_literature_text')[0].textContent = item.name;
+				new_elem.getElementsByClassName('result_literature_text')[0].textContent = item.title;
 				new_elem.style.display='';
 				box.insertBefore(new_elem, infobox);
 			} else {
 				var new_elem = noliterature_dummy.cloneNode(true);
 				new_elem.removeAttribute("id");
 				new_elem.setAttribute('data-id', id);
-				new_elem.getElementsByClassName('result_noliterature_text')[0].textContent = item.name;
+				new_elem.getElementsByClassName('result_noliterature_text')[0].textContent = item.title;
 				new_elem.style.display='';
 				var image = new_elem.getElementsByTagName('img')[0];
 				if (item.type.startsWith("TEACHER")) {
@@ -318,7 +318,7 @@ ui.update = function(f_id, f_name, s_id, s_name, t_id, t_name) {
 ui.update_page_title = function() {
 	var name = "";
 	if (ui.selected_result > 0 && requests.result_array[ui.selected_result] != null) {
-		name = requests.result_array[ui.selected_result].name;
+		name = requests.result_array[ui.selected_result].title;
 	} else if (ui.button.t.getAttribute('data-id') > 0
 			&& ui.button.t.getAttribute('data-name') != null) {
 		name = ui.button.t.getAttribute('data-name');
