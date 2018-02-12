@@ -58,6 +58,16 @@
 						<div>Загружено:</div>
 						<select id=filter_uploaded></select>
 					</div>
+					<div class="info_box_wrapper materials_filter_box_separator">
+						Отображаемые столбцы:
+					</div>
+					<div id=materials_filter_checkbox_box>
+						<div><span>Факультет</span><input type="checkbox"></div>
+						<div><span>Загрузил</span><input type="checkbox"></div>
+						<div><span>Предмет</span><input type="checkbox"></div>
+						<div><span>Загружено</span><input type="checkbox"></div>
+						<div><span>Препод.</span><input type="checkbox"></div>
+					</div>
 					<div class=info_box_wrapper>
 						<button id=filter_button_ok>OK</button>
 					</div>

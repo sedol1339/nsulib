@@ -120,6 +120,31 @@ main {
 	padding: 5px 5px 15px 5px;
 	/*transition: height 0.3s ease-in-out;*/
 }
+.materials_filter_box_separator {
+	border-top: 1px solid #CCCCCC;
+	font-size: 10pt;
+	padding-top: 10px;
+}
+#materials_filter_checkbox_box {
+	flex: 0 0 auto;
+	display: flex;
+	flex-flow: row wrap;
+	align-items: baseline;
+	margin: 10px 10px 0px 10px;
+}
+#materials_filter_checkbox_box div {
+	flex: 0 0 50%;
+	line-height: 25px;
+}
+#materials_filter_checkbox_box div input {
+    position: relative;
+	top: 3px;
+	left: 5px;
+}
+#materials_filter_checkbox_box div span {
+	display: inline-block;
+    width: 55px;
+}
 #materials_table {
 	border-collapse:collapse;
 	width: 100%;
