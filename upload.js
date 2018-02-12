@@ -7,7 +7,7 @@ var ui = {
 	button_publish_or_edit: document.getElementById('publish_file_button'),
 	button_quit: document.getElementById('quit_button'),
 	materials_table: document.getElementById('materials_table'),
-	materials_table_tbody: document.getElementById('materials_table').getElementsByTagName('tbody')[0],
+	//materials_table_tbody: document.getElementById('materials_table').getElementsByTagName('tbody')[0],
 	materials_filter: document.getElementById('materials_header_filter'),
 	materials_filter_box: document.getElementById('materials_filter_box'),
 	materials_filter_button_ok: document.getElementById('filter_button_ok'),
@@ -33,6 +33,9 @@ var ui = {
 
 var data = {
 	materials: { },
+	full_lists: {
+		f:{0: ""}, s:{0: ""}, t:{0: ""}
+	},
 	filters: {
 		f:{0: ""}, s:{0: ""}, t:{0: ""}, uploaded:{"TODAY": "Сегодня", "THIS_WEEK": "За последнюю неделю", "ALL_TIME": "За все время"},
 	},
@@ -71,7 +74,7 @@ function init() {
 	ui.fill_additional_lists();
 	
 	ui.materials_filter.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "switch")});
-	ui.materials_table.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide", true)});
+	//ui.materials_table.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide", true)});
 	ui.materials_filter_button_ok.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide")});
 	
 	ui.filters.f.addEventListener('change', function(event) {ui.event_filter_selection(event, "f")});
@@ -83,6 +86,8 @@ function init() {
 	ui.update_filter_list("t");
 	ui.fill_additional_filter_lists();
 	requests.get_filter_list("f", undefined, undefined, undefined, { update_ui: true, update_ui_custom_function: ui.set_default_filters } );
+	
+	requests.get_full_lists();
 }
 
 ui.materials_filter_show_or_hide = function(event, to_do, no_update) {
@@ -387,7 +392,7 @@ ui.button_quit_click = function(event) {
 }
 
 ui.show_materials = function() {
-	var material_dummy = document.getElementById('dummy_material');
+	/*var material_dummy = document.getElementById('dummy_material');
 	var items_to_remove = [];
 	var entries = ui.materials_table_tbody.getElementsByClassName('material_entry');
 	Array.prototype.forEach.call(entries, function(item, i, arr) {
@@ -398,7 +403,6 @@ ui.show_materials = function() {
 	});
 	if (Object.keys(data.materials).length === 0) {
 		document.getElementById('no_materials').style.display='';
-		console.log(1);
 	} else {
 		document.getElementById('no_materials').style.display='none';
 		document.getElementById('materials_amount').textContent = " (" + Object.keys(data.materials).length + ")";
@@ -411,6 +415,74 @@ ui.show_materials = function() {
 			new_elem.removeAttribute("id");
 			new_elem.style.display='';
 			ui.materials_table_tbody.appendChild(new_elem);
+		}
+	}*/
+	var box = document.getElementById("materials_grid");
+		box.style.display='';
+	while (box.firstChild) {
+		box.removeChild(box.firstChild);
+	}
+	if (Object.keys(data.materials).length === 0) {
+		document.getElementById('no_materials').style.display='';
+		box.style.display='none';
+	} else {
+		document.getElementById('no_materials').style.display='none';
+		document.getElementById('materials_amount').textContent = " (" + Object.keys(data.materials).length + ")";
+		var row_number = 1;
+		for (var id in data.materials) {
+			var entry = data.materials[id];
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.style["grid-row"] = row_number;
+			div.style["grid-column"] = "title";
+			div.textContent = entry.title;
+			box.appendChild(div);
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.style["grid-row"] = row_number;
+			div.style["grid-column"] = "f";
+			div.textContent = data.full_lists.f[entry.faculty];
+			box.appendChild(div);
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.style["grid-row"] = row_number;
+			div.style["grid-column"] = "s";
+			div.textContent = data.full_lists.s[entry.subject];
+			box.appendChild(div);
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.style["grid-row"] = row_number;
+			div.style["grid-column"] = "t";
+			div.textContent = data.full_lists.t[entry.teacher];
+			box.appendChild(div);
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.style["grid-row"] = row_number;
+			div.style["grid-column"] = "uploader";
+			div.textContent = entry.uploader;
+			box.appendChild(div);
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.style["grid-row"] = row_number;
+			div.style["grid-column"] = "uploaded";
+			div.textContent = entry.uploaded;
+			box.appendChild(div);
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.classList.add("delete_button_faint");
+			div.style["grid-row"] = row_number;
+			div.style["grid-column"] = "delete";
+			div.textContent = "удалить";
+			box.appendChild(div);
+			
+			row_number++;
 		}
 	}
 	document.getElementById('receiving_materials_status').style.display='none';
@@ -456,6 +528,24 @@ requests.receive_materials = function(show) {
 }
 
 //TODO убрать повторение кода
+
+requests.get_full_lists = function() {
+	var get_full_list = function(letter) {
+		var url_params = { "action": "list", "target": letter };
+		
+		var request = new XMLHttpRequest();
+		
+		var _url = requests.build_url("/get.php", url_params);
+		request.open("GET", _url, true);
+		request.onload = function() {
+			data.full_lists[letter] = JSON.parse(request.responseText);
+		}
+		request.send();
+	};
+	get_full_list("f");
+	get_full_list("s");
+	get_full_list("t");
+}
 
 requests.get_list = function(target, f_id, s_id, t_id, function_params) {
 	var url_params = { "action": "list", "target": target };

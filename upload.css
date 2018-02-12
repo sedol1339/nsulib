@@ -239,3 +239,34 @@ main {
 	opacity: 1;
 	visibility: visible;
 }
+
+
+#materials_grid, #materials_grid_header {
+	display:grid;
+	grid-template-rows: repeat(auto-fill, 30px);
+	grid-template-columns: [title] minmax(0%, 3fr) [f] minmax(0%, 0.8fr) [s] minmax(0%, 0.8fr) [t] minmax(0%, 0.8fr) [uploader] minmax(0%, 0.8fr) [uploaded] minmax(0%, 1fr) [delete] minmax(0%, 0.6fr);
+}
+#materials_grid_header {
+	background:#F0F0F0;
+	font-weight:bold;
+}
+#materials_grid {
+	overflow-y: scroll;
+}
+#materials_grid::-webkit-scrollbar { /*TODO найти другое решение*/
+    display: none;
+}
+.grid_item {
+	line-height: 30px;
+	padding: 0px 7px 0px 7px;
+	text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.delete_button_faint {
+	color: #444;
+}
+.delete_button_faint:hover {
+	color: #000;
+	cursor:pointer;
+}
