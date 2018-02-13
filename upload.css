@@ -145,44 +145,6 @@ main {
 	display: inline-block;
     width: 55px;
 }
-#materials_table {
-	border-collapse:collapse;
-	width: 100%;
-}
-#materials_table tr {
-	border-bottom: 1px solid #CCC;
-	height: 30px;
-}
-#materials_table tr:hover {
-	background:#EEE;
-}
-#materials_table tr td {
-	padding: 4px 20px 4px 20px;
-	cursor: pointer;
-}
-#materials_table tr td:nth-child(1) {
-	font-size: 10pt;
-    overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	max-width: 100px; /* TODO исправить таблицу */
-}
-#materials_table tr td:nth-child(2) {
-	font-size: 8pt;
-	max-width:1%;
-	white-space: nowrap;
-}
-#materials_table tr td:nth-child(3) {
-	font-size: 8pt;
-	max-width:1%;
-	white-space:nowrap;
-}
-#materials_table tr td:nth-child(4) {
-	font-size: 8pt;
-	color: #777;
-	max-width:1%;
-	white-space:nowrap;
-}
 #no_materials, #receiving_materials_status {
 	height: 50px;
 	text-align: center;
@@ -266,10 +228,19 @@ main {
 }
 
 
+html {
+	--width_title: 3fr;
+	--width_f: 0.8fr;
+	--width_s: 0.8fr;
+	--width_t: 0.8fr;
+	--width_uploader: 0.8fr;
+	--width_uploaded: 1fr;
+	--width_delete: 0.6fr;	
+}
 #materials_grid, #materials_grid_header {
 	display:grid;
 	grid-template-rows: repeat(auto-fill, 30px);
-	grid-template-columns: [title] minmax(0%, 3fr) [f] minmax(0%, 0.8fr) [s] minmax(0%, 0.8fr) [t] minmax(0%, 0.8fr) [uploader] minmax(0%, 0.8fr) [uploaded] minmax(0%, 1fr) [delete] minmax(0%, 0.6fr);
+	grid-template-columns: [title] minmax(0%, var(--width_title)) [f] minmax(0%, var(--width_f)) [s] minmax(0%, var(--width_s)) [t] minmax(0%, var(--width_t)) [uploader] minmax(0%, var(--width_uploader)) [uploaded] minmax(0%, var(--width_uploaded)) [delete] minmax(0%, var(--width_delete));
 }
 #materials_grid_header {
 	background:#F0F0F0;

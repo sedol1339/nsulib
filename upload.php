@@ -58,35 +58,21 @@
 						<div>Загружено:</div>
 						<select id=filter_uploaded></select>
 					</div>
-					<div class="info_box_wrapper materials_filter_box_separator">
+					<!--<div class="info_box_wrapper materials_filter_box_separator">
 						Отображаемые столбцы:
 					</div>
 					<div id=materials_filter_checkbox_box>
-						<div><span>Факультет</span><input type="checkbox"></div>
-						<div><span>Загрузил</span><input type="checkbox"></div>
-						<div><span>Предмет</span><input type="checkbox"></div>
-						<div><span>Загружено</span><input type="checkbox"></div>
-						<div><span>Препод.</span><input type="checkbox"></div>
-					</div>
+						<div><span>Факультет</span><input id=filter_column_f type="checkbox"></div>
+						<div><span>Загрузил</span><input id=filter_column_uploader type="checkbox"></div>
+						<div><span>Предмет</span><input id=filter_column_s type="checkbox"></div>
+						<div><span>Загружено</span><input id=filter_column_uploaded type="checkbox"></div>
+						<div><span>Препод.</span><input id=filter_column_t type="checkbox"></div>
+					</div>-->
 					<div class=info_box_wrapper>
 						<button id=filter_button_ok>OK</button>
 					</div>
 				</div>
 			</div>
-			<!-- ТАБЛИЦА -->
-			<!--<div style="overflow-y:scroll;">
-				<table id=materials_table>
-					<tbody>
-						<tr id=dummy_material class=material_entry style="display:none;">
-							<td>Название</td>
-							<td>Загрузил</td>
-							<td>Дата загрузки</td>
-							<td>удалить</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>-->
-			<!-- GRID -->
 			<div id=materials_grid_header>
 				<div class=grid_item style="grid-row:1;grid-column:title">Название</div>
 				<div class=grid_item style="grid-row:1;grid-column:f">Факультет</div>
@@ -97,100 +83,6 @@
 				<div class=grid_item style="grid-row:1;grid-column:delete">Настройки</div>
 			</div>
 			<div id=materials_grid style="display:none">
-				<!--<div class=grid_item style="grid-row:1;grid-column:title">Визуализация графов[R-T_HV_Ch1_Ch2_Sep]_АнисютинаДиана_0201 Lorem ipsum dolor sit amet, consectetur adipiscing elit.pdf</div>
-				<div class=grid_item style="grid-row:1;grid-column:f">ФИТ</div>
-				<div class=grid_item style="grid-row:1;grid-column:s">Визуализация графов</div>
-				<div class=grid_item style="grid-row:1;grid-column:t">Апанович З. В.</div>
-				<div class=grid_item style="grid-row:1;grid-column:uploader">Oleg Sedukhin</div>
-				<div class=grid_item style="grid-row:1;grid-column:uploaded">22.03.2017 5:52PM</div>
-				<div class=grid_item style="grid-row:1;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:2;grid-column:title">Lektsii_T-2_V_Bondar_1972.djvu</div>
-				<div class=grid_item style="grid-row:2;grid-column:f">МехМат</div>
-				<div class=grid_item style="grid-row:2;grid-column:s">Механика</div>
-				<div class=grid_item style="grid-row:2;grid-column:t">Бондарь А. Е.</div>
-				<div class=grid_item style="grid-row:2;grid-column:uploader">Oleg Sedukhin</div>
-				<div class=grid_item style="grid-row:2;grid-column:uploaded">22.03.2017 5:53PM</div>
-				<div class=grid_item style="grid-row:2;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:3;grid-column:title">Госэкзамен (2010).pdf</div>
-				<div class=grid_item style="grid-row:3;grid-column:uploader">Oleg Sedukhin</div>
-				<div class=grid_item style="grid-row:3;grid-column:uploaded">20.03.2017 11:42PM</div>
-				<div class=grid_item style="grid-row:3;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:4;grid-column:title">ВЫЧМЕТ. V семестр,  лекции, 2007.pdf</div>
-				<div class=grid_item style="grid-row:4;grid-column:uploader">Oleg Sedukhin</div>
-				<div class=grid_item style="grid-row:4;grid-column:uploaded">20.03.2017 9:27PM</div>
-				<div class=grid_item style="grid-row:4;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:5;grid-column:title">ВЫЧМЕТ. V семестр, вопросы на экзамен</div>
-				<div class=grid_item style="grid-row:5;grid-column:uploader">Oleg Sedukhin</div>
-				<div class=grid_item style="grid-row:5;grid-column:uploaded">20.03.2017 9:27PM</div>
-				<div class=grid_item style="grid-row:5;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:6;grid-column:title">ВЫЧМЕТ. V семестр, задачи на экзамен</div>
-				<div class=grid_item style="grid-row:6;grid-column:uploader">Oleg Sedukhin</div>
-				<div class=grid_item style="grid-row:6;grid-column:uploaded">20.03.2017 9:27PM</div>
-				<div class=grid_item style="grid-row:6;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:7;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:7;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:7;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:7;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:8;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:8;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:8;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:8;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:9;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:9;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:9;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:9;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:10;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:10;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:10;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:10;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:11;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:11;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:11;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:11;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:12;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:12;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:12;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:12;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:13;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:13;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:13;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:13;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:14;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:14;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:14;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:14;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:15;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:15;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:15;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:15;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:16;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:16;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:16;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:16;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:17;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:17;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:17;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:17;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:18;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:18;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:18;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:18;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:19;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:19;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:19;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:19;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:20;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:20;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:20;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:20;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:21;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:21;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:21;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:21;grid-column:delete">удалить</div>
-				<div class=grid_item style="grid-row:22;grid-column:title">Колмогоров А. Н. Драгалин А. Г. - Введение в математическую логику</div>
-				<div class=grid_item style="grid-row:22;grid-column:uploader">Andrey Ryabov</div>
-				<div class=grid_item style="grid-row:22;grid-column:uploaded">20.04.2017 3:03AM</div>
-				<div class=grid_item style="grid-row:22;grid-column:delete">удалить</div>-->
 			</div>
 			<div id=no_materials style="display:none;">Нет материалов</div>
 			<div id=receiving_materials_status style="display:none;">
@@ -245,7 +137,6 @@
 			</div>
 			<div id=info_file_about></div>
 			<div id=info_placeholder></div>
-			<!--<div class=common_button id=add_file_button>Добавить файл</div>-->
 			<div class=common_button id=publish_file_button <!--style="display:none;-->">Опубликовать файл</div>
 			<div class=common_button id=quit_button>Выйти в главное меню</div>
 		</div>

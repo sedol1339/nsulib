@@ -7,7 +7,6 @@ var ui = {
 	button_publish_or_edit: document.getElementById('publish_file_button'),
 	button_quit: document.getElementById('quit_button'),
 	materials_table: document.getElementById('materials_table'),
-	//materials_table_tbody: document.getElementById('materials_table').getElementsByTagName('tbody')[0],
 	materials_filter: document.getElementById('materials_header_filter'),
 	materials_filter_box: document.getElementById('materials_filter_box'),
 	materials_filter_button_ok: document.getElementById('filter_button_ok'),
@@ -29,6 +28,22 @@ var ui = {
 		description: document.getElementById('input_description'),
 	},
 	file_about: document.getElementById('info_file_about'),
+	/*filter_column: {
+		f: document.getElementById('filter_column_f'),
+		s: document.getElementById('filter_column_s'),
+		t: document.getElementById('filter_column_t'),
+		uploader: document.getElementById('filter_column_uploader'),
+		uploaded: document.getElementById('filter_column_uploaded'),
+	},
+	grid_columns: {
+		width_title: "3fr",
+		width_f: "0.8fr",
+		width_s: "0.8fr",
+		width_t: "0.8fr",
+		width_uploader: "0.8fr",
+		width_uploaded: "1fr",
+		width_delete: "0.6fr",
+	},*/
 }
 
 var data = {
@@ -392,36 +407,19 @@ ui.button_quit_click = function(event) {
 }
 
 ui.show_materials = function() {
-	/*var material_dummy = document.getElementById('dummy_material');
-	var items_to_remove = [];
-	var entries = ui.materials_table_tbody.getElementsByClassName('material_entry');
-	Array.prototype.forEach.call(entries, function(item, i, arr) {
-		if (item != material_dummy) items_to_remove.push(item);
-	});
-	items_to_remove.forEach(function(item, i, arr) {
-		item.remove();
-	});
-	if (Object.keys(data.materials).length === 0) {
-		document.getElementById('no_materials').style.display='';
-	} else {
-		document.getElementById('no_materials').style.display='none';
-		document.getElementById('materials_amount').textContent = " (" + Object.keys(data.materials).length + ")";
-		for (var id in data.materials) {
-			var entry = data.materials[id];
-			var new_elem = material_dummy.cloneNode(true);
-			new_elem.children[0].textContent = entry.title;
-			new_elem.children[1].textContent = entry.uploader;
-			new_elem.children[2].textContent = entry.uploaded;
-			new_elem.removeAttribute("id");
-			new_elem.style.display='';
-			ui.materials_table_tbody.appendChild(new_elem);
-		}
-	}*/
 	var box = document.getElementById("materials_grid");
 		box.style.display='';
 	while (box.firstChild) {
 		box.removeChild(box.firstChild);
 	}
+	
+	/*var html = document.getElementsByTagName('html')[0];
+	html.style.setProperty("--width_f", ui.grid_columns.width_f ? ui.filter_column.f.checked : "0fr");
+	html.style.setProperty("--width_s", ui.grid_columns.width_s ? ui.filter_column.s.checked : "0fr");
+	html.style.setProperty("--width_t", ui.grid_columns.width_t ? ui.filter_column.t.checked : "0fr");
+	html.style.setProperty("--width_uploader", ui.grid_columns.width_uploader ? ui.filter_column.uploader.checked : "0fr");
+	html.style.setProperty("--width_uploaded", ui.grid_columns.width_uploaded ? ui.filter_column.uploaded.checked : "0fr");*/
+	
 	if (Object.keys(data.materials).length === 0) {
 		document.getElementById('no_materials').style.display='';
 		box.style.display='none';
@@ -439,40 +437,50 @@ ui.show_materials = function() {
 			div.textContent = entry.title;
 			box.appendChild(div);
 			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.style["grid-row"] = row_number;
-			div.style["grid-column"] = "f";
-			div.textContent = data.full_lists.f[entry.faculty];
-			box.appendChild(div);
+			//if (ui.filter_column.f.checked) {
+				var div = document.createElement('div');
+				div.classList.add("grid_item");
+				div.style["grid-row"] = row_number;
+				div.style["grid-column"] = "f";
+				div.textContent = data.full_lists.f[entry.faculty];
+				box.appendChild(div);
+			//}
 			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.style["grid-row"] = row_number;
-			div.style["grid-column"] = "s";
-			div.textContent = data.full_lists.s[entry.subject];
-			box.appendChild(div);
+			//if (ui.filter_column.s.checked) {
+				var div = document.createElement('div');
+				div.classList.add("grid_item");
+				div.style["grid-row"] = row_number;
+				div.style["grid-column"] = "s";
+				div.textContent = data.full_lists.s[entry.subject];
+				box.appendChild(div);
+			//}
 			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.style["grid-row"] = row_number;
-			div.style["grid-column"] = "t";
-			div.textContent = data.full_lists.t[entry.teacher];
-			box.appendChild(div);
+			//if (ui.filter_column.t.checked) {
+				var div = document.createElement('div');
+				div.classList.add("grid_item");
+				div.style["grid-row"] = row_number;
+				div.style["grid-column"] = "t";
+				div.textContent = data.full_lists.t[entry.teacher];
+				box.appendChild(div);
+			//}
 			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.style["grid-row"] = row_number;
-			div.style["grid-column"] = "uploader";
-			div.textContent = entry.uploader;
-			box.appendChild(div);
+			//if (ui.filter_column.uploader.checked) {
+				var div = document.createElement('div');
+				div.classList.add("grid_item");
+				div.style["grid-row"] = row_number;
+				div.style["grid-column"] = "uploader";
+				div.textContent = entry.uploader;
+				box.appendChild(div);
+			//}
 			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.style["grid-row"] = row_number;
-			div.style["grid-column"] = "uploaded";
-			div.textContent = entry.uploaded;
-			box.appendChild(div);
+			//if (ui.filter_column.uploaded.checked) {
+				var div = document.createElement('div');
+				div.classList.add("grid_item");
+				div.style["grid-row"] = row_number;
+				div.style["grid-column"] = "uploaded";
+				div.textContent = entry.uploaded;
+				box.appendChild(div);
+			//}
 			
 			var div = document.createElement('div');
 			div.classList.add("grid_item");
