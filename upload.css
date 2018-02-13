@@ -227,7 +227,6 @@ main {
 	visibility: visible;
 }
 
-
 html {
 	--width_title: 3fr;
 	--width_f: 0.8fr;
@@ -245,11 +244,22 @@ html {
 #materials_grid_header {
 	background:#F0F0F0;
 	font-weight:bold;
+	flex: 0 0 auto;
+}
+#materials_upload_grid {
+	display:grid;
+	grid-template-rows: 30px;
+	border-bottom: 3px solid #DDD;
+	overflow-y: scroll;
+	grid-template-columns: [title] minmax(0%, var(--width_title)) [status_start] minmax(0%, var(--width_f)) [] minmax(0%, var(--width_s)) [] minmax(0%, var(--width_t)) [] minmax(0%, var(--width_uploader)) [status_end] minmax(0%, var(--width_uploaded)) [delete] minmax(0%, var(--width_delete));
+	flex: 1 0 auto;
+	max-height: 180px;
 }
 #materials_grid {
 	overflow-y: scroll;
+	flex: 0 1 100%;
 }
-#materials_grid::-webkit-scrollbar { /*TODO найти другое решение*/
+#materials_grid::-webkit-scrollbar, #materials_upload_grid::-webkit-scrollbar { /*TODO найти другое решение*/
     display: none;
 }
 .grid_item {

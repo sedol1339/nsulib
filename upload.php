@@ -80,14 +80,14 @@
 				<div class="grid_item clickable" id=sort_t style="grid-row:1;grid-column:t">Препод.</div>
 				<div class="grid_item clickable" id=sort_uploader style="grid-row:1;grid-column:uploader">Загрузил</div>
 				<div class="grid_item clickable" id=sort_uploaded style="grid-row:1;grid-column:uploaded">Загружено</div>
-				<div class=grid_item style="grid-row:1;grid-column:delete">Настройки</div>
+				<div class=grid_item style="grid-row:1;grid-column:delete"></div>
 			</div>
-			<div id=materials_grid style="display:none">
-			</div>
+			<div id=materials_upload_grid style="display:none"></div>
 			<div id=no_materials style="display:none;">Нет материалов</div>
 			<div id=receiving_materials_status style="display:none;">
 				Получение списка материалов<span class="loader_dot">.</span><span class="loader_dot">.</span><span class="loader_dot">.</span>
 			</div>
+			<div id=materials_grid></div>
 		</div>
 		<div id=info>
 			<input id=input_file type="file" name="file">

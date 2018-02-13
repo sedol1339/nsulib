@@ -6,7 +6,6 @@ var ui = {
 	dummy: document.getElementById('dummy'),
 	button_publish_or_edit: document.getElementById('publish_file_button'),
 	button_quit: document.getElementById('quit_button'),
-	materials_table: document.getElementById('materials_table'),
 	materials_filter: document.getElementById('materials_header_filter'),
 	materials_filter_box: document.getElementById('materials_filter_box'),
 	materials_filter_button_ok: document.getElementById('filter_button_ok'),
@@ -28,6 +27,8 @@ var ui = {
 		description: document.getElementById('input_description'),
 	},
 	file_about: document.getElementById('info_file_about'),
+	upload_grid: document.getElementById("materials_upload_grid"),
+	grid: document.getElementById("materials_grid"),
 	/*filter_column: {
 		f: document.getElementById('filter_column_f'),
 		s: document.getElementById('filter_column_s'),
@@ -65,6 +66,7 @@ var data = {
 	lists: {
 		f:{0: ""}, s:{0: ""}, t:{0: ""}, type:{"TEACHER": "Учебный материал", "STUDENT": "Конспект", "LITERATURE": "Литература"},
 	},
+	uploading: new Set(), //каждый объект хранит ссылку на элемент, а также процент или результат загрузки файла
 }
 
 var requests = { //functions and variables about xml-http-requests
@@ -117,7 +119,71 @@ function init() {
 	ui.sort.uploader.addEventListener('click', function(event) {ui.show_materials("uploader")});
 	ui.sort.uploaded.addEventListener('click', function(event) {ui.show_materials("uploaded")});
 	
+	ui.grid.addEventListener('mouseleave', ui.grid_onmouseleave);
+	
 	requests.get_full_lists();
+	
+	data.uploading.add({"title": "Test upload", "total": 1231231, "uploaded": 1003423});
+	data.uploading.add({"title": "Another test upload", "total": 6455, "uploaded": 0, "result": "Файл слишком велик"});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	ui.update_upload_grid();
+}
+
+ui.update_upload_grid = function() {
+	data.uploading.forEach(function(entry, _, set) {
+		if (entry.elem == null) {
+			if (ui.upload_grid.lastElementChild) {
+				var row = +ui.upload_grid.lastElementChild.style["grid-row-start"] + 1;
+			} else {
+				ui.upload_grid.style.display = '';
+				var row = 1;
+			}
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.style["grid-row"] = row;
+			div.style["grid-column"] = "title";
+			var span = document.createElement('span');
+			span.title = span.textContent = entry.title;
+			div.appendChild(span);
+			ui.upload_grid.appendChild(div);
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.classList.add("delete_button_faint");
+			div.style["grid-row"] = row;
+			div.style["grid-column"] = "delete";
+			var span = document.createElement('span');
+			span.title = span.textContent = "отмена";
+			div.appendChild(span);
+			ui.upload_grid.appendChild(div);
+		}
+	});
 }
 
 ui.materials_filter_show_or_hide = function(event, to_do, no_update) {
@@ -422,7 +488,7 @@ ui.button_quit_click = function(event) {
 }
 
 ui.show_materials = function(sort) {
-	var box = document.getElementById("materials_grid");
+	var box = ui.grid;
 		box.style.display='';
 	while (box.firstChild) {
 		box.removeChild(box.firstChild);
@@ -437,7 +503,7 @@ ui.show_materials = function(sort) {
 	
 	if (data.materials.length == 0) {
 		document.getElementById('no_materials').style.display='';
-		box.style.display='none';
+		//box.style.display='none';
 	} else {
 		document.getElementById('no_materials').style.display='none';
 		document.getElementById('materials_amount').textContent = " (" + data.materials.length + ")";
@@ -586,6 +652,20 @@ ui.show_materials = function(sort) {
 }
 
 ui.highlighted_row_first_elem = null;
+ui.grid_onmouseleave = function(event) {
+	if (ui.highlighted_row_first_elem == null) return;
+	var sibling = ui.highlighted_row_first_elem;
+	if (sibling) {
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed");
+	}
+	ui.highlighted_row_first_elem = null;
+}
 ui.materials_onmouseover = function(event) {
 	var elem = event.toElement;
 	var column = elem.style["grid-column-start"];
