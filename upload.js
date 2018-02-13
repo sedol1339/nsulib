@@ -123,8 +123,8 @@ function init() {
 	
 	requests.get_full_lists();
 	
-	data.uploading.add({"title": "Test upload", "total": 1231231, "uploaded": 1003423});
-	data.uploading.add({"title": "Another test upload", "total": 6455, "uploaded": 0, "result": "Файл слишком велик"});
+	data.uploading.add({"title": "Test upload", "total": 931231, "uploaded": 703423});
+	data.uploading.add({"title": "Another test upload", "total": 6455, "uploaded": 0, "error": true, "result": "Файл слишком велик"});
 	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
 	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
 	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
@@ -155,12 +155,46 @@ function init() {
 }
 
 ui.update_upload_grid = function() {
+	if (data.uploading.size == 0) {
+		while (ui.upload_grid.firstChild) {
+			ui.upload_grid.removeChild(ui.upload_grid.firstChild);
+		};
+		ui.upload_grid.style.display = 'none';
+		return;
+	} else {
+		ui.upload_grid.style.display = '';
+		ui.upload_grid.style["height"] = Math.min(data.uploading.size, 6) * 30 + 'px';
+	}
+	
+	var rows_to_remove = new Set();
+	Array.prototype.forEach.call(ui.upload_grid.childNodes, function(item, i, arr) {
+		if (item.style["grid-column-start"] == "title") {
+			rows_to_remove.add(item);
+		}
+	});
+	
 	data.uploading.forEach(function(entry, _, set) {
+		var show_result = function(entry, div) {
+			var span = document.createElement('span');
+			if (entry.error) {
+				span.textContent = "Ошибка: " + entry.result;
+				span.style.color = "#E00";
+			} else {
+				span.textContent = entry.result;
+			}
+			span.style.display = "inline-block";
+			div.appendChild(span);
+		};
+		var update_progress = function(entry) {
+			var percent = Math.round(entry.uploaded/entry.total*100) + "%";
+			if (entry.uploaded > entry.total) percent = "100%";
+			entry.loading_span.textContent = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + humanFileSize(entry.total, true) + " (" + percent + ")";
+			entry.progress_bar_inner.style.width = percent;
+		};
 		if (entry.elem == null) {
 			if (ui.upload_grid.lastElementChild) {
 				var row = +ui.upload_grid.lastElementChild.style["grid-row-start"] + 1;
 			} else {
-				ui.upload_grid.style.display = '';
 				var row = 1;
 			}
 			
@@ -173,6 +207,36 @@ ui.update_upload_grid = function() {
 			div.appendChild(span);
 			ui.upload_grid.appendChild(div);
 			
+			entry.elem = div;
+			
+			var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.style["grid-row"] = row;
+			div.style["grid-column-start"] = "status_start";
+			div.style["grid-column-end"] = "delete";
+			if (entry.result) {
+				show_result(entry, div);
+			} else {
+				var span = document.createElement('span');
+				span.classList.add("uploading_span");
+				div.appendChild(span);
+				entry.loading_span = span;
+				
+				var progress_bar = document.createElement('div');
+				progress_bar.classList.add("uploading_progress_bar");
+				div.appendChild(progress_bar);
+				
+				var progress_bar_inner = document.createElement('div');
+				progress_bar_inner.classList.add("uploading_progress_bar_inner");
+				progress_bar.appendChild(progress_bar_inner);
+				
+				entry.progress_bar_inner = progress_bar_inner;
+				entry.loading = true;
+				
+				update_progress(entry);
+			}
+			ui.upload_grid.appendChild(div);
+			
 			var div = document.createElement('div');
 			div.classList.add("grid_item");
 			div.classList.add("delete_button_faint");
@@ -182,7 +246,30 @@ ui.update_upload_grid = function() {
 			span.title = span.textContent = "отмена";
 			div.appendChild(span);
 			ui.upload_grid.appendChild(div);
+		} else {
+			rows_to_remove.delete(entry.elem);
+			if (entry.loading && entry.result) {
+				entry.loading = false;
+				var div = entry.elem.nextSibling;
+				while (div.firstChild) {
+					div.removeChild(local_list.firstChild);
+				};
+				show_result(entry, div);
+			} else if (entry.loading) {
+				update_progress(entry);
+			}
 		}
+	});
+	
+	rows_to_remove.forEach(function(elem, _, set) {
+		var next_elem = elem.nextSibling.nextSibling.nextSibling;
+		while (next_elem) {
+			next_elem.style["grid-row-start"] = next_elem.style["grid-row-start"] - 1;
+			next_elem = next_elem.nextSibling;
+		}
+		ui.upload_grid.removeChild(elem.nextSibling.nextSibling);
+		ui.upload_grid.removeChild(elem.nextSibling);
+		ui.upload_grid.removeChild(elem);
 	});
 }
 
@@ -503,7 +590,7 @@ ui.show_materials = function(sort) {
 	
 	if (data.materials.length == 0) {
 		document.getElementById('no_materials').style.display='';
-		//box.style.display='none';
+		box.style.display='none';
 	} else {
 		document.getElementById('no_materials').style.display='none';
 		document.getElementById('materials_amount').textContent = " (" + data.materials.length + ")";

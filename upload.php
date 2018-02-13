@@ -87,7 +87,7 @@
 			<div id=receiving_materials_status style="display:none;">
 				Получение списка материалов<span class="loader_dot">.</span><span class="loader_dot">.</span><span class="loader_dot">.</span>
 			</div>
-			<div id=materials_grid></div>
+			<div id=materials_grid style="display:none;"></div>
 		</div>
 		<div id=info>
 			<input id=input_file type="file" name="file">

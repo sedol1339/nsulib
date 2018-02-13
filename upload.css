@@ -248,12 +248,12 @@ html {
 }
 #materials_upload_grid {
 	display:grid;
-	grid-template-rows: 30px;
+	grid-template-rows: repeat(auto-fit, 30px);
 	border-bottom: 3px solid #DDD;
 	overflow-y: scroll;
 	grid-template-columns: [title] minmax(0%, var(--width_title)) [status_start] minmax(0%, var(--width_f)) [] minmax(0%, var(--width_s)) [] minmax(0%, var(--width_t)) [] minmax(0%, var(--width_uploader)) [status_end] minmax(0%, var(--width_uploaded)) [delete] minmax(0%, var(--width_delete));
-	flex: 1 0 auto;
-	max-height: 180px;
+	flex: 0 0 auto;
+	height: 0px; /* js */
 }
 #materials_grid {
 	overflow-y: scroll;
@@ -264,6 +264,7 @@ html {
 }
 .grid_item {
 	line-height: 30px;
+	height: 30px;
 	padding: 0px 7px 0px 7px;
 	text-overflow: ellipsis;
     white-space: nowrap;
@@ -285,3 +286,21 @@ html {
 .grid_item_f:hover - div {
 	background:#F0F0F0;
 }*/
+.uploading_span {
+	display: inline-block;
+	width: 200px;
+}
+.uploading_progress_bar {
+	display: inline-block;
+	vertical-align: middle;
+	width: calc((100% - 200px) * 0.9);
+	height: 13px;
+	background: #EEE;
+	border-radius: 3px;
+	overflow: hidden;
+}
+.uploading_progress_bar_inner {
+	display: block;
+	height: 100%;
+	background: #CCC;
+}
