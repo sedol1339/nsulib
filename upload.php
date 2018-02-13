@@ -74,12 +74,12 @@
 				</div>
 			</div>
 			<div id=materials_grid_header>
-				<div class=grid_item style="grid-row:1;grid-column:title">Название</div>
-				<div class=grid_item style="grid-row:1;grid-column:f">Факультет</div>
-				<div class=grid_item style="grid-row:1;grid-column:s">Предмет</div>
-				<div class=grid_item style="grid-row:1;grid-column:t">Препод.</div>
-				<div class=grid_item style="grid-row:1;grid-column:uploader">Загрузил</div>
-				<div class=grid_item style="grid-row:1;grid-column:uploaded">Загружено</div>
+				<div class="grid_item clickable" id=sort_title style="grid-row:1;grid-column:title">Название</div>
+				<div class="grid_item clickable" id=sort_f style="grid-row:1;grid-column:f">Факультет</div>
+				<div class="grid_item clickable" id=sort_s style="grid-row:1;grid-column:s">Предмет</div>
+				<div class="grid_item clickable" id=sort_t style="grid-row:1;grid-column:t">Препод.</div>
+				<div class="grid_item clickable" id=sort_uploader style="grid-row:1;grid-column:uploader">Загрузил</div>
+				<div class="grid_item clickable" id=sort_uploaded style="grid-row:1;grid-column:uploaded">Загружено</div>
 				<div class=grid_item style="grid-row:1;grid-column:delete">Настройки</div>
 			</div>
 			<div id=materials_grid style="display:none">

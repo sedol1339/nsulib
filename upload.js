@@ -44,10 +44,18 @@ var ui = {
 		width_uploaded: "1fr",
 		width_delete: "0.6fr",
 	},*/
+	sort: {
+		title: document.getElementById('sort_title'),
+		f: document.getElementById('sort_f'),
+		s: document.getElementById('sort_s'),
+		t: document.getElementById('sort_t'),
+		uploader: document.getElementById('sort_uploader'),
+		uploaded: document.getElementById('sort_uploaded'),
+	}
 }
 
 var data = {
-	materials: { },
+	materials: [],
 	full_lists: {
 		f:{0: ""}, s:{0: ""}, t:{0: ""}
 	},
@@ -101,6 +109,13 @@ function init() {
 	ui.update_filter_list("t");
 	ui.fill_additional_filter_lists();
 	requests.get_filter_list("f", undefined, undefined, undefined, { update_ui: true, update_ui_custom_function: ui.set_default_filters } );
+	
+	ui.sort.title.addEventListener('click', function(event) {ui.show_materials("title")});
+	ui.sort.f.addEventListener('click', function(event) {ui.show_materials("f")});
+	ui.sort.s.addEventListener('click', function(event) {ui.show_materials("s")});
+	ui.sort.t.addEventListener('click', function(event) {ui.show_materials("t")});
+	ui.sort.uploader.addEventListener('click', function(event) {ui.show_materials("uploader")});
+	ui.sort.uploaded.addEventListener('click', function(event) {ui.show_materials("uploaded")});
 	
 	requests.get_full_lists();
 }
@@ -406,7 +421,7 @@ ui.button_quit_click = function(event) {
 	window.location.href = "/";
 }
 
-ui.show_materials = function() {
+ui.show_materials = function(sort) {
 	var box = document.getElementById("materials_grid");
 		box.style.display='';
 	while (box.firstChild) {
@@ -420,80 +435,213 @@ ui.show_materials = function() {
 	html.style.setProperty("--width_uploader", ui.grid_columns.width_uploader ? ui.filter_column.uploader.checked : "0fr");
 	html.style.setProperty("--width_uploaded", ui.grid_columns.width_uploaded ? ui.filter_column.uploaded.checked : "0fr");*/
 	
-	if (Object.keys(data.materials).length === 0) {
+	if (data.materials.length == 0) {
 		document.getElementById('no_materials').style.display='';
 		box.style.display='none';
 	} else {
 		document.getElementById('no_materials').style.display='none';
-		document.getElementById('materials_amount').textContent = " (" + Object.keys(data.materials).length + ")";
+		document.getElementById('materials_amount').textContent = " (" + data.materials.length + ")";
+		
+		if (sort) {
+			console.log(sort);
+			var sort_func;
+			if (sort == "title") {
+				sort_func = function(a, b) { return a.title.localeCompare(b.title); };
+			} else if (sort == "f") {
+				sort_func = function(a, b) {
+					var result = data.full_lists.f[a.faculty].localeCompare(data.full_lists.f[b.faculty]);
+					if (result == 0) result = data.full_lists.s[a.subject].localeCompare(data.full_lists.s[b.subject]);
+					if (result == 0) result = data.full_lists.t[a.teacher].localeCompare(data.full_lists.t[b.teacher]);
+					return result;
+				};
+			} else if (sort == "s") {
+				sort_func = function(a, b) {
+					var result = data.full_lists.s[a.subject].localeCompare(data.full_lists.s[b.subject]);
+					if (result == 0) result = data.full_lists.t[a.teacher].localeCompare(data.full_lists.t[b.teacher]);
+					if (result == 0) result = data.full_lists.f[a.faculty].localeCompare(data.full_lists.f[b.faculty]);
+					return result;
+				};
+			} else if (sort == "t") {
+				sort_func = function(a, b) {
+					var result = data.full_lists.t[a.teacher].localeCompare(data.full_lists.t[b.teacher]);
+					if (result == 0) result = data.full_lists.f[a.faculty].localeCompare(data.full_lists.f[b.faculty]);
+					if (result == 0) result = data.full_lists.s[a.subject].localeCompare(data.full_lists.s[b.subject]);
+					return result;
+				};
+			} else if (sort == "uploader") {
+				sort_func = function(a, b) {
+					var result = a.uploader.localeCompare(b.uploader);
+					if (result == 0) result = b.uploaded.localeCompare(a.uploaded);
+					return result;
+				};
+			} else if (sort == "uploaded") {
+				sort_func = function(a, b) {
+					return b.uploaded.localeCompare(a.uploaded);
+				};
+			}
+			if (sort_func) {
+				data.materials = data.materials.sort(sort_func);
+			}
+		}
+		
 		var row_number = 1;
-		for (var id in data.materials) {
-			var entry = data.materials[id];
+		data.materials.forEach(function(entry, array_index, arr) {
 			
 			var div = document.createElement('div');
 			div.classList.add("grid_item");
+			//div.classList.add("grid_item_title");
+			div.onmouseover = ui.materials_onmouseover;
 			div.style["grid-row"] = row_number;
 			div.style["grid-column"] = "title";
-			div.textContent = entry.title;
+			var span = document.createElement('span');
+			span.title = span.textContent = entry.title;
+			div.appendChild(span);
 			box.appendChild(div);
 			
 			//if (ui.filter_column.f.checked) {
 				var div = document.createElement('div');
 				div.classList.add("grid_item");
+				//div.classList.add("grid_item_f");
+				div.onmouseover = ui.materials_onmouseover;
 				div.style["grid-row"] = row_number;
 				div.style["grid-column"] = "f";
-				div.textContent = data.full_lists.f[entry.faculty];
+				var span = document.createElement('span');
+				span.title = span.textContent = data.full_lists.f[entry.faculty];
+				div.appendChild(span);
 				box.appendChild(div);
 			//}
 			
 			//if (ui.filter_column.s.checked) {
 				var div = document.createElement('div');
 				div.classList.add("grid_item");
+				div.onmouseover = ui.materials_onmouseover;
 				div.style["grid-row"] = row_number;
 				div.style["grid-column"] = "s";
-				div.textContent = data.full_lists.s[entry.subject];
+				var span = document.createElement('span');
+				span.title = span.textContent = data.full_lists.s[entry.subject];
+				div.appendChild(span);
 				box.appendChild(div);
 			//}
 			
 			//if (ui.filter_column.t.checked) {
 				var div = document.createElement('div');
 				div.classList.add("grid_item");
+				div.onmouseover = ui.materials_onmouseover;
 				div.style["grid-row"] = row_number;
 				div.style["grid-column"] = "t";
-				div.textContent = data.full_lists.t[entry.teacher];
+				var span = document.createElement('span');
+				span.title = span.textContent = data.full_lists.t[entry.teacher];
+				div.appendChild(span);
 				box.appendChild(div);
 			//}
 			
 			//if (ui.filter_column.uploader.checked) {
 				var div = document.createElement('div');
 				div.classList.add("grid_item");
+				div.onmouseover = ui.materials_onmouseover;
 				div.style["grid-row"] = row_number;
 				div.style["grid-column"] = "uploader";
-				div.textContent = entry.uploader;
+				var span = document.createElement('span');
+				span.title = span.textContent = entry.uploader;
+				div.appendChild(span);
 				box.appendChild(div);
 			//}
 			
 			//if (ui.filter_column.uploaded.checked) {
 				var div = document.createElement('div');
 				div.classList.add("grid_item");
+				div.onmouseover = ui.materials_onmouseover;
 				div.style["grid-row"] = row_number;
 				div.style["grid-column"] = "uploaded";
-				div.textContent = entry.uploaded;
+				var span = document.createElement('span');
+				span.title = span.textContent = entry.uploaded;
+				div.appendChild(span);
 				box.appendChild(div);
 			//}
 			
 			var div = document.createElement('div');
 			div.classList.add("grid_item");
+			div.onmouseover = ui.materials_onmouseover;
 			div.classList.add("delete_button_faint");
 			div.style["grid-row"] = row_number;
 			div.style["grid-column"] = "delete";
+			var span = document.createElement('span');
 			div.textContent = "удалить";
+			div.appendChild(span);
 			box.appendChild(div);
 			
+			/*var div = document.createElement('div');
+			div.classList.add("grid_item");
+			div.classList.add("grid_row");
+			div.style["grid-row"] = row_number;
+			div.style["grid-column-start"] = "title";
+			div.style["grid-column-end"] = "-1";
+			box.appendChild(div);*/
+			
 			row_number++;
-		}
+		});
 	}
 	document.getElementById('receiving_materials_status').style.display='none';
+	ui.highlighted_row_first_elem = null;
+}
+
+ui.highlighted_row_first_elem = null;
+ui.materials_onmouseover = function(event) {
+	var elem = event.toElement;
+	var column = elem.style["grid-column-start"];
+	var row = elem.style["grid-row-start"];
+	if (!column || !row) return; //почему так происходит?
+	
+	var find_first_elem_in_row = function(elem) {
+		if (!elem) return;
+		var column = elem.style["grid-column-start"];
+		if (!column) return;
+		var sibling;
+		if (column == "title") {
+			sibling = elem;
+		} else if (column == "f") {
+			sibling = elem.previousSibling;
+		} else if (column == "s") {
+			sibling = elem.previousSibling.previousSibling;
+		} else if (column == "t") {
+			sibling = elem.previousSibling.previousSibling.previousSibling;
+		} else if (column == "uploader") {
+			sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling;
+		} else if (column == "uploaded") {
+			sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
+		} else if (column == "delete") {
+			sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
+		} else {
+			return undefined;
+		}
+		return sibling;
+	}
+	
+	var sibling = find_first_elem_in_row(elem);
+	if (sibling == ui.highlighted_row_first_elem) return;
+	
+	if (sibling) {
+		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.add("js_shadowed");
+	}
+	
+	var sibling = ui.highlighted_row_first_elem;
+	if (sibling) {
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+		sibling.classList.remove("js_shadowed");
+	}
+	
+	ui.highlighted_row_first_elem = find_first_elem_in_row(elem);
 }
 
 requests.build_url = function(url, parameters) {
@@ -527,7 +675,16 @@ requests.receive_materials = function(show) {
 	var _url = requests.build_url("/get.php", url_params);
 	requests.query_get_materials.open("GET", _url, true);
 	requests.query_get_materials.onload = function() {
-		data.materials = JSON.parse(requests.query_get_materials.responseText);
+		//data.materials = JSON.parse(requests.query_get_materials.responseText);
+		//data.materials.length = Math.max.apply(Math, Object.keys(data.materials));
+		//data.materials = Array.from(data.materials);
+		var response = JSON.parse(requests.query_get_materials.responseText);
+		data.materials = [];
+		for (var id in response) {
+			var entry = response[id];
+			entry.id = id;
+			data.materials.push(entry);
+		}
 		if (show) {
 			ui.show_materials();
 		}

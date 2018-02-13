@@ -266,3 +266,12 @@ html {
 	color: #000;
 	cursor:pointer;
 }
+.js_shadowed {
+	background:#F0F0F0;
+}
+/*.grid_item_title:hover, .grid_item_title:hover + div, .grid_item_title:hover + div + div, .grid_item_title:hover + div + div + div, .grid_item_title:hover + div + div + div + div, .grid_item_title:hover + div + div + div + div + div, .grid_item_title:hover + div + div + div + div + div + div {
+	background:#F0F0F0;
+}
+.grid_item_f:hover - div {
+	background:#F0F0F0;
+}*/
