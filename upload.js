@@ -70,7 +70,7 @@ var data = {
 }
 
 var requests = { //functions and variables about xml-http-requests
-	query_upload: null,
+	//query_upload: null,
 	query_get_materials: null,
 	queries_lists: {
 		f:null, s:null, t:null,
@@ -123,7 +123,7 @@ function init() {
 	
 	requests.get_full_lists();
 	
-	data.uploading.add({"title": "Test upload", "total": 931231, "uploaded": 703423});
+	/*data.uploading.add({"title": "Test upload", "total": 931231, "uploaded": 703423});
 	data.uploading.add({"title": "Another test upload", "total": 6455, "uploaded": 0, "error": true, "result": "Файл слишком велик"});
 	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
 	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
@@ -150,11 +150,16 @@ function init() {
 	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
 	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
 	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
+	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});*/
 	ui.update_upload_grid();
 }
 
 ui.update_upload_grid = function() {
+	data.uploading.forEach(function(entry, _, set) {
+		if (entry.state == "NOT_EXIST") {
+			data.uploading.delete(entry);
+		};
+	});
 	if (data.uploading.size == 0) {
 		while (ui.upload_grid.firstChild) {
 			ui.upload_grid.removeChild(ui.upload_grid.firstChild);
@@ -173,50 +178,24 @@ ui.update_upload_grid = function() {
 		}
 	});
 	
-	data.uploading.forEach(function(entry, _, set) {
-		var show_result = function(entry, div) {
-			var span = document.createElement('span');
-			if (entry.error) {
-				span.textContent = "Ошибка: " + entry.result;
-				span.style.color = "#E00";
-			} else {
-				span.textContent = entry.result;
+	var state_handlers = {
+		"UPLOADING": function(entry, div) {
+			if (!entry.loading_span || !div.contains(entry.loading_span) || !div.contains(entry.progress_bar_inner)) {
+				while (div.firstChild) { div.removeChild(div.firstChild); };
+				entry.loading_span = null;
+				entry.progress_bar_inner = null;
 			}
-			span.style.display = "inline-block";
-			div.appendChild(span);
-		};
-		var update_progress = function(entry) {
-			var percent = Math.round(entry.uploaded/entry.total*100) + "%";
-			if (entry.uploaded > entry.total) percent = "100%";
-			entry.loading_span.textContent = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + humanFileSize(entry.total, true) + " (" + percent + ")";
-			entry.progress_bar_inner.style.width = percent;
-		};
-		if (entry.elem == null) {
-			if (ui.upload_grid.lastElementChild) {
-				var row = +ui.upload_grid.lastElementChild.style["grid-row-start"] + 1;
+			if (!entry.total || entry.total == 0) {
+				var percent = "0%";
+				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + "??" + " (" + percent + ")";
+			} else if (entry.uploaded > entry.total) {
+				var percent = "100%";
+				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + humanFileSize(entry.total, true) + " (" + percent + ")";
 			} else {
-				var row = 1;
-			}
-			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.style["grid-row"] = row;
-			div.style["grid-column"] = "title";
-			var span = document.createElement('span');
-			span.title = span.textContent = entry.title;
-			div.appendChild(span);
-			ui.upload_grid.appendChild(div);
-			
-			entry.elem = div;
-			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.style["grid-row"] = row;
-			div.style["grid-column-start"] = "status_start";
-			div.style["grid-column-end"] = "delete";
-			if (entry.result) {
-				show_result(entry, div);
-			} else {
+				var percent = Math.round(entry.uploaded/entry.total*100) + "%";
+				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + humanFileSize(entry.total, true) + " (" + percent + ")";
+			};
+			if (!entry.loading_span) {
 				var span = document.createElement('span');
 				span.classList.add("uploading_span");
 				div.appendChild(span);
@@ -229,35 +208,76 @@ ui.update_upload_grid = function() {
 				var progress_bar_inner = document.createElement('div');
 				progress_bar_inner.classList.add("uploading_progress_bar_inner");
 				progress_bar.appendChild(progress_bar_inner);
-				
 				entry.progress_bar_inner = progress_bar_inner;
-				entry.loading = true;
-				
-				update_progress(entry);
-			}
-			ui.upload_grid.appendChild(div);
-			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.classList.add("delete_button_faint");
-			div.style["grid-row"] = row;
-			div.style["grid-column"] = "delete";
+			};
+			entry.loading_span.textContent = txt;
+			entry.progress_bar_inner.style.width = percent;
+		},
+		"WAITING_FOR_RESPONSE": function(entry, div) {
+			while (div.firstChild) { div.removeChild(div.firstChild); };
 			var span = document.createElement('span');
-			span.title = span.textContent = "отмена";
+			span.textContent = "Ожидание ответа от сервера...";
+			span.style.display = "inline-block";
 			div.appendChild(span);
-			ui.upload_grid.appendChild(div);
+		},
+		"FINISHED": function(entry, div) {
+			while (div.firstChild) { div.removeChild(div.firstChild); };
+			var span = document.createElement('span');
+			span.textContent = entry.result;
+			span.style.display = "inline-block";
+			div.appendChild(span);
+		},
+		"FINISHED_ERROR": function(entry, div) {
+			while (div.firstChild) { div.removeChild(div.firstChild); };
+			var span = document.createElement('span');
+			span.textContent = "Ошибка: " + entry.result;
+			span.style.color = "#E00";
+			span.style.display = "inline-block";
+			div.appendChild(span);
+		},
+	};
+	
+	data.uploading.forEach(function(entry, _, set) {
+		if (entry.elem == null) {
+			if (ui.upload_grid.lastElementChild) {
+				var row = +ui.upload_grid.lastElementChild.style["grid-row-start"] + 1;
+			} else {
+				var row = 1;
+			}
+			
+			var div1 = document.createElement('div');
+			div1.classList.add("grid_item");
+			div1.style["grid-row"] = row;
+			div1.style["grid-column"] = "title";
+			var span1 = document.createElement('span');
+			span1.title = span1.textContent = entry.title;
+			div1.appendChild(span1);
+			ui.upload_grid.appendChild(div1);
+			
+			entry.elem = div1;
+			
+			var div2 = document.createElement('div');
+			div2.classList.add("grid_item");
+			div2.style["grid-row"] = row;
+			div2.style["grid-column-start"] = "status_start";
+			div2.style["grid-column-end"] = "delete";
+			ui.upload_grid.appendChild(div2);
+			
+			var div3 = document.createElement('div');
+			div3.classList.add("grid_item");
+			div3.classList.add("delete_button_faint");
+			div3.style["grid-row"] = row;
+			div3.style["grid-column"] = "delete";
+			var span3 = document.createElement('span');
+			span3.title = span3.textContent = "отмена";
+			div3.appendChild(span3);
+			ui.upload_grid.appendChild(div3);
+			
+			state_handlers[entry.state](entry, div2);
+			
 		} else {
 			rows_to_remove.delete(entry.elem);
-			if (entry.loading && entry.result) {
-				entry.loading = false;
-				var div = entry.elem.nextSibling;
-				while (div.firstChild) {
-					div.removeChild(local_list.firstChild);
-				};
-				show_result(entry, div);
-			} else if (entry.loading) {
-				update_progress(entry);
-			}
+			state_handlers[entry.state](entry, entry.elem.nextSibling);
 		}
 	});
 	
@@ -551,22 +571,39 @@ ui.button_publish_or_edit_click = function(event) {
 		formData.append('year', ui.get_selected_value("year"));
 		formData.append('description', ui.input.description.value);
 		
-		if (requests.query_upload != null) requests.query_upload.abort();
-		requests.query_upload = new XMLHttpRequest();
-		requests.query_upload.open("POST", "uploadScript.php", true);
+		//if (requests.query_upload != null) requests.query_upload.abort();
+		var query_upload = new XMLHttpRequest();
+		query_upload.open("POST", "uploadScript.php", true);
 		
-		requests.query_upload.upload.onprogress = function(event) {
-			console.log( 'Загружено на сервер ' + event.loaded + ' байт из ' + event.total );
-		};
-		requests.query_upload.onload = function(event) {
-			console.log( 'Данные полностью загружены на сервер!' );
-			console.log( 'Ответ: ', requests.query_upload.responseText);
-		};
-		requests.query_upload.onerror = function(event) {
-			console.log( 'Произошла ошибка при загрузке данных на сервер!' );
-		};
-		requests.query_upload.send(formData);
+		var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "formData": formData, "state": "UPLOADING"};
+		data.uploading.add(uploading_obj);
+		ui.update_upload_grid();
 		
+		query_upload.upload.onprogress = function(event) {
+			uploading_obj.uploaded = event.loaded;
+			uploading_obj.total = event.total;
+			console.log(humanFileSize(event.loaded, true) + '/' + humanFileSize(event.total, true));
+			ui.update_upload_grid();
+		};
+		query_upload.upload.onload = function(event) {
+			console.log("query_upload.upload.onload");
+			uploading_obj.state = "WAITING_FOR_RESPONSE";
+			ui.update_upload_grid();
+		};
+		query_upload.onload = function(event) {
+			console.log(query_upload.responseText);
+			uploading_obj.result = query_upload.responseText;
+			uploading_obj.state = "FINISHED";
+			ui.update_upload_grid();
+		};
+		query_upload.onerror = function(event) {
+			console.log("Error: " + query_upload.responseText);
+			uploading_obj.state = "FINISHED_ERROR";
+			uploading_obj.error = true;
+			uploading_obj.result = query_upload.responseText;
+			ui.update_upload_grid();
+		};
+		query_upload.send(formData);
 	}
 }
 
