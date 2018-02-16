@@ -304,3 +304,12 @@ html {
 	height: 100%;
 	background: #CCC;
 }
+.uploading_erase { /* js */
+	display: inline-block;
+	vertical-align: middle;
+	width:10px;
+	height:10px;
+	content: url("img/erase.png");
+	margin-right: 5px;
+	margin-top: 0px;
+}

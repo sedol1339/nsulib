@@ -123,34 +123,6 @@ function init() {
 	
 	requests.get_full_lists();
 	
-	/*data.uploading.add({"title": "Test upload", "total": 931231, "uploaded": 703423});
-	data.uploading.add({"title": "Another test upload", "total": 6455, "uploaded": 0, "error": true, "result": "Файл слишком велик"});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});
-	data.uploading.add({"title": "Other test upload", "total": 6455, "uploaded": 6455, "result": "Файл успешно загружен", "material_id": 55356});*/
 	ui.update_upload_grid();
 }
 
@@ -180,22 +152,10 @@ ui.update_upload_grid = function() {
 	
 	var state_handlers = {
 		"UPLOADING": function(entry, div) {
-			if (!entry.loading_span || !div.contains(entry.loading_span) || !div.contains(entry.progress_bar_inner)) {
+			//if (!entry.loading_span || !div.contains(entry.loading_span) || !div.contains(entry.progress_bar_inner)) {
+			if (entry.state_changed) {
 				while (div.firstChild) { div.removeChild(div.firstChild); };
-				entry.loading_span = null;
-				entry.progress_bar_inner = null;
-			}
-			if (!entry.total || entry.total == 0) {
-				var percent = "0%";
-				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + "??" + " (" + percent + ")";
-			} else if (entry.uploaded > entry.total) {
-				var percent = "100%";
-				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + humanFileSize(entry.total, true) + " (" + percent + ")";
-			} else {
-				var percent = Math.round(entry.uploaded/entry.total*100) + "%";
-				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + humanFileSize(entry.total, true) + " (" + percent + ")";
-			};
-			if (!entry.loading_span) {
+				
 				var span = document.createElement('span');
 				span.classList.add("uploading_span");
 				div.appendChild(span);
@@ -209,31 +169,64 @@ ui.update_upload_grid = function() {
 				progress_bar_inner.classList.add("uploading_progress_bar_inner");
 				progress_bar.appendChild(progress_bar_inner);
 				entry.progress_bar_inner = progress_bar_inner;
+				
+				div.nextSibling.innerHTML = "<span onclick=\"ui.upload_cancel(event)\">отмена</span>";
+			};
+			if (!entry.total || entry.total == 0) {
+				var percent = "0%";
+				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + "??" + " (" + percent + ")";
+			} else if (entry.uploaded > entry.total) {
+				var percent = "100%";
+				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + humanFileSize(entry.total, true) + " (" + percent + ")";
+			} else {
+				var percent = Math.round(entry.uploaded/entry.total*100) + "%";
+				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + humanFileSize(entry.total, true) + " (" + percent + ")";
 			};
 			entry.loading_span.textContent = txt;
 			entry.progress_bar_inner.style.width = percent;
 		},
 		"WAITING_FOR_RESPONSE": function(entry, div) {
+			if (!entry.state_changed) return;
 			while (div.firstChild) { div.removeChild(div.firstChild); };
 			var span = document.createElement('span');
 			span.textContent = "Ожидание ответа от сервера...";
 			span.style.display = "inline-block";
 			div.appendChild(span);
+			div.nextSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
 		},
 		"FINISHED": function(entry, div) {
-			while (div.firstChild) { div.removeChild(div.firstChild); };
-			var span = document.createElement('span');
+			if (!entry.state_changed) {
+				var span = div.firstChild;
+			} else {
+				while (div.firstChild) { div.removeChild(div.firstChild); };
+				var span = document.createElement('span');
+				span.style.display = "inline-block";
+				div.appendChild(span);
+				div.nextSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+			}
 			span.textContent = entry.result;
-			span.style.display = "inline-block";
-			div.appendChild(span);
 		},
 		"FINISHED_ERROR": function(entry, div) {
+			if (!entry.state_changed) {
+				var span = div.firstChild;
+			} else {
+				while (div.firstChild) { div.removeChild(div.firstChild); };
+				var span = document.createElement('span');
+				span.style.display = "inline-block";
+				div.appendChild(span);
+				span.style.color = "#E00";
+				div.nextSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+			}
+			span.textContent = "Ошибка: " + entry.result;
+		},
+		"CANCELLED": function(entry, div) {
+			if (!entry.state_changed) return;
 			while (div.firstChild) { div.removeChild(div.firstChild); };
 			var span = document.createElement('span');
-			span.textContent = "Ошибка: " + entry.result;
-			span.style.color = "#E00";
+			span.textContent = "Загрузка отменена";
 			span.style.display = "inline-block";
 			div.appendChild(span);
+			div.nextSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
 		},
 	};
 	
@@ -269,10 +262,11 @@ ui.update_upload_grid = function() {
 			div3.style["grid-row"] = row;
 			div3.style["grid-column"] = "delete";
 			var span3 = document.createElement('span');
-			span3.title = span3.textContent = "отмена";
+			span3.innerHTML = "отмена";
 			div3.appendChild(span3);
 			ui.upload_grid.appendChild(div3);
 			
+			console.log(entry);
 			state_handlers[entry.state](entry, div2);
 			
 		} else {
@@ -575,7 +569,17 @@ ui.button_publish_or_edit_click = function(event) {
 		var query_upload = new XMLHttpRequest();
 		query_upload.open("POST", "uploadScript.php", true);
 		
-		var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "formData": formData, "state": "UPLOADING"};
+		var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "formData": formData, "_state": "UPLOADING", "_state_changed": true};
+		Object.defineProperty(uploading_obj, "state", {
+			set: function (x) { this._state = x; this._state_changed = true; },
+			get: function () { return this._state; }
+		});
+		Object.defineProperty(uploading_obj, "state_changed", {
+			set: function (x) { this._state_changed = x; },
+			get: function () { if (this._state_changed) {this._state_changed = false; return true;} else {return false;} }
+		});
+		//uploading_obj.setState = function(x) { state = x; this.state_changed = true; };
+		//uploading_obj.getState_changed = function() { if (state_changed) {state_changed = false; return true;} else {return false;} };
 		data.uploading.add(uploading_obj);
 		ui.update_upload_grid();
 		
