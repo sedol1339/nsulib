@@ -286,18 +286,16 @@ html {
 	display:grid;
 	grid-template-rows: repeat(auto-fit, 30px);
 	border-bottom: 3px solid #DDD;
-	overflow-y: scroll;
+	overflow-y: overlay;
 	grid-template-columns: [title] minmax(0%, var(--width_title)) [status_start] minmax(0%, var(--width_f)) [] minmax(0%, var(--width_s)) [] minmax(0%, var(--width_t)) [] minmax(0%, var(--width_uploader)) [status_end] minmax(0%, var(--width_uploaded)) [delete] minmax(0%, var(--width_delete));
 	flex: 0 0 auto;
 	height: 0px; /* js */
 }
 #materials_grid {
-	overflow-y: scroll;
+	overflow-y: overlay;
 	flex: 0 1 100%;
 }
-#materials_grid::-webkit-scrollbar, #materials_upload_grid::-webkit-scrollbar { /*TODO найти другое решение*/
-    display: none;
-}
+
 .grid_item {
 	line-height: 30px;
 	height: 30px;
