@@ -90,7 +90,12 @@
 			<div id=materials_grid style="display:none;"></div>
 		</div>
 		<div id=info>
+			<div id=info_type>
+				<div data-type=publishing>Загрузка</div>
+				<div data-type=editing>Редактирование</div>
+			</div>
 			<input id=input_file type="file" name="file">
+			<div id=edit_info style="display:none;">Внесите изменения и нажмите "Сохранить"</div>
 			<div id=main_info>
 				<div class=info_box_wrapper>
 					<div>Факультет:</div>

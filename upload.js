@@ -15,6 +15,8 @@ var ui = {
 		t: document.getElementById('filter_t'),
 		uploaded: document.getElementById('filter_uploaded'),
 	},
+	info_type: document.getElementById('info_type'),
+	edit_info: document.getElementById('edit_info'),
 	input: {
 		file: document.getElementById('input_file'),
 		f: document.getElementById('input_f'),
@@ -89,6 +91,11 @@ function init() {
 	ui.button_quit.addEventListener('click', function(event) {ui.button_quit_click(event)});
 	ui.input.file.addEventListener('change', function(event) {ui.file_selected(event)});
 	
+	Array.prototype.forEach.call(ui.info_type.children, function(item, i, arr) {
+		item.addEventListener('click', ui.set_uploading_type);
+	});
+	ui.set_uploading_type(null, "publishing");
+	
 	ui.input.f.addEventListener('change', function(event) {ui.event_main_selection(event, "f")});
 	ui.input.s.addEventListener('change', function(event) {ui.event_main_selection(event, "s")});
 	ui.input.t.addEventListener('change', function(event) {ui.event_main_selection(event, "t")});
@@ -124,6 +131,36 @@ function init() {
 	requests.get_full_lists();
 	
 	ui.update_upload_grid();
+}
+
+ui.set_uploading_type = function(event, type) {
+	if (event) {
+		//клик мыши, известен эвент и элемент, определить тип
+		var elem = event.target;
+		type = elem.getAttribute('data-type');
+	} else {
+		//известен тип, определить элемент
+		var elem;
+		Array.prototype.forEach.call(ui.info_type.children, function(item, i, arr) {
+			if (item.getAttribute('data-type') == type) {
+				elem = item;
+			}; //здесь break возиожно сделать только выбрасыванием исключения
+		});
+	}
+	
+	Array.prototype.forEach.call(ui.info_type.children, function(item, i, arr) {
+		item.classList.remove("info_type_selected");
+	});
+	if (elem) { elem.classList.add("info_type_selected"); }
+	
+	ui.mode = type;
+	if (type == "publishing") {
+		ui.input.file.style.display = "";
+		//ui.edit_info.style.display = "none";
+	} else if (type == "editing") {
+		ui.input.file.style.display = "none";
+		//ui.edit_info.style.display = "";
+	}
 }
 
 ui.update_upload_grid = function() {
@@ -531,9 +568,7 @@ ui.recalculate_css = function(event) {
 
 ui.button_publish_or_edit_click = function(event) {
 	
-	var mode = "upload";
-	
-	if (mode == "upload") {	
+	if (ui.mode == "publishing") {	
 	
 		if (ui.input.file.files[0] == null) { window.alert("Не выбран файл"); return; }
 		
@@ -777,6 +812,7 @@ ui.show_materials = function(sort) {
 	}
 	document.getElementById('receiving_materials_status').style.display='none';
 	ui.highlighted_row_first_elem = null;
+	ui.grid.scrollTop = 0;
 }
 
 ui.highlighted_row_first_elem = null;

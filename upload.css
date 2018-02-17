@@ -66,6 +66,36 @@ main {
 	display: flex;
 	flex-flow: column nowrap;
 }
+#info_type {
+	flex: 0 0 45px;
+	display: flex;
+	flex-flow: row nowrap;
+}
+#info_type div {
+	flex: 0 0 50%;
+	background: #FFF;
+	line-height: 45px;
+	display: flex;
+    justify-content: center;
+	font-family: "Segoe UI";
+    font-size: 9pt;
+	color: #666;
+	font-weight: 600;
+	box-sizing: border-box;
+	border-width: 1px 1px 1px 0px;
+	border-style: solid;
+	border-color: #CCCCCC;
+}
+#info_type > :last-child {
+	border-right-width: 0px;
+}
+.info_type_selected {
+	background: #F4F4F4 !important;
+}
+#info_type div:hover {
+	cursor: pointer;
+	background: #F0F0F0;
+}
 #materials_header {
 	flex: 0 0 45px;
 	background:#F8F8F8;
@@ -154,6 +184,12 @@ main {
 }
 #input_file {
 	font-size: 10pt;
+	padding: 10px;
+	border-bottom:1px solid #CCCCCC;
+}
+#edit_info {
+	font-size: 9pt;
+	color: #666;
 	padding: 10px;
 	border-bottom:1px solid #CCCCCC;
 }
