@@ -175,6 +175,7 @@ ui.update_upload_grid = function() {
 			ui.upload_grid.removeChild(ui.upload_grid.firstChild);
 		};
 		ui.upload_grid.style.display = 'none';
+		ui.highlighted_row_first_elem_upload = null;
 		return;
 	} else {
 		ui.upload_grid.style.display = '';
@@ -208,7 +209,7 @@ ui.update_upload_grid = function() {
 				progress_bar.appendChild(progress_bar_inner);
 				entry.progress_bar_inner = progress_bar_inner;
 				
-				div.nextSibling.innerHTML = "<span onclick=\"ui.upload_cancel(event)\">отмена</span>";
+				div.nextElementSibling.innerHTML = "<span onclick=\"ui.upload_erase(event)\">отмена</span>";
 			};
 			if (!entry.total || entry.total == 0) {
 				var percent = "0%";
@@ -230,7 +231,7 @@ ui.update_upload_grid = function() {
 			span.textContent = "Ожидание ответа от сервера...";
 			span.style.display = "inline-block";
 			div.appendChild(span);
-			div.nextSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+			div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
 		},
 		"FINISHED": function(entry, div) {
 			if (!entry.state_changed) {
@@ -240,7 +241,7 @@ ui.update_upload_grid = function() {
 				var span = document.createElement('span');
 				span.style.display = "inline-block";
 				div.appendChild(span);
-				div.nextSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+				div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
 			}
 			span.textContent = entry.result;
 		},
@@ -253,7 +254,7 @@ ui.update_upload_grid = function() {
 				span.style.display = "inline-block";
 				div.appendChild(span);
 				span.style.color = "#E00";
-				div.nextSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+				div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
 			}
 			span.textContent = "Ошибка: " + entry.result;
 		},
@@ -264,7 +265,7 @@ ui.update_upload_grid = function() {
 			span.textContent = "Загрузка отменена";
 			span.style.display = "inline-block";
 			div.appendChild(span);
-			div.nextSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+			div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
 		},
 	};
 	
@@ -311,23 +312,48 @@ ui.update_upload_grid = function() {
 			
 		} else {
 			rows_to_remove.delete(entry.elem);
-			state_handlers[entry.state](entry, entry.elem.nextSibling);
+			state_handlers[entry.state](entry, entry.elem.nextElementSibling);
 		}
 	});
 	
 	rows_to_remove.forEach(function(elem, _, set) {
-		var next_elem = elem.nextSibling.nextSibling.nextSibling;
+		var next_elem = elem.nextElementSibling.nextElementSibling.nextElementSibling;
 		while (next_elem) {
 			next_elem.style["grid-row-start"] = next_elem.style["grid-row-start"] - 1;
-			next_elem = next_elem.nextSibling;
+			next_elem = next_elem.nextElementSibling;
 		}
-		ui.upload_grid.removeChild(elem.nextSibling.nextSibling);
-		ui.upload_grid.removeChild(elem.nextSibling);
+		ui.upload_grid.removeChild(elem.nextElementSibling.nextElementSibling);
+		ui.upload_grid.removeChild(elem.nextElementSibling);
 		ui.upload_grid.removeChild(elem);
+		if (elem == ui.highlighted_row_first_elem_upload) {
+			ui.highlighted_row_first_elem_upload = null;
+		}
 	});
 	
-	ui.highlighted_row_first_elem_upload = null;
-	ui.upload_grid.scrollTop = 0;
+}
+
+ui.upload_erase = function(event) {
+	var elem;
+	for (var i = 0; i < event.path.length; i++) {
+		if (event.path[i].classList.contains("grid_item")) {
+			elem = event.path[i];
+			break;
+		} else if (event.path[i] == document.documentElement) {
+			break;
+		};
+	};
+	if (!elem) return;
+	
+	var first_elem_in_row = elem.previousElementSibling.previousElementSibling;
+	
+	data.uploading.forEach(function(entry, _, set) {
+		if (entry.elem == first_elem_in_row) {
+			entry.XMLHttpRequest.abort();
+			data.uploading.delete(entry);
+		};
+	});
+	
+	ui.update_upload_grid();
 }
 
 ui.materials_filter_show_or_hide = function(event, to_do, no_update) {
@@ -610,7 +636,7 @@ ui.button_publish_or_edit_click = function(event) {
 		var query_upload = new XMLHttpRequest();
 		query_upload.open("POST", "uploadScript.php", true);
 		
-		var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "formData": formData, "_state": "UPLOADING", "_state_changed": true};
+		var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "XMLHttpRequest": query_upload, "_state": "UPLOADING", "_state_changed": true};
 		Object.defineProperty(uploading_obj, "state", {
 			set: function (x) { this._state = x; this._state_changed = true; },
 			get: function () { return this._state; }
@@ -828,12 +854,12 @@ ui.grid_onmouseleave = function(event) {
 		if (ui.highlighted_row_first_elem == null) return;
 		var sibling = ui.highlighted_row_first_elem;
 		if (sibling) {
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
 			sibling.classList.remove("js_shadowed");
 		}
 		ui.highlighted_row_first_elem = null;
@@ -841,8 +867,8 @@ ui.grid_onmouseleave = function(event) {
 		if (ui.highlighted_row_first_elem_upload == null) return;
 		var sibling = ui.highlighted_row_first_elem_upload;
 		if (sibling) {
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
 			sibling.classList.remove("js_shadowed");
 		}
 		ui.highlighted_row_first_elem_upload = null;
@@ -872,17 +898,17 @@ ui.materials_onmouseover = function(event) {
 			if (column == "title") {
 				sibling = elem;
 			} else if (column == "f") {
-				sibling = elem.previousSibling;
+				sibling = elem.previousElementSibling;
 			} else if (column == "s") {
-				sibling = elem.previousSibling.previousSibling;
+				sibling = elem.previousElementSibling.previousElementSibling;
 			} else if (column == "t") {
-				sibling = elem.previousSibling.previousSibling.previousSibling;
+				sibling = elem.previousElementSibling.previousElementSibling.previousElementSibling;
 			} else if (column == "uploader") {
-				sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling;
+				sibling = elem.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling;
 			} else if (column == "uploaded") {
-				sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
+				sibling = elem.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling;
 			} else if (column == "delete") {
-				sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
+				sibling = elem.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling;
 			} else {
 				return undefined;
 			}
@@ -890,9 +916,9 @@ ui.materials_onmouseover = function(event) {
 			if (column == "title") {
 				sibling = elem;
 			} else if (column == "status_start") {
-				sibling = elem.previousSibling;
+				sibling = elem.previousElementSibling;
 			} else if (column == "delete") {
-				sibling = elem.previousSibling.previousSibling;
+				sibling = elem.previousElementSibling.previousElementSibling;
 			} else {
 				return undefined;
 			}
@@ -905,23 +931,23 @@ ui.materials_onmouseover = function(event) {
 		if (sibling == ui.highlighted_row_first_elem) return;
 		
 		if (sibling) {
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
 			sibling.classList.add("js_shadowed");
 		}
 		
 		var sibling = ui.highlighted_row_first_elem;
 		if (sibling) {
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
 			sibling.classList.remove("js_shadowed");
 		}
 		
@@ -930,15 +956,15 @@ ui.materials_onmouseover = function(event) {
 		if (sibling == ui.highlighted_row_first_elem_upload) return;
 		
 		if (sibling) {
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
 			sibling.classList.add("js_shadowed");
 		}
 		
 		var sibling = ui.highlighted_row_first_elem_upload;
 		if (sibling) {
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
 			sibling.classList.remove("js_shadowed");
 		}
 		
