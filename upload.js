@@ -243,7 +243,7 @@ ui.update_upload_grid = function() {
 				div.appendChild(span);
 				div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
 			}
-			span.textContent = entry.result;
+			span.title = span.textContent = entry.result;
 		},
 		"FINISHED_ERROR": function(entry, div) {
 			if (!entry.state_changed) {
@@ -256,7 +256,7 @@ ui.update_upload_grid = function() {
 				span.style.color = "#E00";
 				div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
 			}
-			span.textContent = "Ошибка: " + entry.result;
+			span.title = span.textContent = "Ошибка: " + entry.result;
 		},
 		"CANCELLED": function(entry, div) {
 			if (!entry.state_changed) return;
@@ -657,21 +657,26 @@ ui.button_publish_or_edit_click = function(event) {
 			ui.update_upload_grid();
 		};
 		query_upload.upload.onload = function(event) {
-			console.log("query_upload.upload.onload");
+			console.log("upload.onload");
 			uploading_obj.state = "WAITING_FOR_RESPONSE";
 			ui.update_upload_grid();
 		};
 		query_upload.onload = function(event) {
-			console.log(query_upload.responseText);
+			console.log("onload " + query_upload.responseText);
 			uploading_obj.result = query_upload.responseText;
-			uploading_obj.state = "FINISHED";
+			if (query_upload.status == 200) {
+				uploading_obj.state = "FINISHED";
+			} else {
+				uploading_obj.state = "FINISHED_ERROR";
+				uploading_obj.error = true;
+			}
 			ui.update_upload_grid();
 		};
 		query_upload.onerror = function(event) {
-			console.log("Error: " + query_upload.responseText);
+			console.log("onerror");
 			uploading_obj.state = "FINISHED_ERROR";
 			uploading_obj.error = true;
-			uploading_obj.result = query_upload.responseText;
+			uploading_obj.result = "Ошибка сети";
 			ui.update_upload_grid();
 		};
 		query_upload.send(formData);
