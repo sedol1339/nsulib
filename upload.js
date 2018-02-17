@@ -127,6 +127,7 @@ function init() {
 	ui.sort.uploaded.addEventListener('click', function(event) {ui.show_materials("uploaded")});
 	
 	ui.grid.addEventListener('mouseleave', ui.grid_onmouseleave);
+	ui.upload_grid.addEventListener('mouseleave', ui.grid_onmouseleave);
 	
 	requests.get_full_lists();
 	
@@ -279,6 +280,7 @@ ui.update_upload_grid = function() {
 			div1.classList.add("grid_item");
 			div1.style["grid-row"] = row;
 			div1.style["grid-column"] = "title";
+			div1.onmouseover = ui.materials_onmouseover;
 			var span1 = document.createElement('span');
 			span1.title = span1.textContent = entry.title;
 			div1.appendChild(span1);
@@ -291,6 +293,7 @@ ui.update_upload_grid = function() {
 			div2.style["grid-row"] = row;
 			div2.style["grid-column-start"] = "status_start";
 			div2.style["grid-column-end"] = "delete";
+			div2.onmouseover = ui.materials_onmouseover;
 			ui.upload_grid.appendChild(div2);
 			
 			var div3 = document.createElement('div');
@@ -298,12 +301,12 @@ ui.update_upload_grid = function() {
 			div3.classList.add("delete_button_faint");
 			div3.style["grid-row"] = row;
 			div3.style["grid-column"] = "delete";
+			div3.onmouseover = ui.materials_onmouseover;
 			var span3 = document.createElement('span');
 			span3.innerHTML = "отмена";
 			div3.appendChild(span3);
 			ui.upload_grid.appendChild(div3);
 			
-			console.log(entry);
 			state_handlers[entry.state](entry, div2);
 			
 		} else {
@@ -322,6 +325,9 @@ ui.update_upload_grid = function() {
 		ui.upload_grid.removeChild(elem.nextSibling);
 		ui.upload_grid.removeChild(elem);
 	});
+	
+	ui.highlighted_row_first_elem_upload = null;
+	ui.upload_grid.scrollTop = 0;
 }
 
 ui.materials_filter_show_or_hide = function(event, to_do, no_update) {
@@ -816,22 +822,43 @@ ui.show_materials = function(sort) {
 }
 
 ui.highlighted_row_first_elem = null;
+ui.highlighted_row_first_elem_upload = null;
 ui.grid_onmouseleave = function(event) {
-	if (ui.highlighted_row_first_elem == null) return;
-	var sibling = ui.highlighted_row_first_elem;
-	if (sibling) {
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed");
+	if (event.currentTarget == ui.grid) {
+		if (ui.highlighted_row_first_elem == null) return;
+		var sibling = ui.highlighted_row_first_elem;
+		if (sibling) {
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed");
+		}
+		ui.highlighted_row_first_elem = null;
+	} else if (event.currentTarget == ui.upload_grid) {
+		if (ui.highlighted_row_first_elem_upload == null) return;
+		var sibling = ui.highlighted_row_first_elem_upload;
+		if (sibling) {
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed");
+		}
+		ui.highlighted_row_first_elem_upload = null;
 	}
-	ui.highlighted_row_first_elem = null;
 }
 ui.materials_onmouseover = function(event) {
-	var elem = event.toElement;
+	var elem;
+	//var elem = event.target;
+	for (var i = 0; i < event.path.length; i++) {
+		if (event.path[i].classList.contains("grid_item")) {
+			elem = event.path[i];
+			break;
+		} else if (event.path[i] == document.documentElement) {
+			break;
+		};
+	};
 	var column = elem.style["grid-column-start"];
 	var row = elem.style["grid-row-start"];
 	if (!column || !row) return; //почему так происходит?
@@ -841,51 +868,82 @@ ui.materials_onmouseover = function(event) {
 		var column = elem.style["grid-column-start"];
 		if (!column) return;
 		var sibling;
-		if (column == "title") {
-			sibling = elem;
-		} else if (column == "f") {
-			sibling = elem.previousSibling;
-		} else if (column == "s") {
-			sibling = elem.previousSibling.previousSibling;
-		} else if (column == "t") {
-			sibling = elem.previousSibling.previousSibling.previousSibling;
-		} else if (column == "uploader") {
-			sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling;
-		} else if (column == "uploaded") {
-			sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
-		} else if (column == "delete") {
-			sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
-		} else {
-			return undefined;
+		if (elem.parentNode == ui.grid) {
+			if (column == "title") {
+				sibling = elem;
+			} else if (column == "f") {
+				sibling = elem.previousSibling;
+			} else if (column == "s") {
+				sibling = elem.previousSibling.previousSibling;
+			} else if (column == "t") {
+				sibling = elem.previousSibling.previousSibling.previousSibling;
+			} else if (column == "uploader") {
+				sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling;
+			} else if (column == "uploaded") {
+				sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
+			} else if (column == "delete") {
+				sibling = elem.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling.previousSibling;
+			} else {
+				return undefined;
+			}
+		} else if (elem.parentNode == ui.upload_grid) {
+			if (column == "title") {
+				sibling = elem;
+			} else if (column == "status_start") {
+				sibling = elem.previousSibling;
+			} else if (column == "delete") {
+				sibling = elem.previousSibling.previousSibling;
+			} else {
+				return undefined;
+			}
 		}
 		return sibling;
 	}
 	
 	var sibling = find_first_elem_in_row(elem);
-	if (sibling == ui.highlighted_row_first_elem) return;
-	
-	if (sibling) {
-		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.add("js_shadowed");
+	if (elem.parentNode == ui.grid) {
+		if (sibling == ui.highlighted_row_first_elem) return;
+		
+		if (sibling) {
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed");
+		}
+		
+		var sibling = ui.highlighted_row_first_elem;
+		if (sibling) {
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed");
+		}
+		
+		ui.highlighted_row_first_elem = find_first_elem_in_row(elem);
+	} else if (elem.parentNode == ui.upload_grid) {
+		if (sibling == ui.highlighted_row_first_elem_upload) return;
+		
+		if (sibling) {
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.add("js_shadowed");
+		}
+		
+		var sibling = ui.highlighted_row_first_elem_upload;
+		if (sibling) {
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
+			sibling.classList.remove("js_shadowed");
+		}
+		
+		ui.highlighted_row_first_elem_upload = find_first_elem_in_row(elem);
 	}
-	
-	var sibling = ui.highlighted_row_first_elem;
-	if (sibling) {
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed"); sibling = sibling.nextSibling;
-		sibling.classList.remove("js_shadowed");
-	}
-	
-	ui.highlighted_row_first_elem = find_first_elem_in_row(elem);
 }
 
 requests.build_url = function(url, parameters) {
