@@ -293,7 +293,7 @@ html {
 }
 #materials_grid {
 	overflow-y: overlay;
-	flex: 0 1 100%;
+	flex: 0 1 auto;
 }
 
 .grid_item {
@@ -313,6 +313,12 @@ html {
 }
 .js_shadowed {
 	background:#F0F0F0;
+}
+.js_bold {
+	font-weight: bold;
+	box-sizing: border-box;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
 }
 /*.grid_item_title:hover, .grid_item_title:hover + div, .grid_item_title:hover + div + div, .grid_item_title:hover + div + div + div, .grid_item_title:hover + div + div + div + div, .grid_item_title:hover + div + div + div + div + div, .grid_item_title:hover + div + div + div + div + div + div {
 	background:#F0F0F0;
