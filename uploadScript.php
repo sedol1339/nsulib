@@ -1,20 +1,5 @@
 <?php
 
-/*$uploaddir = '';
-$uploadfile = $uploaddir . basename($_FILES['file']['name']);
-
-echo $_FILES['file']['name'] . ' ';
-echo $_FILES['file']['tmp_name'] . ' ';
-echo $_FILES['file']['type'] . ' ';
-echo $_FILES['file']['size'] . ' ';
-echo $_FILES['file']['error'] . ' ';
-
-if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) {
-    echo "Файл корректен и был успешно загружен.\n";
-} else {
-    echo "Возможная атака с помощью файловой загрузки!\n";
-}*/
-
 error_reporting(0);
 
 function error($message) {
@@ -26,6 +11,13 @@ function error($message) {
 
 function internal_error($message) {
 	header('HTTP/1.1 500 Internal Server Error');
+	header('Content-Type: text/html; charset=utf-8');
+	echo $message;
+	exit;
+}
+
+function send_answer_and_exit($message) {
+	header('HTTP/1.1 200 OK');
 	header('Content-Type: text/html; charset=utf-8');
 	echo $message;
 	exit;
@@ -95,15 +87,81 @@ switch ($file['error']) {
 		internal_error("Внутренняя ошибка сервера: " . $file['error']);
 }
 
+$type .= ":UNKNOWN";
 
-//безопасность?
+$uploader = "1";
+
+$ip = "";
+
+$filesize = $file['size'];
+
 $filename = random_str();
 $path = dirname(dirname(__FILE__)) . "/files/" . $filename;
 if (!move_uploaded_file($_FILES['file']['tmp_name'], $path))
 	internal_error("Внутренняя ошибка сервера: move_uploaded_file");
 
-//echo $filename;
+//------------------------------
 
-exit;
+include('.login_data');
+	
+$mysqli = new mysqli($db_host, $db_user, $db_password, $db_schema);
+
+if ($mysqli->connect_errno) {
+	echo "Не удалось подключиться к MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error; exit;
+}
+
+if (!$mysqli->set_charset("utf8")) {
+	echo "Ошибка при загрузке набора символов utf8: " . $mysqli->error; exit;
+}
+
+//------------------------------
+
+$columns = "title";
+$values = "'" . $mysqli->real_escape_string($title) . "'";
+
+$columns .= ", " . "faculty";
+$values .= ", " . "'" . $mysqli->real_escape_string($f) . "'";
+
+$columns .= ", " . "subject";
+$values .= ", " . "'" . $mysqli->real_escape_string($s) . "'";
+
+$columns .= ", " . "teacher";
+$values .= ", " . "'" . $mysqli->real_escape_string($t) . "'";
+
+$columns .= ", " . "type";
+$values .= ", " . "'" . $mysqli->real_escape_string($type) . "'";
+
+$columns .= ", " . "author";
+$values .= ", " . "'" . $mysqli->real_escape_string($author) . "'";
+
+$columns .= ", " . "year";
+$values .= ", " . "'" . $mysqli->real_escape_string($year) . "'";
+
+$columns .= ", " . "commentary";
+$values .= ", " . "'" . $mysqli->real_escape_string($description) . "'";
+
+$columns .= ", " . "uploader";
+$values .= ", " . "'" . $mysqli->real_escape_string($uploader) . "'";
+
+$columns .= ", " . "ip";
+$values .= ", " . "'" . $mysqli->real_escape_string($ip) . "'";
+
+$columns .= ", " . "file";
+$values .= ", " . "'" . $mysqli->real_escape_string($filename) . "'";
+
+$columns .= ", " . "filesize";
+$values .= ", " . "'" . $mysqli->real_escape_string($filesize) . "'";
+
+$sql = "INSERT INTO materials (" . $columns . ") VALUES (" . $values . ")";
+
+if (!$result = $mysqli->query($sql))
+	error("MYSQL " . $mysqli->errno . ": " . $mysqli->error);
+
+$new_id = $mysqli->insert_id;
+
+if ($new_id == 0)
+	error("MYSQL: insert_id is 0");
+
+send_answer_and_exit($new_id);
 
 ?>

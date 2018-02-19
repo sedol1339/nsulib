@@ -663,12 +663,14 @@ ui.button_publish_or_edit_click = function(event) {
 		};
 		query_upload.onload = function(event) {
 			console.log("onload " + query_upload.responseText);
-			uploading_obj.result = query_upload.responseText;
 			if (query_upload.status == 200) {
 				uploading_obj.state = "FINISHED";
+				ui.last_uploaded = query_upload.responseText;
+				uploading_obj.result = "Файл успешно загружен.";
 			} else {
 				uploading_obj.state = "FINISHED_ERROR";
 				uploading_obj.error = true;
+				uploading_obj.result = query_upload.responseText;
 			}
 			ui.update_upload_grid();
 		};
