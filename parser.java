@@ -1,15 +1,21 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -49,6 +55,8 @@ public class Main {
 	static Map<Integer, Info> teachers = new HashMap<Integer, Info>();
 	static List<Linking> linkings = new ArrayList<Linking>();
 	//static int faculties_length = 0, groups_length = 0, subjects_length = 0, teachers_length = 0;
+	
+	static Random r = new Random();
 
 	public static void main(String[] args) {
 
@@ -64,11 +72,6 @@ public class Main {
 		
 		parseShedule();
 		fillDatabaseLists();
-		fillMaterials();
-	}
-	
-	static void fillMaterials() {
-		
 	}
 	
 	static void fillDatabaseLists() {
@@ -85,7 +88,7 @@ public class Main {
 		}
 		
 		//Факультеты:
-		runSQL(conn, "ALTER TABLE `faculties` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL");
+		//runSQL(conn, "ALTER TABLE `faculties` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL");
 		runSQL(conn, "DELETE FROM `faculties` WHERE 1");
 		for (Integer id : faculties.keySet()) {
 			Info entry = faculties.get(id);
@@ -93,11 +96,11 @@ public class Main {
 				+ "','" + escapeString(entry.full_title) + "','" + escapeString(entry.short_title) + "')";
 			runSQL(conn, sql);
 		}
-		runSQL(conn, "ALTER TABLE `faculties` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT");
+		//runSQL(conn, "ALTER TABLE `faculties` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT");
 		runSQL(conn, "ALTER TABLE `faculties` AUTO_INCREMENT = " + escapeString("" + (faculties.size() + 1)));
 		
 		//предметы:
-		runSQL(conn, "ALTER TABLE `subjects` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL");
+		//runSQL(conn, "ALTER TABLE `subjects` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL");
 		runSQL(conn, "DELETE FROM `subjects` WHERE 1");
 		for (Integer id : subjects.keySet()) {
 			Info entry = subjects.get(id);
@@ -105,11 +108,11 @@ public class Main {
 				+ "','" + escapeString(entry.full_title) + "','" + escapeString(entry.short_title) + "')";
 			runSQL(conn, sql);
 		}
-		runSQL(conn, "ALTER TABLE `subjects` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT");
+		//runSQL(conn, "ALTER TABLE `subjects` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT");
 		runSQL(conn, "ALTER TABLE `subjects` AUTO_INCREMENT = " + escapeString("" + (subjects.size() + 1)));
 		
 		//преподаватели:
-		runSQL(conn, "ALTER TABLE `teachers` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL");
+		//runSQL(conn, "ALTER TABLE `teachers` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL");
 		runSQL(conn, "DELETE FROM `teachers` WHERE 1");
 		for (Integer id : teachers.keySet()) {
 			Info entry = teachers.get(id);
@@ -117,7 +120,7 @@ public class Main {
 				+ "','" + escapeString(entry.full_title) + "','" + escapeString(entry.short_title) + "')";
 			runSQL(conn, sql);
 		}
-		runSQL(conn, "ALTER TABLE `teachers` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT");
+		//runSQL(conn, "ALTER TABLE `teachers` CHANGE `id` `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT");
 		runSQL(conn, "ALTER TABLE `teachers` AUTO_INCREMENT = " + escapeString("" + (teachers.size() + 1)));
 		
 		//связи:
@@ -126,6 +129,71 @@ public class Main {
 			String sql = "INSERT INTO `relations`(`faculty`, `subject`, `teacher`) VALUES ('" + escapeString("" + linking.faculty)
 			+ "','" + escapeString("" + linking.subject) + "','" + escapeString("" + linking.teacher) + "')";
 			runSQL(conn, sql);
+		}
+		
+		//материалы:
+		Map<Integer, Double> modifier_1 = new HashMap<Integer, Double>();
+		modifier_1.put(1, 0.1); //ГГФ
+		modifier_1.put(1, 1.0); //ММФ
+		modifier_1.put(1, 0.4); //ФЕН
+		modifier_1.put(1, 0.5); //ФФ
+		modifier_1.put(1, 1.5); //ФИТ
+		modifier_1.put(1, 0.0); //ЭФ
+		modifier_1.put(1, 0.2); //ИФП
+		modifier_1.put(1, 0.0); //ИМП
+		Map<Integer, Double> modifier_2 = new HashMap<Integer, Double>();
+		for(int i = 0; i <= subjects.size(); i++) {
+			double d = Math.random() * 10 - 5;
+			double d2 = (d < -4) ? 0 : Math.pow(2, d);
+			modifier_2.put(i, d2);
+		}
+		
+		File dir = new File("D:\\nsulib\\random filenames");
+		File[] directoryListing = dir.listFiles();
+		List<String[]> names_and_mimes = new ArrayList<String[]>();
+		for (File child : directoryListing) {
+			String[] name_mime = {child.getName(), Files.probeContentType(child.toPath())};
+			names_and_mimes.add(name_mime);
+		}
+		
+		for (Linking linking : linkings) {
+			double modifier = modifier_1.get(linking.faculty) * modifier_2.get(linking.subject);
+			long amount_teacher = Math.round(Math.pow(2, Math.random() * 3.5) * modifier);
+			long amount_student = Math.round(Math.pow(2, Math.random() * 3.5) * modifier);
+			long amount_literature = Math.round(Math.pow(2, Math.random() * 2) * modifier);
+			for (int i = 0; i < amount_teacher + amount_student + amount_literature; i++) {
+				//создаем учебный материал
+				
+				int f = linking.faculty;
+				int s = linking.subject;
+				int t = linking.teacher;
+				
+				String type;
+				if (i < amount_teacher) {
+					type = "TEACHER";
+				} else if (i < amount_teacher + amount_student) {
+					type = "STUDENT";
+				} else {
+					type = "LITERATURE";
+				}
+				
+				int random_id = r.nextInt(names_and_mimes.size());
+				String title = names_and_mimes.get(random_id)[0];
+				String mime = names_and_mimes.get(random_id)[1];
+				
+				String author = null;
+				String year = null;
+				String commentary = null;
+				int uploader = 0;
+				long ip = 0;
+				String link = null;
+				String file = "----";
+				int filesize = 0;
+				String uploaded = "";
+				String edited = "";
+				int viewed = 0;
+				int downloaded = 0;
+			}
 		}
 	}
 	
@@ -213,8 +281,9 @@ public class Main {
 				}
 				linking.groups.add(id);
 				System.out.println(linking);
-			//System.exit(0);
 			}
+			//break;
+			//System.exit(0);
 		}
 		System.out.println("Количество факультетов: " + faculties.size());
 		System.out.println("Количество групп: " + groups.size());
@@ -316,14 +385,108 @@ public class Main {
     }
 	
 	public static void runSQL(Connection conn, String s) {
-		System.out.print(s + "...");
+		System.out.print(s);
 		try {
 			conn.createStatement().executeUpdate(s);
-			System.out.print("Success\n");
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
+	}
+	
+	static String getRandomAuthorName(boolean fromInside) {
+		if (!fromInside && r.nextInt(5) == 0) {
+			return null;
+		}
+		String name, surname;
+		switch (r.nextInt(5)) {
+		case 0: name = "А.Б."; break;
+		case 1: name = "Г.Д."; break;
+		case 2: name = "Е.А."; break;
+		case 3: name = "В.П."; break;
+		case 4: default: name = "Л.К."; break;
+		}
+		switch (r.nextInt(5)) {
+		case 0: surname = "Рогов"; break;
+		case 1: surname = "Сачков"; break;
+		case 2: surname = "Усачев"; break;
+		case 3: surname = "Мамонтов"; break;
+		case 4: default: surname = "Котовский"; break;
+		}
+		String second = "";
+		if(r.nextInt(5) == 0) {
+			second = ", " + getRandomAuthorName(true);
+		}
+		if (fromInside)
+			return name + " " + surname + second;
+		else
+			return "'" + surname + " " + name + second + "'";
+	}
+	
+	static String getRandomYear() {
+		switch (r.nextInt(5)) {
+		case 0: return null;
+		case 1: return "'2017'";
+		case 2: return "'2016'";
+		case 3: return "'2015'";
+		case 4: default: return "'2014'";
+		}
+	}
+	
+	static String getRandomCommentary() {
+		if(r.nextInt(2) == 0) {
+			return null;
+		}
+		int length = 0;
+		while(true) {
+			int add = r.nextInt(10);
+			if (add > 0) length += add;
+			else break;
+			if (length > 1000) break;
+		}
+		if (length == 0) return "''";
+		char[] ret = new char[length];
+		for (int i = 0; i < length; i++)
+			ret[i] = '-';
+		return "'" + new String( ret) + "'";
+	}
+	
+	static String getRandomUploader() {
+		int rnd = r.nextInt(1500);
+		if (rnd > 800) return "1";
+		if (rnd > 400) return "2";
+		if (rnd > 200) return "3";
+		if (rnd > 100) return "4";
+		if (rnd > 50) return "5";
+		if (rnd > 10) return "6";
+		return "7";
+	}
+	
+	static String[] getRandomDates() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		sdf.format(timestamp);
+		
+		int monthEdited = r.nextInt(12);
+		int monthUploaded = r.nextInt(monthEdited + 1) - 1;
+		monthEdited++;
+		monthUploaded++;
+		int dayEdited = r.nextInt(28);
+		int dayUploaded = r.nextInt(dayEdited + 1) - 1;
+		dayEdited++;
+		dayUploaded++;
+		int hrEdited = r.nextInt(24);
+		int hrUploaded = r.nextInt(hrEdited + 1) - 1;
+		int minEdited = r.nextInt(60);
+		int minUploaded = r.nextInt(minEdited + 1) - 1;
+		int secEdited = r.nextInt(60);
+		int secUploaded = r.nextInt(secEdited + 1) - 1;
+		String[] ret = new String[2];
+		ret[0] = String.format("'2017-%d-%d %d:%d:%d.000'",
+			monthUploaded, dayUploaded, hrUploaded, minUploaded, secUploaded);
+		ret[1] = String.format("'2017-%d-%d %d:%d:%d.000'",
+				monthEdited, dayEdited, hrEdited, minEdited, secEdited);
+		return ret;
 	}
 }
