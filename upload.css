@@ -264,9 +264,9 @@ main {
 }
 
 html {
-	--width_title: 3fr;
-	--width_f: 0.8fr;
-	--width_s: 0.8fr;
+	--width_title: 1.8fr;
+	--width_f: 0.55fr;
+	--width_s: 0.9fr;
 	--width_t: 0.8fr;
 	--width_uploader: 0.8fr;
 	--width_uploaded: 1fr;

@@ -62,6 +62,7 @@ var data = {
 	full_lists: {
 		f:{0: ""}, s:{0: ""}, t:{0: ""}
 	},
+	relations: [],
 	filters: {
 		f:{0: ""}, s:{0: ""}, t:{0: ""}, uploaded:{"TODAY": "Сегодня", "THIS_WEEK": "За последнюю неделю", "ALL_TIME": "За все время"},
 	},
@@ -99,10 +100,10 @@ function init() {
 	ui.input.f.addEventListener('change', function(event) {ui.event_main_selection(event, "f")});
 	ui.input.s.addEventListener('change', function(event) {ui.event_main_selection(event, "s")});
 	ui.input.t.addEventListener('change', function(event) {ui.event_main_selection(event, "t")});
-	ui.update_list("f");
-	ui.update_list("s");
-	ui.update_list("t");
-	requests.get_list("f", undefined, undefined, undefined, { update_ui: true } );
+	//ui.update_list("f");
+	//ui.update_list("s");
+	//ui.update_list("t");
+	//requests.get_list("f", undefined, undefined, undefined, { update_ui: true } );
 	ui.fill_additional_lists();
 	
 	ui.materials_filter.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "switch")});
@@ -129,7 +130,7 @@ function init() {
 	ui.grid.addEventListener('mouseleave', ui.grid_onmouseleave);
 	ui.upload_grid.addEventListener('mouseleave', ui.grid_onmouseleave);
 	
-	requests.get_full_lists();
+	requests.get_full_lists_and_relations();
 	
 	ui.update_upload_grid();
 }
@@ -422,7 +423,8 @@ ui.get_selected_filter_value = function(letter) {
 }
 
 ui.event_main_selection = function(event, letter) {
-	if (ui.get_selected_value(letter) == 0) {
+	ui.update_lists(letter);
+	/*if (ui.get_selected_value(letter) == 0) {
 		//если выбрано пустое значение, сбрасываем нижние списки
 		if (letter == "f") {
 			data.lists.s = {0: ""};
@@ -445,7 +447,7 @@ ui.event_main_selection = function(event, letter) {
 		//обновляем t
 		ui.input["t"].disabled = true;
 		requests.get_list("t", ui.get_selected_value("f"), ui.get_selected_value("s"), undefined, { update_ui: true } );
-	}
+	}*/
 }
 
 ui.event_filter_selection = function(event, letter) {
@@ -708,52 +710,60 @@ ui.show_materials = function(sort) {
 		box.style.display='none';
 	} else {
 		document.getElementById('no_materials').style.display='none';
-		document.getElementById('materials_amount').textContent = " (" + data.materials.length + ")";
+		if (data.materials.length > 1000) {
+			document.getElementById('materials_amount').textContent = " (" + data.materials.length + ", показано 1000)";
+		} else {
+			document.getElementById('materials_amount').textContent = " (" + data.materials.length + ")";
+		}
 		
-		if (sort) {
-			console.log(sort);
-			var sort_func;
-			if (sort == "title") {
-				sort_func = function(a, b) { return a.title.localeCompare(b.title); };
-			} else if (sort == "f") {
-				sort_func = function(a, b) {
-					var result = data.full_lists.f[a.faculty].localeCompare(data.full_lists.f[b.faculty]);
-					if (result == 0) result = data.full_lists.s[a.subject].localeCompare(data.full_lists.s[b.subject]);
-					if (result == 0) result = data.full_lists.t[a.teacher].localeCompare(data.full_lists.t[b.teacher]);
-					return result;
-				};
-			} else if (sort == "s") {
-				sort_func = function(a, b) {
-					var result = data.full_lists.s[a.subject].localeCompare(data.full_lists.s[b.subject]);
-					if (result == 0) result = data.full_lists.t[a.teacher].localeCompare(data.full_lists.t[b.teacher]);
-					if (result == 0) result = data.full_lists.f[a.faculty].localeCompare(data.full_lists.f[b.faculty]);
-					return result;
-				};
-			} else if (sort == "t") {
-				sort_func = function(a, b) {
-					var result = data.full_lists.t[a.teacher].localeCompare(data.full_lists.t[b.teacher]);
-					if (result == 0) result = data.full_lists.f[a.faculty].localeCompare(data.full_lists.f[b.faculty]);
-					if (result == 0) result = data.full_lists.s[a.subject].localeCompare(data.full_lists.s[b.subject]);
-					return result;
-				};
-			} else if (sort == "uploader") {
-				sort_func = function(a, b) {
-					var result = a.uploader.localeCompare(b.uploader);
-					if (result == 0) result = b.uploaded.localeCompare(a.uploaded);
-					return result;
-				};
-			} else if (sort == "uploaded") {
-				sort_func = function(a, b) {
-					return b.uploaded.localeCompare(a.uploaded);
-				};
-			}
-			if (sort_func) {
-				data.materials = data.materials.sort(sort_func);
-			}
+		
+		if (!sort) {
+			sort = "f";
+		}
+		console.log(sort);
+		var sort_func;
+		if (sort == "title") {
+			sort_func = function(a, b) { return a.title.localeCompare(b.title); };
+		} else if (sort == "f") {
+			sort_func = function(a, b) {
+				var result = data.full_lists.f[a.faculty][1].localeCompare(data.full_lists.f[b.faculty][1]);
+				if (result == 0) result = data.full_lists.s[a.subject][1].localeCompare(data.full_lists.s[b.subject][1]);
+				if (result == 0) result = data.full_lists.t[a.teacher][1].localeCompare(data.full_lists.t[b.teacher][1]);
+				return result;
+			};
+		} else if (sort == "s") {
+			sort_func = function(a, b) {
+				var result = data.full_lists.s[a.subject][1].localeCompare(data.full_lists.s[b.subject][1]);
+				if (result == 0) result = data.full_lists.t[a.teacher][1].localeCompare(data.full_lists.t[b.teacher][1]);
+				if (result == 0) result = data.full_lists.f[a.faculty][1].localeCompare(data.full_lists.f[b.faculty][1]);
+				return result;
+			};
+		} else if (sort == "t") {
+			sort_func = function(a, b) {
+				var result = data.full_lists.t[a.teacher][1].localeCompare(data.full_lists.t[b.teacher][1]);
+				if (result == 0) result = data.full_lists.f[a.faculty][1].localeCompare(data.full_lists.f[b.faculty][1]);
+				if (result == 0) result = data.full_lists.s[a.subject][1].localeCompare(data.full_lists.s[b.subject][1]);
+				return result;
+			};
+		} else if (sort == "uploader") {
+			sort_func = function(a, b) {
+				var result = a.uploader.localeCompare(b.uploader);
+				if (result == 0) result = b.uploaded.localeCompare(a.uploaded);
+				return result;
+			};
+		} else if (sort == "uploaded") {
+			sort_func = function(a, b) {
+				return b.uploaded.localeCompare(a.uploaded);
+			};
+		}
+		if (sort_func) {
+			data.materials = data.materials.sort(sort_func);
 		}
 		
 		var row_number = 1;
 		data.materials.forEach(function(entry, array_index, arr) {
+			
+			if (row_number > 1000) return;
 			
 			var div = document.createElement('div');
 			div.classList.add("grid_item");
@@ -776,7 +786,8 @@ ui.show_materials = function(sort) {
 				div.style["grid-row"] = row_number;
 				div.style["grid-column"] = "f";
 				var span = document.createElement('span');
-				span.title = span.textContent = data.full_lists.f[entry.faculty];
+				span.title = data.full_lists.f[entry.faculty][0]
+				span.textContent = data.full_lists.f[entry.faculty][1];
 				div.appendChild(span);
 				box.appendChild(div);
 			//}
@@ -789,7 +800,8 @@ ui.show_materials = function(sort) {
 				div.style["grid-row"] = row_number;
 				div.style["grid-column"] = "s";
 				var span = document.createElement('span');
-				span.title = span.textContent = data.full_lists.s[entry.subject];
+				span.title = data.full_lists.s[entry.subject][0];
+				span.textContent = data.full_lists.s[entry.subject][1];
 				div.appendChild(span);
 				box.appendChild(div);
 			//}
@@ -802,7 +814,8 @@ ui.show_materials = function(sort) {
 				div.style["grid-row"] = row_number;
 				div.style["grid-column"] = "t";
 				var span = document.createElement('span');
-				span.title = span.textContent = data.full_lists.t[entry.teacher];
+				span.title = data.full_lists.t[entry.teacher][0];
+				span.textContent = data.full_lists.t[entry.teacher][1];
 				div.appendChild(span);
 				box.appendChild(div);
 			//}
@@ -1093,8 +1106,8 @@ requests.receive_materials = function(show) {
 
 //TODO убрать повторение кода
 
-requests.get_full_lists = function() {
-	var get_full_list = function(letter) {
+requests.get_full_lists_and_relations = function() {
+	/*var get_full_list = function(letter) {
 		var url_params = { "action": "list", "target": letter };
 		
 		var request = new XMLHttpRequest();
@@ -1108,7 +1121,72 @@ requests.get_full_lists = function() {
 	};
 	get_full_list("f");
 	get_full_list("s");
-	get_full_list("t");
+	get_full_list("t");*/
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "/init.json", true);
+	xhr.onload = function() {
+		var response = JSON.parse(xhr.responseText);
+		data.full_lists.f = response.faculties;
+		data.full_lists.s = response.subjects;
+		data.full_lists.t = response.teachers;
+		data.relations = response.relations;
+		ui.update_lists("init");
+	}
+	xhr.send();
+}
+
+ui.update_lists = function(letter) {
+	var upd = function(letter) {
+		var local_list = ui.input[letter];
+		var local_data = data.lists[letter];
+		while (local_list.firstChild) {
+			local_list.removeChild(local_list.firstChild);
+		};
+		var func = function(i, _, set) {
+			var title = (i == 0) ? "" : data.full_lists[letter][i][(letter == "t") ? 1 : 0];
+			var opt = document.createElement('option');
+			opt.textContent = title;
+			opt.value = i;
+			local_list.appendChild(opt);
+		};
+		func(0, null, null);
+		local_data.forEach(func);
+	};
+	if (letter == "init") {
+		data.lists.f = new Set(Object.keys(data.full_lists.f));
+		data.lists.s = new Set();
+		data.lists.t = new Set();
+		upd("f"); upd("s"); upd("t");
+	} else if (letter == "f") {
+		data.lists.s.clear();
+		if (ui.get_selected_value("f") != 0) {
+			for (var i = 0; i < data.relations.length; i++) {
+				var relation = data.relations[i];
+				if (relation[0] == ui.get_selected_value("f")) {
+					data.lists.s.add(relation[1]);
+				}
+			}
+		}
+		data.lists.t.clear();
+		upd("s"); upd("t");
+	} else if (letter == "s") {
+		data.lists.t.clear();
+		if (ui.get_selected_value("s") != 0) {
+			for (var i = 0; i < data.relations.length; i++) {
+				var relation = data.relations[i];
+				if (relation[0] == ui.get_selected_value("f") && relation[1] == ui.get_selected_value("s")) {
+					data.lists.t.add(relation[2]);
+				}
+			}
+		}
+		upd("t");
+		//если преподаватель один, выбираем его в списке
+		if (data.lists.t.size == 1) {
+			ui.input["t"].selectedIndex = 1
+		}
+	} else {
+		//ничего не делаем
+	}
 }
 
 requests.get_list = function(target, f_id, s_id, t_id, function_params) {
