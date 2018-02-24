@@ -1,3 +1,9 @@
+24.02	http://jquery.page2page.ru/index.php5/Введение_в_jQuery
+
+23.02	https://habrahabr.ru/company/ruvds/blog/333856/
+		https://learn.javascript.ru/prototype
+		https://learn.javascript.ru/new-prototype
+
 22.02	Реализовано: использование init.json в upload.php. TODO: убрать из get.php названия, использовать init.json для получения названий, также и в index.php
 
 22.02	Доработаны связи между таблицами. TODO использовать init.json в upload.php

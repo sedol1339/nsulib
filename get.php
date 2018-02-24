@@ -97,7 +97,7 @@
 		
 		if ($target == 'f') { //вернуть список факультетов
 			
-			$sql = "SELECT DISTINCT faculties.id, faculties.title FROM faculties, materials WHERE faculties.id = materials.faculty ";
+			$sql = "SELECT DISTINCT faculties.id FROM faculties, materials WHERE faculties.id = materials.faculty ";
 			if ($s != 0) { $sql .= " AND materials.subject = $s"; }
 			if ($t != 0) { $sql .= " AND materials.teacher = $t"; }
 		
@@ -105,13 +105,14 @@
 				echo "Запрос $sql не удался: (" . $mysqli->errno . ") " . $mysqli->error; exit;
 			} else {
 				while ($row = $result->fetch_assoc()) {
-					$list[$row["id"]] = $row["title"];
+					//$list[$row["id"]] = $row["title"];
+					array_push($list, intval($row["id"]));
 				}
 			}
 			
 		} else if ($target == 's') { //вернуть список предметов
 			
-			$sql = "SELECT DISTINCT subjects.id, subjects.title FROM subjects, materials WHERE subjects.id = materials.subject ";
+			$sql = "SELECT DISTINCT subjects.id FROM subjects, materials WHERE subjects.id = materials.subject ";
 			if ($f != 0) { $sql .= " AND materials.faculty = $f"; }
 			if ($t != 0) { $sql .= " AND materials.teacher = $t"; }
 		
@@ -119,13 +120,14 @@
 				echo "Запрос $sql не удался: (" . $mysqli->errno . ") " . $mysqli->error; exit;
 			} else {
 				while ($row = $result->fetch_assoc()) {
-					$list[$row["id"]] = $row["title"];
+					//$list[$row["id"]] = $row["title"];
+					array_push($list, intval($row["id"]));
 				}
 			}
 			
 		} else if ($target == 't') { //вернуть список преподавателей
 			
-			$sql = "SELECT DISTINCT teachers.id, teachers.name FROM teachers, materials WHERE teachers.id = materials.teacher ";
+			$sql = "SELECT DISTINCT teachers.id FROM teachers, materials WHERE teachers.id = materials.teacher ";
 			if ($f != 0) { $sql .= " AND materials.faculty = $f"; }
 			if ($s != 0) { $sql .= " AND materials.subject = $s"; }
 		
@@ -133,7 +135,8 @@
 				echo "Запрос $sql не удался: (" . $mysqli->errno . ") " . $mysqli->error; exit;
 			} else {
 				while ($row = $result->fetch_assoc()) {
-					$list[$row["id"]] = $row["name"];
+					//$list[$row["id"]] = $row["name"];
+					array_push($list, intval($row["id"]));
 				}
 			}
 			

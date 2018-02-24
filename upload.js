@@ -64,7 +64,7 @@ var data = {
 	},
 	relations: [],
 	filters: {
-		f:{0: ""}, s:{0: ""}, t:{0: ""}, uploaded:{"TODAY": "Сегодня", "THIS_WEEK": "За последнюю неделю", "ALL_TIME": "За все время"},
+		f:[], s:[], t:[], uploaded:{"TODAY": "Сегодня", "THIS_WEEK": "За последнюю неделю", "ALL_TIME": "За все время"},
 	},
 	lists: {
 		f:{0: ""}, s:{0: ""}, t:{0: ""}, type:{"TEACHER": "Учебный материал", "STUDENT": "Конспект", "LITERATURE": "Литература"},
@@ -460,11 +460,11 @@ ui.event_filter_selection = function(event, letter) {
 	if (ui.get_selected_filter_value(letter) == 0) {
 		//если выбрано пустое значение, сбрасываем нижние списки
 		if (letter == "s" | letter == "f") {
-			data.filters.t = {0: ""};
+			data.filters.t = [];
 			ui.update_filter_list("t");
 		};
 		if (letter == "f") {
-			data.filters.s = {0: ""};
+			data.filters.s = [];
 			ui.update_filter_list("s");
 		};
 		return;
@@ -474,7 +474,7 @@ ui.event_filter_selection = function(event, letter) {
 		ui.filters["s"].disabled = true;
 		requests.get_filter_list("s", ui.get_selected_filter_value("f"), undefined, undefined, { update_ui: true } );
 		//сбрасываем t
-		data.filters.t = {0: ""};
+		data.filters.t = [];
 		ui.update_filter_list("t");
 	} else if (letter == "s") {
 		//обновляем t
@@ -493,8 +493,20 @@ ui.update_list = function(letter) {
 ui.update_filter_list = function(letter) {
 	var local_list = ui.filters[letter];
 	var local_data = data.filters[letter];
-	var selected = ui.fill_select_tag_and_select_if_one_option(local_list, local_data);
-	ui.filters[letter].disabled = false;
+	//var selected = ui.fill_select_tag_and_select_if_one_option(local_list, local_data);
+	//ui.filters[letter].disabled = false;
+	while (local_list.firstChild) {
+		local_list.removeChild(local_list.firstChild);
+	};
+	var func = function(i, _, set) {
+		var title = (i == 0) ? "" : data.full_lists[letter][i][(letter == "t") ? 1 : 0];
+		var opt = document.createElement('option');
+		opt.textContent = title;
+		opt.value = i;
+		local_list.appendChild(opt);
+	};
+	func(0, null, null);
+	local_data.forEach(func);
 }
 
 ui.set_default_filters = function() {
@@ -1189,7 +1201,7 @@ ui.update_lists = function(letter) {
 	}
 }
 
-requests.get_list = function(target, f_id, s_id, t_id, function_params) {
+/*requests.get_list = function(target, f_id, s_id, t_id, function_params) {
 	var url_params = { "action": "list", "target": target };
 	if (f_id != undefined) url_params["f"] = f_id;
 	if (s_id != undefined) url_params["s"] = s_id;
@@ -1208,7 +1220,7 @@ requests.get_list = function(target, f_id, s_id, t_id, function_params) {
 		}
 	}
 	requests.queries_lists[target].send();
-}
+}*/
 
 requests.get_filter_list = function(target, f_id, s_id, t_id, function_params) {
 	var url_params = { "action": "list", "target": target };
@@ -1223,7 +1235,7 @@ requests.get_filter_list = function(target, f_id, s_id, t_id, function_params) {
 	requests.queries_filters[target].open("GET", _url, true);
 	requests.queries_filters[target].onload = function() {
 		data.filters[target] = JSON.parse(requests.queries_filters[target].responseText);
-		data.filters[target][0] = "";
+		//data.filters[target][0] = "";
 		if (function_params.update_ui == true) {
 			ui.update_filter_list(target);
 		}
