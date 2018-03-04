@@ -1,5 +1,9 @@
-function checkpoint() {
-	var str = new Error("Checkpoint:").stack;
+function checkpoint(param) {
+	if (param) {
+		var str = new Error("Checkpoint (" + param + "):").stack;
+	} else {
+		var str = new Error("Checkpoint:").stack;
+	}
 	str = str.substring(7,str.length);
 	var parts = str.split("\n");
 	var last_index = 0;

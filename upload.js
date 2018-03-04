@@ -1,59 +1,41 @@
 'use strict';
 
-document.addEventListener('DOMContentLoaded', init);
-
 var ui = {
-	dummy: document.getElementById('dummy'),
-	button_publish_or_edit: document.getElementById('publish_file_button'),
-	button_quit: document.getElementById('quit_button'),
-	materials_filter: document.getElementById('materials_header_filter'),
-	materials_filter_box: document.getElementById('materials_filter_box'),
-	materials_filter_button_ok: document.getElementById('filter_button_ok'),
+	dummy: $('#dummy'),
+	button_publish_or_edit: $('#publish_file_button'),
+	button_quit: $('#quit_button'),
+	materials_filter: $('#materials_header_filter'),
+	materials_filter_box: $('#materials_filter_box'),
+	materials_filter_button_ok: $('#filter_button_ok'),
 	filters: {
-		f: document.getElementById('filter_f'),
-		s: document.getElementById('filter_s'),
-		t: document.getElementById('filter_t'),
-		uploaded: document.getElementById('filter_uploaded'),
+		f: $('#filter_f'),
+		s: $('#filter_s'),
+		t: $('#filter_t'),
+		uploaded: $('#filter_uploaded'),
 	},
-	info_type: document.getElementById('info_type'),
-	edit_info: document.getElementById('edit_info'),
+	info_type: $('#info_type'),
+	edit_info: $('#edit_info'),
 	input: {
-		file: document.getElementById('input_file'),
-		f: document.getElementById('input_f'),
-		s: document.getElementById('input_s'),
-		t: document.getElementById('input_t'),
-		type: document.getElementById('input_type'),
-		title: document.getElementById('input_title'),
-		author: document.getElementById('input_author'),
-		year: document.getElementById('input_year'),
-		description: document.getElementById('input_description'),
+		file: $('#input_file'),
+		f: $('#input_f'),
+		s: $('#input_s'),
+		t: $('#input_t'),
+		type: $('#input_type'),
+		title: $('#input_title'),
+		author: $('#input_author'),
+		year: $('#input_year'),
+		description: $('#input_description'),
 	},
-	file_about: document.getElementById('info_file_about'),
-	upload_grid: document.getElementById("materials_upload_grid"),
-	grid: document.getElementById("materials_grid"),
-	/*filter_column: {
-		f: document.getElementById('filter_column_f'),
-		s: document.getElementById('filter_column_s'),
-		t: document.getElementById('filter_column_t'),
-		uploader: document.getElementById('filter_column_uploader'),
-		uploaded: document.getElementById('filter_column_uploaded'),
-	},
-	grid_columns: {
-		width_title: "3fr",
-		width_f: "0.8fr",
-		width_s: "0.8fr",
-		width_t: "0.8fr",
-		width_uploader: "0.8fr",
-		width_uploaded: "1fr",
-		width_delete: "0.6fr",
-	},*/
+	file_about: $('#info_file_about'),
+	upload_grid: $("#materials_upload_grid"),
+	grid: $("#materials_grid"),
 	sort: {
-		title: document.getElementById('sort_title'),
-		f: document.getElementById('sort_f'),
-		s: document.getElementById('sort_s'),
-		t: document.getElementById('sort_t'),
-		uploader: document.getElementById('sort_uploader'),
-		uploaded: document.getElementById('sort_uploaded'),
+		title: $('#sort_title'),
+		f: $('#sort_f'),
+		s: $('#sort_s'),
+		t: $('#sort_t'),
+		uploader: $('#sort_uploader'),
+		uploaded: $('#sort_uploaded'),
 	}
 }
 
@@ -83,85 +65,75 @@ var requests = { //functions and variables about xml-http-requests
 	},
 };
 
-function init() {
+$(document).ready(function init() {
+	
 	ui.init_guide_box();
-	window.addEventListener('beforeunload', ui.process_exit);
-	window.addEventListener('resize', ui.recalculate_css);
+	
+	$(window).on('beforeunload', ui.process_exit);
+	$(window).on('resize', ui.recalculate_css);
 	ui.recalculate_css();
-	ui.button_publish_or_edit.addEventListener('click', function(event) {ui.button_publish_or_edit_click(event)});
-	ui.button_quit.addEventListener('click', function(event) {ui.button_quit_click(event)});
-	ui.input.file.addEventListener('change', function(event) {ui.file_selected(event)});
 	
-	Array.prototype.forEach.call(ui.info_type.children, function(item, i, arr) {
-		item.addEventListener('click', ui.set_uploading_type);
-	});
+	ui.button_publish_or_edit.on('click', ui.button_publish_or_edit_click);
+	ui.button_quit.on('click', ui.button_quit_click);
+	ui.input.file.on('change', ui.file_selected);
+	
 	ui.set_uploading_type(null, "publishing");
+	ui.info_type.children().each(function() {
+		$(this).on('click', ui.set_uploading_type);
+	});
 	
-	ui.input.f.addEventListener('change', function(event) {ui.event_main_selection(event, "f")});
-	ui.input.s.addEventListener('change', function(event) {ui.event_main_selection(event, "s")});
-	ui.input.t.addEventListener('change', function(event) {ui.event_main_selection(event, "t")});
-	//ui.update_list("f");
-	//ui.update_list("s");
-	//ui.update_list("t");
-	//requests.get_list("f", undefined, undefined, undefined, { update_ui: true } );
+	ui.input.f.on('change', function(event) {ui.event_main_selection(event, "f")});
+	ui.input.s.on('change', function(event) {ui.event_main_selection(event, "s")});
+	ui.input.t.on('change', function(event) {ui.event_main_selection(event, "t")});
 	ui.fill_additional_lists();
 	
-	ui.materials_filter.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "switch")});
-	//ui.materials_table.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide", true)});
-	ui.materials_filter_button_ok.addEventListener('click', function(event) {ui.materials_filter_show_or_hide(event, "hide")});
-	
-	ui.filters.f.addEventListener('change', function(event) {ui.event_filter_selection(event, "f")});
-	ui.filters.s.addEventListener('change', function(event) {ui.event_filter_selection(event, "s")});
-	ui.filters.t.addEventListener('change', function(event) {ui.event_filter_selection(event, "t")});
-	ui.filters.uploaded.addEventListener('change', function(event) {ui.event_filter_selection(event, "uploaded")});
+	ui.materials_filter.on('click', function(event) {ui.materials_filter_show_or_hide(event, "switch")});
+	ui.materials_filter_button_ok.on('click', function(event) {ui.materials_filter_show_or_hide(event, "hide")});
+	ui.filters.f.on('change', function(event) {ui.event_filter_selection(event, "f")});
+	ui.filters.s.on('change', function(event) {ui.event_filter_selection(event, "s")});
+	ui.filters.t.on('change', function(event) {ui.event_filter_selection(event, "t")});
+	ui.filters.uploaded.on('change', function(event) {ui.event_filter_selection(event, "uploaded")});
 	ui.update_filter_list("f");
 	ui.update_filter_list("s");
 	ui.update_filter_list("t");
 	ui.fill_additional_filter_lists();
 	requests.get_filter_list("f", undefined, undefined, undefined, { update_ui: true, update_ui_custom_function: ui.set_default_filters } );
 	
-	ui.sort.title.addEventListener('click', function(event) {ui.show_materials("title")});
-	ui.sort.f.addEventListener('click', function(event) {ui.show_materials("f")});
-	ui.sort.s.addEventListener('click', function(event) {ui.show_materials("s")});
-	ui.sort.t.addEventListener('click', function(event) {ui.show_materials("t")});
-	ui.sort.uploader.addEventListener('click', function(event) {ui.show_materials("uploader")});
-	ui.sort.uploaded.addEventListener('click', function(event) {ui.show_materials("uploaded")});
+	ui.sort.title.on('click', function(event) {ui.show_materials("title")});
+	ui.sort.f.on('click', function(event) {ui.show_materials("f")});
+	ui.sort.s.on('click', function(event) {ui.show_materials("s")});
+	ui.sort.t.on('click', function(event) {ui.show_materials("t")});
+	ui.sort.uploader.on('click', function(event) {ui.show_materials("uploader")});
+	ui.sort.uploaded.on('click', function(event) {ui.show_materials("uploaded")});
 	
-	ui.grid.addEventListener('mouseleave', ui.grid_onmouseleave);
-	ui.upload_grid.addEventListener('mouseleave', ui.grid_onmouseleave);
+	ui.grid.on('mouseleave', ui.grid_onmouseleave);
+	ui.upload_grid.on('mouseleave', ui.grid_onmouseleave);
 	
 	requests.get_full_lists_and_relations();
 	
 	ui.update_upload_grid();
-}
+	
+	//checkpoint("init finished");
+});
 
 ui.set_uploading_type = function(event, type) {
 	if (event) {
 		//клик мыши, известен эвент и элемент, определить тип
-		var elem = event.target;
-		type = elem.getAttribute('data-type');
+		var elem = $(event.delegateTarget);
+		type = elem.attr('data-type');
 	} else {
 		//известен тип, определить элемент
-		var elem;
-		Array.prototype.forEach.call(ui.info_type.children, function(item, i, arr) {
-			if (item.getAttribute('data-type') == type) {
-				elem = item;
-			}; //здесь break возиожно сделать только выбрасыванием исключения
-		});
+		var elem = ui.info_type.find("[data-type='" + type + "']");
 	}
 	
-	Array.prototype.forEach.call(ui.info_type.children, function(item, i, arr) {
-		item.classList.remove("info_type_selected");
-	});
-	if (elem) { elem.classList.add("info_type_selected"); }
+	ui.info_type.children().removeClass("info_type_selected");
+	if (elem) {elem.addClass("info_type_selected");}
 	
 	ui.mode = type;
 	if (type == "publishing") {
-		ui.input.file.style.display = "";
-		//ui.edit_info.style.display = "none";
+		ui.input.file.css('display', "");
 	} else if (type == "editing") {
-		ui.input.file.style.display = "none";
-		//ui.edit_info.style.display = "";
+		ui.input.file.css('display', "none");
 	}
 }
 
@@ -172,45 +144,46 @@ ui.update_upload_grid = function() {
 		};
 	});
 	if (data.uploading.size == 0) {
-		while (ui.upload_grid.firstChild) {
-			ui.upload_grid.removeChild(ui.upload_grid.firstChild);
-		};
-		ui.upload_grid.style.display = 'none';
+		ui.upload_grid.empty().css('display', "none");
 		ui.highlighted_row_first_elem_upload = null;
 		return;
 	} else {
-		ui.upload_grid.style.display = '';
-		ui.upload_grid.style["height"] = Math.min(data.uploading.size, 6) * 30 + 'px';
+		//ui.upload_grid.css('display', "").css('height', Math.min(data.uploading.size, 6) * 30 + 'px');
+		ui.upload_grid.css('display', "").css('height', '150' + 'px');
 	}
 	
+	/*var rows_to_remove = new Set();
+	ui.upload_grid.children("[grid-column-start='title']").each( function() {
+		rows_to_remove.add($(this));
+	});*/
+	//var rows_to_remove = new Set(ui.upload_grid.children("[grid-column-start='title']"));
 	var rows_to_remove = new Set();
-	Array.prototype.forEach.call(ui.upload_grid.childNodes, function(item, i, arr) {
-		if (item.style["grid-column-start"] == "title") {
-			rows_to_remove.add(item);
+	ui.upload_grid.children().each(function() {
+		if ($(this).css('grid-column-start') == 'title') {
+			rows_to_remove.add($(this));
 		}
 	});
 	
 	var state_handlers = {
 		"UPLOADING": function(entry, div) {
-			//if (!entry.loading_span || !div.contains(entry.loading_span) || !div.contains(entry.progress_bar_inner)) {
 			if (entry.state_changed) {
-				while (div.firstChild) { div.removeChild(div.firstChild); };
+				div.empty();
 				
-				var span = document.createElement('span');
-				span.classList.add("uploading_span");
-				div.appendChild(span);
+				var span = $('<span>');
+				span.addClass("uploading_span");
+				div.append(span);
 				entry.loading_span = span;
 				
-				var progress_bar = document.createElement('div');
-				progress_bar.classList.add("uploading_progress_bar");
-				div.appendChild(progress_bar);
+				var progress_bar = $('<div>');
+				progress_bar.addClass("uploading_progress_bar");
+				div.append(progress_bar);
 				
-				var progress_bar_inner = document.createElement('div');
-				progress_bar_inner.classList.add("uploading_progress_bar_inner");
-				progress_bar.appendChild(progress_bar_inner);
+				var progress_bar_inner = $('<div>');
+				progress_bar_inner.addClass("uploading_progress_bar_inner");
+				progress_bar.append(progress_bar_inner);
 				entry.progress_bar_inner = progress_bar_inner;
 				
-				div.nextElementSibling.innerHTML = "<span onclick=\"ui.upload_erase(event)\">отмена</span>";
+				div.next().empty().append($('<span>').html('отмена').click(ui.upload_erase));
 			};
 			if (!entry.total || entry.total == 0) {
 				var percent = "0%";
@@ -222,133 +195,130 @@ ui.update_upload_grid = function() {
 				var percent = Math.round(entry.uploaded/entry.total*100) + "%";
 				var txt = "Загружено " + humanFileSize(entry.uploaded, true) + " из " + humanFileSize(entry.total, true) + " (" + percent + ")";
 			};
-			entry.loading_span.textContent = txt;
-			entry.progress_bar_inner.style.width = percent;
+			entry.loading_span.text(txt);
+			entry.progress_bar_inner.css("width", percent);
 		},
 		"WAITING_FOR_RESPONSE": function(entry, div) {
 			if (!entry.state_changed) return;
-			while (div.firstChild) { div.removeChild(div.firstChild); };
-			var span = document.createElement('span');
-			span.textContent = "Ожидание ответа от сервера...";
-			span.style.display = "inline-block";
-			div.appendChild(span);
-			div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+			div.empty();
+			var span = $('<span>');
+			span.text("Ожидание ответа от сервера...");
+			span.css("display", "inline-block");
+			div.append(span);
+			div.next().empty().append($('<div>').addClass('uploading_erase').click(ui.upload_erase));
 		},
 		"FINISHED": function(entry, div) {
 			if (!entry.state_changed) {
-				var span = div.firstChild;
+				var span = div.first();
 			} else {
-				while (div.firstChild) { div.removeChild(div.firstChild); };
-				var span = document.createElement('span');
-				span.style.display = "inline-block";
-				div.appendChild(span);
-				div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+				div.empty();
+				var span = $('<span>');
+				span.css("display", "inline-block");
+				div.append(span);
+				div.next().empty().append($('<div>').addClass('uploading_erase').click(ui.upload_erase));
 			}
-			span.title = span.textContent = entry.result;
+			span.text(entry.result);
+			span.prop("title", span.text());
 		},
 		"FINISHED_ERROR": function(entry, div) {
 			if (!entry.state_changed) {
-				var span = div.firstChild;
+				var span = div.first();
 			} else {
-				while (div.firstChild) { div.removeChild(div.firstChild); };
-				var span = document.createElement('span');
-				span.style.display = "inline-block";
-				div.appendChild(span);
-				span.style.color = "#E00";
-				div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+				div.empty();
+				var span = $('<span>');
+				span.css("display", "inline-block");
+				div.append(span);
+				span.css("color", "#E00");
+				div.next().empty().append($('<div>').addClass('uploading_erase').click(ui.upload_erase));
 			}
-			span.title = span.textContent = "Ошибка: " + entry.result;
+			span.text("Ошибка: " + entry.result);
+			span.prop("title", span.text());
 		},
 		"CANCELLED": function(entry, div) {
 			if (!entry.state_changed) return;
-			while (div.firstChild) { div.removeChild(div.firstChild); };
-			var span = document.createElement('span');
-			span.textContent = "Загрузка отменена";
-			span.style.display = "inline-block";
-			div.appendChild(span);
-			div.nextElementSibling.innerHTML = "<div class=uploading_erase onclick=\"ui.upload_erase(event)\"></div>";
+			div.empty();
+			var span = $('<span>');
+			span.text("Загрузка отменена");
+			span.css("display", "inline-block");
+			div.append(span);
+			div.next().empty().append($('<div>').addClass('uploading_erase').click(ui.upload_erase));
 		},
 	};
 	
 	data.uploading.forEach(function(entry, _, set) {
-		if (entry.elem == null) {
-			if (ui.upload_grid.lastElementChild) {
-				var row = +ui.upload_grid.lastElementChild.style["grid-row-start"] + 1;
+		if (!entry.elem) {
+			/*if (!ui.upload_grid.is(':empty')) {
+				var row = +ui.upload_grid.last().css("grid-row-start") + 1;
+				console.log("if: " + row);
 			} else {
 				var row = 1;
-			}
+				console.log("else: " + row);
+			}*/
 			
-			var div1 = document.createElement('div');
-			div1.classList.add("grid_item");
-			div1.style["grid-row"] = row;
-			div1.style["grid-column"] = "title";
-			div1.onmouseover = ui.materials_onmouseover;
-			var span1 = document.createElement('span');
-			span1.title = span1.textContent = entry.title;
-			div1.appendChild(span1);
-			ui.upload_grid.appendChild(div1);
+			var div1 = $("<div>");
+			div1.addClass("grid_item");
+			//div1.css("grid-row", row);
+			div1.css("grid-column", "title");
+			div1.mouseover(ui.materials_onmouseover);
+			var span1 = $("<span>");
+			span1.prop("title", entry.title);
+			span1.text(entry.title);
+			div1.append(span1);
+			ui.upload_grid.append(div1);
 			
 			entry.elem = div1;
 			
-			var div2 = document.createElement('div');
-			div2.classList.add("grid_item");
-			div2.style["grid-row"] = row;
-			div2.style["grid-column-start"] = "status_start";
-			div2.style["grid-column-end"] = "delete";
-			div2.onmouseover = ui.materials_onmouseover;
-			ui.upload_grid.appendChild(div2);
+			var div2 = $("<div>");
+			div2.addClass("grid_item");
+			//div2.css("grid-row", row);
+			div2.css("grid-column-start", "status_start");
+			div2.css("grid-column-end", "delete");
+			div2.mouseover(ui.materials_onmouseover);
+			ui.upload_grid.append(div2);
 			
-			var div3 = document.createElement('div');
-			div3.classList.add("grid_item");
-			div3.classList.add("delete_button_faint");
-			div3.style["grid-row"] = row;
-			div3.style["grid-column"] = "delete";
-			div3.onmouseover = ui.materials_onmouseover;
-			var span3 = document.createElement('span');
-			span3.innerHTML = "отмена";
-			div3.appendChild(span3);
-			ui.upload_grid.appendChild(div3);
+			var div3 = $("<div>");
+			div3.addClass("grid_item");
+			div3.addClass("delete_button_faint");
+			//div3.css("grid-row", row);
+			div3.css("grid-column", "delete");
+			div3.mouseover(ui.materials_onmouseover);
+			var span3 = $("<span>");
+			span3.html("отмена");
+			div3.append(span3);
+			ui.upload_grid.append(div3);
 			
 			state_handlers[entry.state](entry, div2);
 			
 		} else {
-			rows_to_remove.delete(entry.elem);
-			state_handlers[entry.state](entry, entry.elem.nextElementSibling);
+			rows_to_remove.forEach(function(elem, _, set) {
+				if (elem.is(entry.elem)) {
+					rows_to_remove.delete(elem);
+				}
+			});
+			state_handlers[entry.state](entry, entry.elem.next());
 		}
 	});
 	
 	rows_to_remove.forEach(function(elem, _, set) {
-		var next_elem = elem.nextElementSibling.nextElementSibling.nextElementSibling;
-		while (next_elem) {
-			next_elem.style["grid-row-start"] = next_elem.style["grid-row-start"] - 1;
-			next_elem = next_elem.nextElementSibling;
-		}
-		ui.upload_grid.removeChild(elem.nextElementSibling.nextElementSibling);
-		ui.upload_grid.removeChild(elem.nextElementSibling);
-		ui.upload_grid.removeChild(elem);
-		if (elem == ui.highlighted_row_first_elem_upload) {
+		/*var next_elem = elem.next().next().next();
+		while (next_elem[0]) {
+			next_elem.css("grid-row-start", "-=1");
+			next_elem = next_elem.next();
+		}*/
+		elem.next().next().remove();
+		elem.next().remove();
+		elem.remove();
+		if (elem.is(ui.highlighted_row_first_elem_upload)) {
 			ui.highlighted_row_first_elem_upload = null;
 		}
 	});
-	
 }
 
 ui.upload_erase = function(event) {
-	var elem;
-	for (var i = 0; i < event.path.length; i++) {
-		if (event.path[i].classList.contains("grid_item")) {
-			elem = event.path[i];
-			break;
-		} else if (event.path[i] == document.documentElement) {
-			break;
-		};
-	};
-	if (!elem) return;
-	
-	var first_elem_in_row = elem.previousElementSibling.previousElementSibling;
-	
+	var elem = $(event.delegateTarget).closest(".grid_item");
+	var first_elem_in_row = elem.prev().prev(); 
 	data.uploading.forEach(function(entry, _, set) {
-		if (entry.elem == first_elem_in_row) {
+		if (entry.elem.is(first_elem_in_row)) {
 			entry.XMLHttpRequest.abort();
 			data.uploading.delete(entry);
 		};
@@ -359,17 +329,17 @@ ui.upload_erase = function(event) {
 
 ui.materials_filter_show_or_hide = function(event, to_do, no_update) {
 	var show = function() {
-		ui.materials_filter_box.style.display = '';
-		ui.materials_filter.classList.add("materials_header_filter_darken");
+		ui.materials_filter_box.css('display', "");
+		ui.materials_filter.addClass("materials_header_filter_darken");
 	};
 	var hide = function() {
-		ui.materials_filter_box.style.display = 'none';
-		ui.materials_filter.classList.remove("materials_header_filter_darken");
+		ui.materials_filter_box.css('display', "none");
+		ui.materials_filter.removeClass("materials_header_filter_darken");
 		
 		if (no_update != true) { requests.receive_materials(true); }
 	}
 	if (to_do == "switch") {
-		if (materials_filter_box.style.display == 'none') {
+		if (ui.materials_filter_box.css('display') == 'none') {
 			show();
 		} else {
 			hide();
@@ -382,8 +352,8 @@ ui.materials_filter_show_or_hide = function(event, to_do, no_update) {
 }
 
 ui.file_selected = function() {
-	var file = ui.input.file.files[0];
-	var text_area = ui.file_about;
+	var file = ui.input.file.prop('files')[0];
+	if (!file) return;
 	var lastDotPosition = file.name.lastIndexOf(".");
 	if (lastDotPosition < 1 | lastDotPosition == file.name.length - 1) {
 		var file_name = file.name;
@@ -392,8 +362,8 @@ ui.file_selected = function() {
 		var file_name = file.name.substr(0, lastDotPosition);
 		var file_ext = file.name.substr(lastDotPosition + 1, file.name.length);
 	}
-	text_area.textContent = "Файл " + file_ext + ", размер " + humanFileSize(file.size, true);
-	ui.input.title.value = file_name;
+	ui.file_about.text("Файл " + file_ext + ", размер " + humanFileSize(file.size, true));
+	ui.input.title.val(file_name);
 }
 
 function humanFileSize(bytes, si) {
@@ -413,41 +383,19 @@ function humanFileSize(bytes, si) {
 }
 
 ui.get_selected_value = function(letter) {
-	if (ui.input[letter].selectedIndex == -1) return 0;
-	return ui.input[letter].options[ui.input[letter].selectedIndex].value;
+	//if (ui.input[letter].selectedIndex == -1) return 0;
+	//return ui.input[letter].options[ui.input[letter].selectedIndex].value;
+	return ui.input[letter].val();
 }
 
 ui.get_selected_filter_value = function(letter) {
-	if (ui.filters[letter].selectedIndex == -1) return 0;
-	return ui.filters[letter].options[ui.filters[letter].selectedIndex].value;
+	//if (ui.filters[letter].selectedIndex == -1) return 0;
+	//return ui.filters[letter].options[ui.filters[letter].selectedIndex].value;
+	return ui.filters[letter].val();
 }
 
 ui.event_main_selection = function(event, letter) {
 	ui.update_lists(letter);
-	/*if (ui.get_selected_value(letter) == 0) {
-		//если выбрано пустое значение, сбрасываем нижние списки
-		if (letter == "f") {
-			data.lists.s = {0: ""};
-			ui.update_list("s");
-		};
-		if (letter == "s" || letter == "f") {
-			data.lists.t = {0: ""};
-			ui.update_list("t");
-		};
-		return;
-	};
-	if (letter == "f") {
-		//обновляем s
-		ui.input["s"].disabled = true;
-		requests.get_list("s", ui.get_selected_value("f"), undefined, undefined, { update_ui: true } );
-		//сбрасываем t
-		data.lists.t = {0: ""};
-		ui.update_list("t");
-	} else if (letter == "s") {
-		//обновляем t
-		ui.input["t"].disabled = true;
-		requests.get_list("t", ui.get_selected_value("f"), ui.get_selected_value("s"), undefined, { update_ui: true } );
-	}*/
 }
 
 ui.event_filter_selection = function(event, letter) {
@@ -471,14 +419,14 @@ ui.event_filter_selection = function(event, letter) {
 	};
 	if (letter == "f") {
 		//обновляем s
-		ui.filters["s"].disabled = true;
+		//ui.filters["s"].prop('disabled', true);
 		requests.get_filter_list("s", ui.get_selected_filter_value("f"), undefined, undefined, { update_ui: true } );
 		//сбрасываем t
 		data.filters.t = [];
 		ui.update_filter_list("t");
 	} else if (letter == "s") {
 		//обновляем t
-		ui.filters["t"].disabled = true;
+		//ui.filters["t"].prop('disabled', true);
 		requests.get_filter_list("t", ui.get_selected_filter_value("f"), ui.get_selected_filter_value("s"), undefined, { update_ui: true } );
 	}
 }
@@ -487,23 +435,21 @@ ui.update_list = function(letter) {
 	var local_list = ui.input[letter];
 	var local_data = data.lists[letter];
 	ui.fill_select_tag_and_select_if_one_option(local_list, local_data);
-	ui.input[letter].disabled = false;
+	ui.input[letter].prop('disabled', false);
 }
 
 ui.update_filter_list = function(letter) {
 	var local_list = ui.filters[letter];
 	var local_data = data.filters[letter];
 	//var selected = ui.fill_select_tag_and_select_if_one_option(local_list, local_data);
-	//ui.filters[letter].disabled = false;
-	while (local_list.firstChild) {
-		local_list.removeChild(local_list.firstChild);
-	};
+	//ui.filters[letter].prop('disabled', false);
+	local_list.empty();
 	var func = function(i, _, set) {
 		var title = (i == 0) ? "" : data.full_lists[letter][i][(letter == "t") ? 1 : 0];
-		var opt = document.createElement('option');
-		opt.textContent = title;
-		opt.value = i;
-		local_list.appendChild(opt);
+		var opt = $('<option>');
+		opt.text(title);
+		opt.prop('value', i);
+		local_list.append(opt);
 	};
 	func(0, null, null);
 	local_data.forEach(func);
@@ -511,8 +457,8 @@ ui.update_filter_list = function(letter) {
 
 ui.set_default_filters = function() {
 	//не трогать, говнокод, собран из палок и земли, при прикосновении ломается
-	ui.filters.uploaded.value = "ALL_TIME";
-	ui.filters.f.value = "1";
+	ui.filters.uploaded.val("ALL_TIME");
+	ui.filters.f.val("1");
 	ui.event_filter_selection(null, "f"); //для обновления списка предметов
 	requests.receive_materials(true);
 }
@@ -525,10 +471,10 @@ ui.fill_additional_lists = function() {
 	
 	//year (заполняем самостоятельно)
 	for (var i = 2018; i > 1994; i--) {
-		var opt = document.createElement('option');
-		opt.textContent = i;
-		opt.value = i;
-		ui.input.year.appendChild(opt);
+		var opt = $('<option>');
+		opt.text(i);
+		opt.val(i);
+		ui.input.year.append(opt);
 	}
 }
 
@@ -540,23 +486,21 @@ ui.fill_additional_filter_lists = function() {
 }
 
 ui.fill_select_tag_and_select_if_one_option = function(local_list, local_data) {
-	while (local_list.firstChild) {
-		local_list.removeChild(local_list.firstChild);
-	};
+	local_list.empty();
 	for (var i in local_data) {
 		var item = local_data[i];
-		var opt = document.createElement('option');
-		opt.textContent = item;
-		opt.value = i;
-		local_list.appendChild(opt);
+		var opt = $('<option>');
+		opt.text(item);
+		opt.val(i);
+		local_list.append(opt);
 	};
 	//если в списке только одно значение, возможно кроме пустого, устанавливаем его
 	if (Object.keys(local_data).length == 1) {
-		local_list.value = local_list.lastElementChild.value;
+		local_list.val(local_list.last().prop('value'));
 		return false;
 	};
-	if (Object.keys(local_data).length == 2 & local_list.firstElementChild.textContent == "") {
-		local_list.value = local_list.lastElementChild.value;
+	if (Object.keys(local_data).length == 2 & local_list.first().text() == "") {
+		local_list.val(local_list.last().prop('value'));
 		return true;
 	};
 	return false;
@@ -571,28 +515,28 @@ function get_cookie(name) {
 
 ui.init_guide_box = function() {
 	//upload.css: #guide_box_wrapper {pointer-events: none;} #guide_box {pointer-events: auto;}
-	var guide_box_wrapper = document.getElementById('guide_box_wrapper');
-	var button_guidebox_ok = document.getElementById('button_guidebox_ok');
-	button_guidebox_ok.addEventListener('click', ui.hide_guide_box);
+	ui.guide_box_wrapper = $('#guide_box_wrapper');
+	ui.button_guidebox_ok = $('#button_guidebox_ok');
+	ui.button_guidebox_ok.on('click', ui.hide_guide_box);
 	var show_guide_box = true;
 	if (get_cookie("showGuideBox") === 'false') show_guide_box = false;
 	if (show_guide_box) {
 		ui.show_guide_box();
-		ui.dummy.style.display = '';
-		ui.dummy.addEventListener('click', ui.hide_guide_box);
+		ui.dummy.css('display', "");
+		ui.dummy.on('click', ui.hide_guide_box);
 	};
 }
 
 ui.show_guide_box = function() {
-	guide_box_wrapper.style.display = '';
-	ui.dummy.style.display = '';
-	ui.dummy.classList.add("dummy_shade");
+	ui.guide_box_wrapper.css('display', "");
+	ui.dummy.css('display', "");
+	ui.dummy.addClass("dummy_shade");
 }
 
 ui.hide_guide_box = function() {
-	guide_box_wrapper.style.display = 'none';
-	ui.dummy.style.display = 'none';
-	ui.dummy.classList.remove("dummy_shade");
+	ui.guide_box_wrapper.css('display', "none");
+	ui.dummy.css('display', "none");
+	ui.dummy.removeClass("dummy_shade");
 	document.cookie = "showGuideBox=false";
 }
 
@@ -608,15 +552,14 @@ ui.process_exit = function(event) {
 }
 
 ui.recalculate_css = function(event) {
-	var main_width = document.getElementById('main_container').clientWidth;
-	//TODO исправить таблицу
+	//var main_width = $('#main_container').css('clientWidth');
 }
 
 ui.button_publish_or_edit_click = function(event) {
 	
 	if (ui.mode == "publishing") {	
 	
-		if (ui.input.file.files[0] == null) { window.alert("Не выбран файл"); return; }
+		if (ui.input.file.prop('files')[0] == null) { window.alert("Не выбран файл"); return; }
 		
 		var blank_fields_exist = false;
 		var error_message = "Не заполнены следующие поля:\n";
@@ -625,7 +568,7 @@ ui.button_publish_or_edit_click = function(event) {
 		if (ui.get_selected_value("s") == 0) { blank_fields_exist = true; error_message += "Предмет\n"; }
 		if (ui.get_selected_value("t") == 0) { blank_fields_exist = true; error_message += "Преподаватель\n"; }
 		if (ui.get_selected_value("type") == 0) { blank_fields_exist = true; error_message += "Тип\n"; }
-		if (ui.input.title.value.length == 0) { blank_fields_exist = true; error_message += "Название\n"; }
+		if (ui.input.title.val().length == 0) { blank_fields_exist = true; error_message += "Название\n"; }
 		
 		if (blank_fields_exist) {
 			window.alert(error_message);
@@ -635,18 +578,17 @@ ui.button_publish_or_edit_click = function(event) {
 		//TODO проверка имени файла (на сервере и на клиенте)
 		
 		var formData = new FormData();
-		formData.append('file', ui.input.file.files[0]);
+		formData.append('file', ui.input.file.prop('files')[0]);
 		formData.append('f', ui.get_selected_value("f"));
 		formData.append('s', ui.get_selected_value("s"));
 		formData.append('t', ui.get_selected_value("t"));
 		formData.append('type', ui.get_selected_value("type"));
-		formData.append('title', ui.input.title.value);
+		formData.append('title', ui.input.title.val());
 		
-		formData.append('author', ui.input.author.value);
+		formData.append('author', ui.input.author.val());
 		formData.append('year', ui.get_selected_value("year"));
-		formData.append('description', ui.input.description.value);
+		formData.append('description', ui.input.description.val());
 		
-		//if (requests.query_upload != null) requests.query_upload.abort();
 		var query_upload = new XMLHttpRequest();
 		query_upload.open("POST", "uploadScript.php", true);
 		
@@ -659,8 +601,6 @@ ui.button_publish_or_edit_click = function(event) {
 			set: function (x) { this._state_changed = x; },
 			get: function () { if (this._state_changed) {this._state_changed = false; return true;} else {return false;} }
 		});
-		//uploading_obj.setState = function(x) { state = x; this.state_changed = true; };
-		//uploading_obj.getState_changed = function() { if (state_changed) {state_changed = false; return true;} else {return false;} };
 		data.uploading.add(uploading_obj);
 		ui.update_upload_grid();
 		
@@ -705,37 +645,33 @@ ui.button_quit_click = function(event) {
 
 ui.show_materials = function(sort) {
 	var box = ui.grid;
-		box.style.display='';
-	while (box.firstChild) {
-		box.removeChild(box.firstChild);
-	}
+	box.css('display', '');
+	box.empty();
 	
-	/*var html = document.getElementsByTagName('html')[0];
-	html.style.setProperty("--width_f", ui.grid_columns.width_f ? ui.filter_column.f.checked : "0fr");
-	html.style.setProperty("--width_s", ui.grid_columns.width_s ? ui.filter_column.s.checked : "0fr");
-	html.style.setProperty("--width_t", ui.grid_columns.width_t ? ui.filter_column.t.checked : "0fr");
-	html.style.setProperty("--width_uploader", ui.grid_columns.width_uploader ? ui.filter_column.uploader.checked : "0fr");
-	html.style.setProperty("--width_uploaded", ui.grid_columns.width_uploaded ? ui.filter_column.uploaded.checked : "0fr");*/
+	/*var html = $('html')[0];
+	html.css("--width_f", ui.grid_columns.width_f ? ui.filter_column.f.prop('checked') : "0fr");
+	html.css("--width_s", ui.grid_columns.width_s ? ui.filter_column.s.prop('checked') : "0fr");
+	html.css("--width_t", ui.grid_columns.width_t ? ui.filter_column.t.prop('checked') : "0fr");
+	html.css("--width_uploader", ui.grid_columns.width_uploader ? ui.filter_column.uploader.prop('checked') : "0fr");
+	html.css("--width_uploaded", ui.grid_columns.width_uploaded ? ui.filter_column.uploaded.prop('checked') : "0fr");*/
 	
 	if (data.materials.length == 0) {
-		document.getElementById('no_materials').style.display='';
-		box.style.display='none';
+		$('#no_materials').css('display', '');
+		box.css('display', 'none');
 	} else {
-		document.getElementById('no_materials').style.display='none';
+		$('#no_materials').css('display', 'none');
 		if (data.materials.length > 1000) {
-			document.getElementById('materials_amount').textContent = " (" + data.materials.length + ", показано 1000)";
+			$('#materials_amount').text(" (" + data.materials.length + ", показано 1000)");
 		} else {
-			document.getElementById('materials_amount').textContent = " (" + data.materials.length + ")";
+			$('#materials_amount').text(" (" + data.materials.length + ")");
 		}
 		
 		
 		if (!sort) {
 			sort = "f";
 		}
-		console.log(sort);
-		var sort_func;
 		if (sort == "title") {
-			sort_func = function(a, b) { return a.title.localeCompare(b.title); };
+			var sort_func = function(a, b) { return a.title.localeCompare(b.title); };
 		} else if (sort == "f") {
 			sort_func = function(a, b) {
 				var result = data.full_lists.f[a.faculty][1].localeCompare(data.full_lists.f[b.faculty][1]);
@@ -744,27 +680,27 @@ ui.show_materials = function(sort) {
 				return result;
 			};
 		} else if (sort == "s") {
-			sort_func = function(a, b) {
+			var sort_func = function(a, b) {
 				var result = data.full_lists.s[a.subject][1].localeCompare(data.full_lists.s[b.subject][1]);
 				if (result == 0) result = data.full_lists.t[a.teacher][1].localeCompare(data.full_lists.t[b.teacher][1]);
 				if (result == 0) result = data.full_lists.f[a.faculty][1].localeCompare(data.full_lists.f[b.faculty][1]);
 				return result;
 			};
 		} else if (sort == "t") {
-			sort_func = function(a, b) {
+			var sort_func = function(a, b) {
 				var result = data.full_lists.t[a.teacher][1].localeCompare(data.full_lists.t[b.teacher][1]);
 				if (result == 0) result = data.full_lists.f[a.faculty][1].localeCompare(data.full_lists.f[b.faculty][1]);
 				if (result == 0) result = data.full_lists.s[a.subject][1].localeCompare(data.full_lists.s[b.subject][1]);
 				return result;
 			};
 		} else if (sort == "uploader") {
-			sort_func = function(a, b) {
+			var sort_func = function(a, b) {
 				var result = a.uploader.localeCompare(b.uploader);
 				if (result == 0) result = b.uploaded.localeCompare(a.uploaded);
 				return result;
 			};
 		} else if (sort == "uploaded") {
-			sort_func = function(a, b) {
+			var sort_func = function(a, b) {
 				return b.uploaded.localeCompare(a.uploaded);
 			};
 		}
@@ -777,137 +713,140 @@ ui.show_materials = function(sort) {
 			
 			if (row_number > 1000) return;
 			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.onmouseover = ui.materials_onmouseover;
-			div.onclick = ui.material_select_event;
-			div.style["grid-row"] = row_number;
-			div.style["grid-column"] = "title";
-			var span = document.createElement('span');
-			span.title = span.textContent = entry.title;
-			div.appendChild(span);
-			box.appendChild(div);
+			var div = $("<div>");
+			div.addClass("grid_item");
+			div.mouseover(ui.materials_onmouseover);
+			div.click(ui.material_select_event);
+			div.css("grid-row", row_number);
+			div.css("grid-column", "title");
+			var span = $("<span>");
+			span.prop('title', entry.title);
+			span.text(entry.title);
+			div.append(span);
+			box.append(div);
 			
-			div.setAttribute('data-id', entry.id);
+			div.attr('data-id', entry.id);
 			
 			//if (ui.filter_column.f.checked) {
-				var div = document.createElement('div');
-				div.classList.add("grid_item");
-				div.onmouseover = ui.materials_onmouseover;
-				div.onclick = ui.material_select_event;
-				div.style["grid-row"] = row_number;
-				div.style["grid-column"] = "f";
-				var span = document.createElement('span');
-				span.title = data.full_lists.f[entry.faculty][0]
-				span.textContent = data.full_lists.f[entry.faculty][1];
-				div.appendChild(span);
-				box.appendChild(div);
+				var div = $("<div>");
+				div.addClass("grid_item");
+				div.mouseover(ui.materials_onmouseover);
+				div.click(ui.material_select_event);
+				div.css("grid-row", row_number);
+				div.css("grid-column", "f");
+				var span = $("<span>");
+				span.prop('title', data.full_lists.f[entry.faculty][0]);
+				span.text(data.full_lists.f[entry.faculty][1]);
+				div.append(span);
+				box.append(div);
 			//}
 			
 			//if (ui.filter_column.s.checked) {
-				var div = document.createElement('div');
-				div.classList.add("grid_item");
-				div.onmouseover = ui.materials_onmouseover;
-				div.onclick = ui.material_select_event;
-				div.style["grid-row"] = row_number;
-				div.style["grid-column"] = "s";
-				var span = document.createElement('span');
-				span.title = data.full_lists.s[entry.subject][0];
-				span.textContent = data.full_lists.s[entry.subject][1];
-				div.appendChild(span);
-				box.appendChild(div);
+				var div = $("<div>");
+				div.addClass("grid_item");
+				div.mouseover(ui.materials_onmouseover);
+				div.click(ui.material_select_event);
+				div.css("grid-row", row_number);
+				div.css("grid-column", "s");
+				var span = $("<span>");
+				span.prop('title', data.full_lists.s[entry.subject][0]);
+				span.text(data.full_lists.s[entry.subject][1]);
+				div.append(span);
+				box.append(div);
 			//}
 			
 			//if (ui.filter_column.t.checked) {
-				var div = document.createElement('div');
-				div.classList.add("grid_item");
-				div.onmouseover = ui.materials_onmouseover;
-				div.onclick = ui.material_select_event;
-				div.style["grid-row"] = row_number;
-				div.style["grid-column"] = "t";
-				var span = document.createElement('span');
-				span.title = data.full_lists.t[entry.teacher][0];
-				span.textContent = data.full_lists.t[entry.teacher][1];
-				div.appendChild(span);
-				box.appendChild(div);
+				var div = $("<div>");
+				div.addClass("grid_item");
+				div.mouseover(ui.materials_onmouseover);
+				div.click(ui.material_select_event);
+				div.css("grid-row", row_number);
+				div.css("grid-column", "t");
+				var span = $("<span>");
+				span.prop('title', data.full_lists.t[entry.teacher][0]);
+				span.text(data.full_lists.t[entry.teacher][1]);
+				div.append(span);
+				box.append(div);
 			//}
 			
 			//if (ui.filter_column.uploader.checked) {
-				var div = document.createElement('div');
-				div.classList.add("grid_item");
-				div.onmouseover = ui.materials_onmouseover;
-				div.onclick = ui.material_select_event;
-				div.style["grid-row"] = row_number;
-				div.style["grid-column"] = "uploader";
-				var span = document.createElement('span');
-				span.title = span.textContent = entry.uploader;
-				div.appendChild(span);
-				box.appendChild(div);
+				var div = $("<div>");
+				div.addClass("grid_item");
+				div.mouseover(ui.materials_onmouseover);
+				div.click(ui.material_select_event);
+				div.css("grid-row", row_number);
+				div.css("grid-column", "uploader");
+				var span = $("<span>");
+				span.prop('title', entry.uploader);
+				span.text(entry.uploader);
+				div.append(span);
+				box.append(div);
 			//}
 			
 			//if (ui.filter_column.uploaded.checked) {
-				var div = document.createElement('div');
-				div.classList.add("grid_item");
-				div.onmouseover = ui.materials_onmouseover;
-				div.onclick = ui.material_select_event;
-				div.style["grid-row"] = row_number;
-				div.style["grid-column"] = "uploaded";
-				var span = document.createElement('span');
-				span.title = span.textContent = entry.uploaded;
-				div.appendChild(span);
-				box.appendChild(div);
+				var div = $("<div>");
+				div.addClass("grid_item");
+				div.mouseover(ui.materials_onmouseover);
+				div.click(ui.material_select_event);
+				div.css("grid-row", row_number);
+				div.css("grid-column", "uploaded");
+				var span = $("<span>");
+				span.prop('title', entry.uploaded);
+				span.text(entry.uploaded);
+				div.append(span);
+				box.append(div);
 			//}
 			
-			var div = document.createElement('div');
-			div.classList.add("grid_item");
-			div.onmouseover = ui.materials_onmouseover;
-			div.classList.add("delete_button_faint");
-			div.style["grid-row"] = row_number;
-			div.style["grid-column"] = "delete";
-			var span = document.createElement('span');
-			div.textContent = "удалить";
-			div.appendChild(span);
-			box.appendChild(div);
+			var div = $("<div>");
+			div.addClass("grid_item");
+			div.mouseover(ui.materials_onmouseover);
+			div.addClass("delete_button_faint");
+			div.css("grid-row", row_number);
+			div.css("grid-column", "delete");
+			var span = $("<span>");
+			div.text("удалить");
+			div.append(span);
+			box.append(div);
 			
 			row_number++;
 		});
 	}
-	document.getElementById('receiving_materials_status').style.display='none';
+	$('#receiving_materials_status').css('display', 'none');
 	ui.highlighted_row_first_elem = null;
 	ui.selected_row_first_elem = null;
-	ui.grid.scrollTop = 0;
+	ui.grid.scrollTop(0);
 }
 
 ui.material_select = function(elem) {
-	if (elem == ui.selected_row_first_elem) {
+	if (elem.is(ui.selected_row_first_elem)) {
 		var clear_selection = true;
 	}	
 	var sibling = elem;
 	if (sibling) {
-		sibling.classList.add("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.add("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.add("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.add("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.add("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.add("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.add("js_bold");
+		sibling.addClass("js_bold"); sibling = sibling.next();
+		sibling.addClass("js_bold"); sibling = sibling.next();
+		sibling.addClass("js_bold"); sibling = sibling.next();
+		sibling.addClass("js_bold"); sibling = sibling.next();
+		sibling.addClass("js_bold"); sibling = sibling.next();
+		sibling.addClass("js_bold"); sibling = sibling.next();
+		sibling.addClass("js_bold");
 	}
 	sibling = ui.selected_row_first_elem;
 	if (sibling) {
-		sibling.classList.remove("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.remove("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.remove("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.remove("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.remove("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.remove("js_bold"); sibling = sibling.nextElementSibling;
-		sibling.classList.remove("js_bold");
+		sibling.removeClass("js_bold"); sibling = sibling.next();
+		sibling.removeClass("js_bold"); sibling = sibling.next();
+		sibling.removeClass("js_bold"); sibling = sibling.next();
+		sibling.removeClass("js_bold"); sibling = sibling.next();
+		sibling.removeClass("js_bold"); sibling = sibling.next();
+		sibling.removeClass("js_bold"); sibling = sibling.next();
+		sibling.removeClass("js_bold");
 	}
 	if (clear_selection) {
 		ui.selected_row_first_elem = null;
 		return;
 	}
 	ui.selected_row_first_elem = elem;
-	ui.selected_material_id = elem.getAttribute('data-id');
+	ui.selected_material_id = elem.attr('data-id');
 	ui.set_uploading_type(null, "editing");
 	ui.fill_info_to_edit();
 }
@@ -925,9 +864,8 @@ ui.fill_info_to_edit = function() {
 }
 
 ui.material_select_event = function(event) {
-	var elem;
-	//var elem = event.target;
-	for (var i = 0; i < event.path.length; i++) {
+	var elem = $(event.delegateTarget);
+	/*for (var i = 0; i < event.path.length; i++) {
 		if (event.path[i].classList.contains("grid_item")) {
 			elem = event.path[i];
 			break;
@@ -935,6 +873,8 @@ ui.material_select_event = function(event) {
 			break;
 		};
 	};
+	
+	elem = $(elem);*/
 	
 	var sibling = find_first_elem_in_row(elem);
 	
@@ -945,26 +885,26 @@ ui.selected_row_first_elem = null;
 ui.highlighted_row_first_elem = null;
 ui.highlighted_row_first_elem_upload = null;
 ui.grid_onmouseleave = function(event) {
-	if (event.currentTarget == ui.grid) {
-		if (ui.highlighted_row_first_elem == null) return;
+	if ($(event.currentTarget).is(ui.grid)) {
+		if (!ui.highlighted_row_first_elem) return;
 		var sibling = ui.highlighted_row_first_elem;
 		if (sibling) {
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed");
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed");
 		}
 		ui.highlighted_row_first_elem = null;
-	} else if (event.currentTarget == ui.upload_grid) {
-		if (ui.highlighted_row_first_elem_upload == null) return;
+	} else if ($(event.currentTarget).is(ui.upload_grid)) {
+		if (!ui.highlighted_row_first_elem_upload) return;
 		var sibling = ui.highlighted_row_first_elem_upload;
 		if (sibling) {
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed");
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed");
 		}
 		ui.highlighted_row_first_elem_upload = null;
 	}
@@ -972,34 +912,34 @@ ui.grid_onmouseleave = function(event) {
 
 function find_first_elem_in_row(elem) {
 	if (!elem) return;
-	var column = elem.style["grid-column-start"];
+	var column = elem.css("grid-column-start");
 	if (!column) return;
 	var sibling;
-	if (elem.parentNode == ui.grid) {
+	if (elem.parent().is(ui.grid)) {
 		if (column == "title") {
 			sibling = elem;
 		} else if (column == "f") {
-			sibling = elem.previousElementSibling;
+			sibling = elem.prev();
 		} else if (column == "s") {
-			sibling = elem.previousElementSibling.previousElementSibling;
+			sibling = elem.prev().prev();
 		} else if (column == "t") {
-			sibling = elem.previousElementSibling.previousElementSibling.previousElementSibling;
+			sibling = elem.prev().prev().prev();
 		} else if (column == "uploader") {
-			sibling = elem.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling;
+			sibling = elem.prev().prev().prev().prev();
 		} else if (column == "uploaded") {
-			sibling = elem.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling;
+			sibling = elem.prev().prev().prev().prev().prev();
 		} else if (column == "delete") {
-			sibling = elem.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling;
+			sibling = elem.prev().prev().prev().prev().prev().prev();
 		} else {
 			return undefined;
 		}
-	} else if (elem.parentNode == ui.upload_grid) {
+	} else if (elem.parent().is(ui.upload_grid)) {
 		if (column == "title") {
 			sibling = elem;
 		} else if (column == "status_start") {
-			sibling = elem.previousElementSibling;
+			sibling = elem.prev();
 		} else if (column == "delete") {
-			sibling = elem.previousElementSibling.previousElementSibling;
+			sibling = elem.prev().prev();
 		} else {
 			return undefined;
 		}
@@ -1008,8 +948,9 @@ function find_first_elem_in_row(elem) {
 }
 
 ui.materials_onmouseover = function(event) {
-	var elem;
-	//var elem = event.target;
+	var elem = $(event.delegateTarget);
+	/*console.log(event);
+	console.log(event.target);
 	for (var i = 0; i < event.path.length; i++) {
 		if (event.path[i].classList.contains("grid_item")) {
 			elem = event.path[i];
@@ -1018,50 +959,51 @@ ui.materials_onmouseover = function(event) {
 			break;
 		};
 	};
-	var column = elem.style["grid-column-start"];
-	var row = elem.style["grid-row-start"];
+	elem = $(elem);*/
+	var column = elem.css("grid-column-start");
+	var row = elem.css("grid-row-start");
 	if (!column || !row) return; //почему так происходит?
 	
 	var sibling = find_first_elem_in_row(elem);
-	if (elem.parentNode == ui.grid) {
-		if (sibling == ui.highlighted_row_first_elem) return;
+	if (elem.parent().is(ui.grid)) {
+		if (sibling.is(ui.highlighted_row_first_elem)) return;
 		
 		if (sibling) {
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.add("js_shadowed");
+			sibling.addClass("js_shadowed"); sibling = sibling.next();
+			sibling.addClass("js_shadowed"); sibling = sibling.next();
+			sibling.addClass("js_shadowed"); sibling = sibling.next();
+			sibling.addClass("js_shadowed"); sibling = sibling.next();
+			sibling.addClass("js_shadowed"); sibling = sibling.next();
+			sibling.addClass("js_shadowed"); sibling = sibling.next();
+			sibling.addClass("js_shadowed");
 		}
 		
 		var sibling = ui.highlighted_row_first_elem;
 		if (sibling) {
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed");
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed");
 		}
 		
 		ui.highlighted_row_first_elem = find_first_elem_in_row(elem);
-	} else if (elem.parentNode == ui.upload_grid) {
-		if (sibling == ui.highlighted_row_first_elem_upload) return;
+	} else if (elem.parent().is(ui.upload_grid)) {
+		if (sibling.is(ui.highlighted_row_first_elem_upload)) return;
 		
 		if (sibling) {
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.add("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.add("js_shadowed");
+			sibling.addClass("js_shadowed"); sibling = sibling.next();
+			sibling.addClass("js_shadowed"); sibling = sibling.next();
+			sibling.addClass("js_shadowed");
 		}
 		
 		var sibling = ui.highlighted_row_first_elem_upload;
 		if (sibling) {
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed"); sibling = sibling.nextElementSibling;
-			sibling.classList.remove("js_shadowed");
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed"); sibling = sibling.next();
+			sibling.removeClass("js_shadowed");
 		}
 		
 		ui.highlighted_row_first_elem_upload = find_first_elem_in_row(elem);
@@ -1083,8 +1025,8 @@ requests.build_url = function(url, parameters) {
 
 requests.receive_materials = function(show) {
 	if (show) {
-		document.getElementById('receiving_materials_status').style.display='';
-		document.getElementById('no_materials').style.display='none';
+		$('#receiving_materials_status').css('display', '');
+		$('#no_materials').css('display', 'none');
 	}
 	
 	var url_params = { "action": "materials" };
@@ -1099,9 +1041,6 @@ requests.receive_materials = function(show) {
 	var _url = requests.build_url("/get.php", url_params);
 	requests.query_get_materials.open("GET", _url, true);
 	requests.query_get_materials.onload = function() {
-		//data.materials = JSON.parse(requests.query_get_materials.responseText);
-		//data.materials.length = Math.max.apply(Math, Object.keys(data.materials));
-		//data.materials = Array.from(data.materials);
 		var response = JSON.parse(requests.query_get_materials.responseText);
 		data.materials = [];
 		for (var id in response) {
@@ -1119,21 +1058,6 @@ requests.receive_materials = function(show) {
 //TODO убрать повторение кода
 
 requests.get_full_lists_and_relations = function() {
-	/*var get_full_list = function(letter) {
-		var url_params = { "action": "list", "target": letter };
-		
-		var request = new XMLHttpRequest();
-		
-		var _url = requests.build_url("/get.php", url_params);
-		request.open("GET", _url, true);
-		request.onload = function() {
-			data.full_lists[letter] = JSON.parse(request.responseText);
-		}
-		request.send();
-	};
-	get_full_list("f");
-	get_full_list("s");
-	get_full_list("t");*/
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", "/init.json", true);
 	xhr.onload = function() {
@@ -1151,15 +1075,13 @@ ui.update_lists = function(letter) {
 	var upd = function(letter) {
 		var local_list = ui.input[letter];
 		var local_data = data.lists[letter];
-		while (local_list.firstChild) {
-			local_list.removeChild(local_list.firstChild);
-		};
+		local_list.empty();
 		var func = function(i, _, set) {
 			var title = (i == 0) ? "" : data.full_lists[letter][i][(letter == "t") ? 1 : 0];
-			var opt = document.createElement('option');
-			opt.textContent = title;
-			opt.value = i;
-			local_list.appendChild(opt);
+			var opt = $('<option>');
+			opt.text(title);
+			opt.val(i);
+			local_list.append(opt);
 		};
 		func(0, null, null);
 		local_data.forEach(func);
@@ -1194,33 +1116,13 @@ ui.update_lists = function(letter) {
 		upd("t");
 		//если преподаватель один, выбираем его в списке
 		if (data.lists.t.size == 1) {
-			ui.input["t"].selectedIndex = 1
+			ui.input["t"].children("option")[1].prop('selected', 'selected'); //?
+
 		}
 	} else {
 		//ничего не делаем
 	}
 }
-
-/*requests.get_list = function(target, f_id, s_id, t_id, function_params) {
-	var url_params = { "action": "list", "target": target };
-	if (f_id != undefined) url_params["f"] = f_id;
-	if (s_id != undefined) url_params["s"] = s_id;
-	if (t_id != undefined) url_params["t"] = t_id;
-	
-	if (requests.queries_lists[target] != null) requests.queries_lists[target].abort();
-	requests.queries_lists[target] = new XMLHttpRequest();
-	
-	var _url = requests.build_url("/get.php", url_params);
-	requests.queries_lists[target].open("GET", _url, true);
-	requests.queries_lists[target].onload = function() {
-		data.lists[target] = JSON.parse(requests.queries_lists[target].responseText);
-		data.lists[target][0] = "";
-		if (function_params.update_ui == true) {
-			ui.update_list(target);
-		}
-	}
-	requests.queries_lists[target].send();
-}*/
 
 requests.get_filter_list = function(target, f_id, s_id, t_id, function_params) {
 	var url_params = { "action": "list", "target": target };
@@ -1236,7 +1138,7 @@ requests.get_filter_list = function(target, f_id, s_id, t_id, function_params) {
 	requests.queries_filters[target].onload = function() {
 		data.filters[target] = JSON.parse(requests.queries_filters[target].responseText);
 		//data.filters[target][0] = "";
-		if (function_params.update_ui == true) {
+		if (function_params.update_ui) {
 			ui.update_filter_list(target);
 		}
 		if (function_params.update_ui_custom_function != undefined) {

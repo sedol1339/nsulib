@@ -23,6 +23,8 @@ function send_answer_and_exit($message) {
 	exit;
 }
 
+//send_answer_and_exit("9876");
+
 function random_str($length = 24) {
     $characters = '0123456789ABCDEF';
     $charactersLength = strlen($characters);

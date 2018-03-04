@@ -10,9 +10,10 @@
 	<link rel="stylesheet" href="common.css" media="all" />
 	<link rel="stylesheet" href="header.css" media="all" />
 	<link rel="stylesheet" href="upload.css" media="all" />
-	<script src="jquery-3.3.1.min.js" defer></script>
-	<script src="utils.js" defer></script>
-	<script src="upload.js" defer></script>
+	<script src="upload_old.js" defer></script>
+	<!--<script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.0/css/smoothness/jquery-ui-1.10.0.custom.min.css" />
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.0/jquery-ui.js"></script>-->
 </head>
 <body>
 	<div id=dummy style="display:none;z-index:1;position:absolute;width:100%;height:100%"></div>
