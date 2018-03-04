@@ -80,6 +80,7 @@ main > article {
 	content:url("img/erase_dark.png");
 }
 #aside1_results_box {
+	width: 220px;
 	flex: 1 0 0px;
 	display: flex;
 	flex-flow: column nowrap;
@@ -117,6 +118,11 @@ main > article {
 	vertical-align:-20%;
 	margin-right:3px;
 	content:url("img/logo_teacher.png");
+}
+.result > p {
+	text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .result_noliterature {
 	flex: 0 0 auto;

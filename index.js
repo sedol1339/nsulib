@@ -1,34 +1,38 @@
 'use strict';
 
-document.addEventListener('DOMContentLoaded', init);
-
 var ui = { //functions and variables about user interface
 	button: {
-		f: document.getElementById('button_faculty'),
-		s: document.getElementById('button_subject'),
-		t: document.getElementById('button_teacher'),
+		f: $('#button_faculty'),
+		s: $('#button_subject'),
+		t: $('#button_teacher'),
 	},
 	clear: {
-		f: document.getElementById('clear_faculty'),
-		s: document.getElementById('clear_subject'),
-		t: document.getElementById('clear_teacher'),
+		f: $('#clear_faculty'),
+		s: $('#clear_subject'),
+		t: $('#clear_teacher'),
 	},
 	list: {
-		f: document.getElementById('list_faculties'),
-		s: document.getElementById('list_subjects'),
-		t: document.getElementById('list_teachers'),
+		f: $('#list_faculties'),
+		s: $('#list_subjects'),
+		t: $('#list_teachers'),
 	},
-	results_box: document.getElementById('aside1_results_box'),
-	article_frame: document.getElementById('article_frame'),
-	download_frame: document.getElementById('download_frame'),
-	button_download: document.getElementById('button_download'),
-	dummy: document.getElementById('dummy'),
+	results_box: $('#aside1_results_box'),
+	article_frame: $('#article_frame'),
+	download_frame: $('#download_frame'),
+	button_download: $('#button_download'),
+	dummy: $('#dummy'),
 	default_names: {
 		f: "Все факультеты",
 		s: "Все предметы",
 		t: "Все преподаватели",
 	},
 };
+
+var data = {
+	full_lists: {
+		f:{0: ""}, s:{0: ""}, t:{0: ""}
+	},
+}
 
 var requests = { //functions and variables about xml-http-requests
 	lists: {
@@ -41,114 +45,101 @@ var requests = { //functions and variables about xml-http-requests
 	},
 };
 
-function init() {
-	ui.dummy.addEventListener('click', ui.cancel_all_lists);
-	window.addEventListener('resize', ui.recalculate_css);
+$(document).ready(function init() {
+	ui.dummy.click(ui.cancel_all_lists);
+	$(window).on('resize', ui.recalculate_css);
 	ui.recalculate_css();
-	ui.button.f.addEventListener('click', function(event) {ui.button_show_list(event, "f")});
-	ui.button.s.addEventListener('click', function(event) {ui.button_show_list(event, "s")});
-	ui.button.t.addEventListener('click', function(event) {ui.button_show_list(event, "t")});
-	ui.clear.f.addEventListener('click', function(event) {ui.button_clear(event, "f")});
-	ui.clear.s.addEventListener('click', function(event) {ui.button_clear(event, "s")});
-	ui.clear.t.addEventListener('click', function(event) {ui.button_clear(event, "t")});
-	ui.list.f.addEventListener('click', function(event) {ui.list_event_selection(event, "f")});
-	ui.list.s.addEventListener('click', function(event) {ui.list_event_selection(event, "s")});
-	ui.list.t.addEventListener('click', function(event) {ui.list_event_selection(event, "t")});
-	ui.results_box.addEventListener('click', ui.results_event_selection);
-	ui.button_download.addEventListener('click', ui.download);
-	ui.update(initial_f, null, initial_s, null, initial_t, null);
-};
+	ui.button.f.click(function(event) {ui.button_show_list(event, "f")});
+	ui.button.s.click(function(event) {ui.button_show_list(event, "s")});
+	ui.button.t.click(function(event) {ui.button_show_list(event, "t")});
+	ui.clear.f.click(function(event) {ui.button_clear(event, "f")});
+	ui.clear.s.click(function(event) {ui.button_clear(event, "s")});
+	ui.clear.t.click(function(event) {ui.button_clear(event, "t")});
+	ui.list.f.click(function(event) {ui.list_event_selection(event, "f")});
+	ui.list.s.click(function(event) {ui.list_event_selection(event, "s")});
+	ui.list.t.click(function(event) {ui.list_event_selection(event, "t")});
+	ui.results_box.click(ui.results_event_selection);
+	ui.button_download.click(ui.download);
+	requests.get_full_lists_and_relations( function on_finish() {
+		ui.update(initial_f, initial_s, initial_t);
+	});
+});
 
 ui.recalculate_css = function() {
 	//recalculate lists maxHeight
 	var total_height = Math.round(parseFloat(
-		window.getComputedStyle(document.getElementById('aside1')).height));
-	var button_faculty = ui.button.f.parentElement; //wrapper
-	var button_subject = ui.button.s.parentElement;
-	var button_teacher = ui.button.t.parentElement;
-	var _parent = button_faculty.parentElement;
-	var offset_faculty_button = button_faculty.offsetTop - _parent.offsetTop;
-	var offset_subject_button = button_subject.offsetTop - _parent.offsetTop;
-	var offset_teacher_button = button_teacher.offsetTop - _parent.offsetTop;
-	ui.list.f.style.maxHeight = (total_height - 6 - offset_faculty_button) + 'px';
-	ui.list.s.style.maxHeight = (total_height - 6 - offset_subject_button) + 'px';
-	ui.list.t.style.maxHeight = (total_height - 6 - offset_teacher_button) + 'px';
+		window.getComputedStyle($('#aside1')[0]).height));
+	var button_faculty = ui.button.f.parent(); //wrapper
+	var button_subject = ui.button.s.parent();
+	var button_teacher = ui.button.t.parent();
+	var _parent = button_faculty.parent();
+	var offset_faculty_button = button_faculty.offset().top - _parent.offset().top;
+	var offset_subject_button = button_subject.offset().top - _parent.offset().top;
+	var offset_teacher_button = button_teacher.offset().top - _parent.offset().top;
+	ui.list.f.css('maxHeight', total_height - 6 - offset_faculty_button + 'px');
+	ui.list.s.css('maxHeight', total_height - 6 - offset_subject_button + 'px');
+	ui.list.t.css('maxHeight', total_height - 6 - offset_teacher_button + 'px');
 };
 
 ui.list_update = function(letter) {
 	var list = ui.list[letter];
-	while(list.children[1]) { list.removeChild(list.children[1]); }
-	var dummy = list.firstElementChild;
+	list.children().slice(1).remove();
+	var dummy = list.children().first();
 	var current_data_list = requests.lists[letter];
 	var data_list = requests.lists[letter]
-	for (var id in data_list) {
-		var new_elem = dummy.cloneNode(true);
-		var new_elem_inner = new_elem.getElementsByClassName('search_box_list_element_text')[0];
-		new_elem_inner.textContent = data_list[id];
-		new_elem.style.display='';
-		new_elem.setAttribute('data-id',id);
-		new_elem.setAttribute('data-name',data_list[id]);
-		new_elem_inner.textContent = data_list[id];
-		list.appendChild(new_elem);
-	};
+	var add = function(id, _, set) {
+		var name = (id == 0) ? ui.default_names[letter] : data.full_lists[letter][id][(letter == "t") ? 1 : 0];
+		var new_elem = dummy.clone();
+		var new_elem_inner = new_elem.find('.search_box_list_element_text').first();
+		new_elem_inner.text(name);
+		new_elem.css('display', '');
+		new_elem.attr('data-id', id);
+		list.append(new_elem);
+	}
+	add(0);
+	data_list.forEach(add);
 };
 
 ui.list_event_selection = function(event, letter) {
 	event.stopPropagation();
 	ui.button_hide_list(letter);
-	var elem = event.target;
-	var id, name;
-	while(elem.parentNode) {
-		if (elem.hasAttribute('data-id')) {
-			id = +elem.getAttribute('data-id');
-			name = elem.getAttribute('data-name');
-			break;
-		}
-		elem = elem.parentNode;
-	}
-	ui.button_set_data(letter, id, name);
-	ui.update(
-			ui.button.f.getAttribute('data-id'),
-			ui.button.f.getAttribute('data-name'),
-			ui.button.s.getAttribute('data-id'),
-			ui.button.s.getAttribute('data-name'),
-			ui.button.t.getAttribute('data-id'),
-			ui.button.t.getAttribute('data-name'),
-	);
+	var elem = $(event.target);
+	var outer = elem.closest("[data-id]");
+	var id = outer.attr('data-id');
+	var name = (id == 0) ? ui.default_names[letter] : data.full_lists[letter][id][(letter == "t") ? 1 : 0];
+	ui.button_set_data(letter, id);
+	var f = ui.button.f.attr('data-id');
+	var s = (letter != "f") ? ui.button.s.attr('data-id') : 0;
+	var t = (letter == "t") ? ui.button.t.attr('data-id') : 0;
+	ui.update(f, s, t);
 };
 
-ui.button_set_data = function(letter, id ,text) {
+ui.button_set_data = function(letter, id) {
 	var button = ui.button[letter];
-	var button_inner = button.getElementsByClassName('aside1_search_box_button_text')[0];
-	button.setAttribute('data-id',id);
-	if (text != null) {
-		button.setAttribute('data-name',text);
-		button_inner.textContent = text;
-	}
+	var button_inner = button.find('.aside1_search_box_button_text').first();
+	button.attr('data-id', id);
+	var name = (id == 0) ? ui.default_names[letter] : data.full_lists[letter][id][(letter == "t") ? 1 : 0];
+	button_inner.text(name);
 };
 
 ui.button_show_list = function(event, letter) {
 	var list = ui.list[letter];
-	list.style.display = 'flex';
-	list.scrollTop = 0;
-	ui.dummy.style.display = '';
+	list.css('display', 'flex');
+	list.scrollTop(0);
+	ui.dummy.css('display', '');
 };
 
 ui.button_clear = function(event, letter) {
-	ui.button[letter].setAttribute('data-id', 0);
-	ui.update(
-			ui.button.f.getAttribute('data-id'),
-			ui.button.f.getAttribute('data-name'),
-			ui.button.s.getAttribute('data-id'),
-			ui.button.s.getAttribute('data-name'),
-			ui.button.t.getAttribute('data-id'),
-			ui.button.t.getAttribute('data-name'),
-	);
+	ui.button[letter].attr('data-id', 0);
+	var f = ui.button.f.attr('data-id');
+	var s = (letter != "f") ? ui.button.s.attr('data-id') : 0;
+	var t = (letter == "t") ? ui.button.t.attr('data-id') : 0;
+	ui.update(f, s, t);
 };
 
 ui.button_hide_list = function(letter) {
-	ui.list[letter].style.display = '';
-	ui.dummy.style.display = 'none';
+	ui.list[letter].css('display', '');
+	ui.dummy.css('display', 'none');
 };
 
 ui.cancel_all_lists = function() {
@@ -158,122 +149,112 @@ ui.cancel_all_lists = function() {
 };
 
 ui.results_event_selection = function(event) {
-	var elem = event.target;
-	var id;
-	while(elem.parentNode) {
-		if (elem.hasAttribute('data-id')) {
-			id = +elem.getAttribute('data-id');
-			ui.result_selection(id);
-			return;
-		};
-		if (elem == ui.results_box)
-			return;
-		elem = elem.parentNode;
-	}
+	ui.result_selection($(event.target).closest("[data-id]").attr('data-id'));
 };
 
 ui.result_selection = function(id) {
-	var stub = document.getElementById('aside2_stub');
-	var box = document.getElementById('aside2_info_box');
+	var stub = $('#aside2_stub');
+	var box = $('#aside2_info_box');
 	if (id == 0) {
 		ui.selected_result = null;
-		stub.style.display='';
-		box.style.display='none';
-		ui.article_frame.style.display = 'none';
-		ui.article_frame.src = "about:blank";
+		stub.css('display', '');
+		box.css('display', 'none');
+		ui.article_frame.css('display', 'none');
+		ui.article_frame.prop('src', 'about:blank');
 	} else {
 		var result = requests.result_array[id];
-		stub.style.display='none';
-		box.style.display='';
-		var span_author = document.getElementById('author_span');
-		var span_description = document.getElementById('description_span');
-		var span_date = document.getElementById('date_span');
+		stub.css('display', 'none');
+		box.css('display', '');
+		var span_author = $('#author_span');
+		var span_description = $('#description_span');
+		var span_date = $('#date_span');
 		if (result.author) {
-			span_author.textContent = result.author;
+			span_author.text(result.author);
 		} else {
-			span_author.textContent = '';
-			var faint = document.createElement('span');
-			faint.className += 'text_faint_style';
-			span_author.appendChild(faint);
-			faint.textContent = 'Не указан';
+			span_author.empty().append($('<span>').addClass('text_faint_style').text('Не указан'));
 		};
-		if (result.description) {
-			span_description.textContent = result.description;
+		if (result.commentary) {
+			if (result.commentary.length > 200) {
+				var descr = result.commentary.substr(0, 200) + "...";
+			} else {
+				var descr = result.commentary;
+			}
+			span_description.text(descr);
 		} else {
-			span_description.textContent = '';
-			var faint = document.createElement('span');
-			faint.className += 'text_faint_style';
-			span_description.appendChild(faint);
-			faint.textContent = 'Отсутствует';
+			span_description.empty().append($('<span>').addClass('text_faint_style').text('Отсутствует'));
 		};
 		if (result.date) {
-			span_date.textContent = result.date;
+			span_date.text(result.date);
 		} else {
-			span_date.textContent = '';
-			var faint = document.createElement('span');
-			faint.className += 'text_faint_style';
-			span_date.appendChild(faint);
-			faint.textContent = 'Неизвестно';
+			span_date.empty().append($('<span>').addClass('text_faint_style').text('Неизвестно'));
 		};
-		ui.article_frame.style.display = '';
-		if (result.type.split(":")[1] == "PDF") {
+		ui.article_frame.css('display', '');
+		//TODO
+		/*if (result.type.split(":")[1] == "PDF") {
 			ui.article_frame.src = "/files/test_pdf.pdf";
 		} else {
 			ui.article_frame.src = "/files/no_preview.html";
-		}
+		}*/
 		ui.selected_result = id;
 	}
-	ui.update_page_url(false);
+	ui.update_page_url(
+		ui.button.f.attr('data-id'),
+		ui.button.s.attr('data-id'),
+		ui.button.t.attr('data-id'),
+		id, false
+	);
 };
 
 ui.results_update = function() {
 	var box = ui.results_box;
-	var noliterature_dummy = document.getElementById('dummyNoliterature');
-	var literature_dummy = document.getElementById('dummyLiterature');
-	var literatureHeader = document.getElementById('result_literature_header');
-	var infobox = document.getElementById('result_infobox');
-	var items_to_remove = [];
-	var noliterature_delete = box.getElementsByClassName('result_noliterature');
-	var literature_delete = box.getElementsByClassName('result_literature');
-	Array.prototype.forEach.call(noliterature_delete, function(item, i, arr) {
-		if (item != noliterature_dummy) items_to_remove.push(item);
+	var noliterature_dummy = $('#dummyNoliterature');
+	var literature_dummy = $('#dummyLiterature');
+	var literatureHeader = $('#result_literature_header');
+	var infobox = $('#result_infobox');
+	//var items_to_remove = [];
+	box.find('.result_noliterature').each( function() {
+		if (!$(this).is(noliterature_dummy)) {
+			//items_to_remove.push(this);
+			this.remove();
+		}
 	});
-	Array.prototype.forEach.call(literature_delete, function(item, i, arr) {
-		if (item != literature_dummy) items_to_remove.push(item);
+	box.find('.result_literature').each( function() {
+		if (!$(this).is(literature_dummy)) {
+			//items_to_remove.push(this);
+			this.remove();
+		}
 	});
-	items_to_remove.forEach(function(item, i, arr) {
-		item.remove();
-	});
-	if (requests.result_array == null) {
-		infobox.style.display='';
-		infobox.getElementsByClassName('result_infobox_text')[0].textContent = 'Нет материалов';
-		literatureHeader.style.display='none';
+	if (!requests.result_array) {
+		infobox.css('display', '');
+		var text = ui.button.f.attr('data-id') == 0 ? '' /*'Уточните поисковой запрос'*/ : 'Нет материалов';
+		infobox.find('.result_infobox_text').first().text(text);
+		literatureHeader.css('display', 'none');
 	} else {
-		infobox.style.display='none';
+		infobox.css('display', 'none');
 		var literature_exists = false;
 		for (var id in requests.result_array) {
 			var item = requests.result_array[id];
 			if (item.type.startsWith('LITERATURE')) {
 				literature_exists = true;
-				var new_elem = literature_dummy.cloneNode(true);
-				new_elem.removeAttribute("id");
-				new_elem.setAttribute('data-id', id);
-				new_elem.getElementsByClassName('result_literature_text')[0].textContent = item.title;
-				new_elem.style.display='';
-				box.insertBefore(new_elem, infobox);
+				var new_elem = literature_dummy.clone();
+				new_elem.removeAttr("id");
+				new_elem.attr('data-id', id);
+				new_elem.find('.result_literature_text').first().text(item.title);
+				new_elem.css('display', '');
+				new_elem.insertBefore(infobox);
 			} else {
-				var new_elem = noliterature_dummy.cloneNode(true);
-				new_elem.removeAttribute("id");
-				new_elem.setAttribute('data-id', id);
-				new_elem.getElementsByClassName('result_noliterature_text')[0].textContent = item.title;
-				new_elem.style.display='';
-				var image = new_elem.getElementsByTagName('img')[0];
+				var new_elem = noliterature_dummy.clone();
+				new_elem.removeAttr("id");
+				new_elem.attr('data-id', id);
+				new_elem.find('.result_noliterature_text').first().text(item.title);
+				new_elem.css('display', '');
+				var image = new_elem.find('img').first();
 				if (item.type.startsWith("TEACHER")) {
-					image.className += "image_methodic";
-					box.insertBefore(new_elem, noliterature_dummy.nextSibling);
+					image.addClass("image_methodic");
+					new_elem.insertBefore(noliterature_dummy.next());
 				} else if (item.type.startsWith("STUDENT")) {
-					image.className += "image_abstract";
-					box.insertBefore(new_elem, literatureHeader);
+					image.addClass("image_abstract");
+					new_elem.insertBefore(literatureHeader);
 				};
 				if (initial_res == id) {
 					initial_res = null;
@@ -282,19 +263,19 @@ ui.results_update = function() {
 			}
 		};
 		if (literature_exists) {
-			literatureHeader.style.display='';
+			literatureHeader.css('display', '');
 		} else {
-			literatureHeader.style.display='none';
+			literatureHeader.css('display', 'none');
 		}
 	}
 	if (ui.results_update.elem_to_select != null) {
-		ui.results_update.elem_to_select.click();
+		ui.results_update.elem_to_select.trigger("click");
 		//TODO: прокрутка полосы до этого элемента
 		ui.results_update.elem_to_select = null;
 	}
 };
 
-ui.update = function(f_id, f_name, s_id, s_name, t_id, t_name) {
+ui.update = function(f_id, s_id, t_id) {
 	//вызывается при изменении факультета, предмета или преподавателя
 	//устанавливает надписи, отправляет запрос о материалах, заполняет списки
 	ui.selected_result = null;
@@ -307,54 +288,53 @@ ui.update = function(f_id, f_name, s_id, s_name, t_id, t_name) {
 	requests.get_list("f", 0, 0, 0);
 	requests.get_list("s", f_id, 0, 0);
 	requests.get_list("t", f_id, s_id, 0);
-	ui.button_set_data("f", f_id, f_name);
-	ui.button_set_data("s", s_id, s_name);
-	ui.button_set_data("t", t_id, t_name);
-	//имена (*_name) будут уточнены после окончания requests.get_list
-	ui.update_page_url();
+	ui.button_set_data("f", f_id);
+	ui.button_set_data("s", s_id);
+	ui.button_set_data("t", t_id);
 	ui.result_selection(0);
+	//ui.update_page_url(f_id, s_id, t_id, 0, false);
 }
 
 ui.update_page_title = function() {
-	var name = "";
 	if (ui.selected_result > 0 && requests.result_array[ui.selected_result] != null) {
 		name = requests.result_array[ui.selected_result].title;
-	} else if (ui.button.t.getAttribute('data-id') > 0
-			&& ui.button.t.getAttribute('data-name') != null) {
-		name = ui.button.t.getAttribute('data-name');
-	} else if (ui.button.s.getAttribute('data-id') > 0
-			&& ui.button.s.getAttribute('data-name') != null) {
-		name = ui.button.s.getAttribute('data-name');
-	} else if (ui.button.f.getAttribute('data-id') > 0
-			&& ui.button.f.getAttribute('data-name') != null) {
-		name = ui.button.f.getAttribute('data-name');
+	} else if (ui.button.t.attr('data-id') > 0) {
+		var id = ui.button.t.attr('data-id');
+		var name = (id == 0) ? ui.default_names.t : data.full_lists.t[id][1];
+	} else if (ui.button.s.attr('data-id') > 0) {
+		var id = ui.button.s.attr('data-id');
+		var name = (id == 0) ? ui.default_names.s : data.full_lists.s[id][1];
+	} else if (ui.button.f.attr('data-id') > 0) {
+		var id = ui.button.f.attr('data-id');
+		var name = (id == 0) ? ui.default_names.f : data.full_lists.f[id][1];
 	};
 	var name2 = "NSU Online Library";
-	if (name.length > 0) {
+	if (name) {
 		name2 = name + " - " + name2;
 	};
 	document.title = name2;
 }
 
-ui.update_page_url = function(push_in_history = true) {
+ui.update_page_url = function(f, s, t, res, push_in_history = true) {
 	ui.update_page_title();
 	var params = {};
-	var f = ui.button.f.getAttribute('data-id');
-	var s = ui.button.s.getAttribute('data-id');
-	var t = ui.button.t.getAttribute('data-id');
+	/*var f = ui.button.f.attr('data-id');
+	var s = ui.button.s.attr('data-id');
+	var t = ui.button.t.attr('data-id');*/
 	if (f > 0) params["f"] = f;
 	if (s > 0) params["s"] = s;
 	if (t > 0) params["t"] = t;
-	if (ui.selected_result > 0) params["res"] = ui.selected_result;
+	//if (ui.selected_result > 0) params["res"] = ui.selected_result;
+	if (res > 0) params["res"] = res;
 	var name;
-	if (ui.update_page_url.notFirstUsage != undefined) {
+	if (ui.update_page_url.notFirstUsage) {
 		if (push_in_history) {
 			window.history.pushState(
-				{}, "", requests.build_url("", params)
+				{}, "", requests.build_url("/", params)
 			);
 		} else {
 			window.history.replaceState(
-				{}, "", requests.build_url("", params)
+				{}, "", requests.build_url("/", params)
 			);
 		}
 	} else {
@@ -364,13 +344,11 @@ ui.update_page_url = function(push_in_history = true) {
 
 ui.download = function(event) {
 	var id = ui.selected_result;
-	ui.download_frame.src = requests.build_url("/download.php", {
+	ui.download_frame.prop('src', requests.build_url("/download.php", {
 		"file": encodeURIComponent(requests.result_array[id].file),
-		"filename": requests.result_array[id].name,
-	});
+		"filename": encodeURIComponent(requests.result_array[ui.selected_result].title),
+	}));
 }
-
-/////////////////////////////////////
 
 requests.build_url = function(url, parameters) {
   var qs = "";
@@ -414,12 +392,28 @@ requests.get_list = function(target, f_id, s_id, t_id) {
 	requests.queries_lists[target].open("GET", _url, true);
 	requests.queries_lists[target].onload = function() {
 		requests.lists[target] = JSON.parse(requests.queries_lists[target].responseText);
-		requests.lists[target][0] = ui.default_names[target];
 		ui.list_update(target);
-		var id = +ui.button[target].getAttribute('data-id');
-		var name = requests.lists[target][id]
-		if (name != null) ui.button_set_data(target, id, name);
+		var id = +ui.button[target].attr('data-id');
+		if (target == "t" && id == 0 && requests.lists.t.length == 1) {
+			//выбираем учителя, если он один в списке
+			id = requests.lists.t[0];
+		}
+		ui.button_set_data(target, id);
 		ui.update_page_title();
 	}
 	requests.queries_lists[target].send();
+}
+
+requests.get_full_lists_and_relations = function(on_finish) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "/init.json", true);
+	xhr.onload = function() {
+		var response = JSON.parse(xhr.responseText);
+		data.full_lists.f = response.faculties;
+		data.full_lists.s = response.subjects;
+		data.full_lists.t = response.teachers;
+		data.relations = response.relations;
+		if (on_finish) on_finish();
+	}
+	xhr.send();
 }

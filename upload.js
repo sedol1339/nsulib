@@ -209,7 +209,7 @@ ui.update_upload_grid = function() {
 		},
 		"FINISHED": function(entry, div) {
 			if (!entry.state_changed) {
-				var span = div.first();
+				var span = div.children().first();
 			} else {
 				div.empty();
 				var span = $('<span>');
@@ -222,7 +222,7 @@ ui.update_upload_grid = function() {
 		},
 		"FINISHED_ERROR": function(entry, div) {
 			if (!entry.state_changed) {
-				var span = div.first();
+				var span = div.children().first();
 			} else {
 				div.empty();
 				var span = $('<span>');
@@ -499,7 +499,7 @@ ui.fill_select_tag_and_select_if_one_option = function(local_list, local_data) {
 		local_list.val(local_list.last().prop('value'));
 		return false;
 	};
-	if (Object.keys(local_data).length == 2 & local_list.first().text() == "") {
+	if (Object.keys(local_data).length == 2 & local_list.children().first().text() == "") {
 		local_list.val(local_list.last().prop('value'));
 		return true;
 	};

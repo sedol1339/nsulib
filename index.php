@@ -10,6 +10,8 @@
 	<link rel="stylesheet" href="common.css" media="all" />
 	<link rel="stylesheet" href="header.css" media="all" />
 	<link rel="stylesheet" href="index.css" media="all" />
+	<script src="jquery-3.3.1.min.js" defer></script>
+	<script src="utils.js" defer></script>
 	<script src="index.js" defer></script>
 	<script>
 		var initial_f = 0, initial_s = 0, initial_t = 0, initial_res = 0;
@@ -62,14 +64,14 @@
 				</div>
 			</div>
 			<div id=aside1_results_box>
-				<div class="result_noliterature" id=dummyNoliterature style="display:none;">
+				<div class="result result_noliterature" id=dummyNoliterature style="display:none;">
 					<img></img>
 					<p class=result_noliterature_text>DummyNoliterature</p>
 				</div>
 				<div id=result_literature_header style="display:none;">
 					<p class=result_literature_header_text>Литература</p>
 				</div>
-				<div class="result_literature" id=dummyLiterature style="display:none;">
+				<div class="result result_literature" id=dummyLiterature style="display:none;">
 					<p class=result_literature_text>DummyLiterature</p>
 				</div>
 				<div id=result_infobox>

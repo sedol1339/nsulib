@@ -3,3 +3,5 @@
 *.lnk
 *.bat
 *.ftp
+files/
+!files/.htaccess
