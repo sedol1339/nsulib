@@ -99,7 +99,6 @@ $filesize = $file['size'];
 
 $filename = random_str();
 $path = dirname(__FILE__) . "/files/" . $filename;
-echo $path . " " . $_FILES['file']['tmp_name'];
 if (!move_uploaded_file($_FILES['file']['tmp_name'], $path))
 	internal_error("Внутренняя ошибка сервера: move_uploaded_file");
 
