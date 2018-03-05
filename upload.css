@@ -91,6 +91,10 @@ main {
 }
 .info_type_selected {
 	background: #F4F4F4 !important;
+	box-sizing: border-box !important;
+	border-top: 5px #DDD solid !important;
+	border-bottom: 5px #DDD solid !important;
+	line-height: 37px !important;
 }
 #info_type div:hover {
 	cursor: pointer;

@@ -132,6 +132,7 @@ ui.set_uploading_type = function(event, type) {
 	ui.mode = type;
 	if (type == "publishing") {
 		ui.input.file.css('display', "");
+		ui.material_deselect();
 	} else if (type == "editing") {
 		ui.input.file.css('display', "none");
 	}
@@ -148,8 +149,8 @@ ui.update_upload_grid = function() {
 		ui.highlighted_row_first_elem_upload = null;
 		return;
 	} else {
-		//ui.upload_grid.css('display', "").css('height', Math.min(data.uploading.size, 6) * 30 + 'px');
-		ui.upload_grid.css('display', "").css('height', '150' + 'px');
+		ui.upload_grid.css('display', "").css('height', Math.min(data.uploading.size, 6) * 30 + 'px');
+		//ui.upload_grid.css('display', "").css('height', '150' + 'px');
 	}
 	
 	/*var rows_to_remove = new Set();
@@ -363,7 +364,9 @@ ui.file_selected = function() {
 		var file_ext = file.name.substr(lastDotPosition + 1, file.name.length);
 	}
 	ui.file_about.text("Файл " + file_ext + ", размер " + humanFileSize(file.size, true));
-	ui.input.title.val(file_name);
+	//ui.input.title.val(file_name);
+	ui.input.title.val(file.name);	//иначе файл скачивается обратно без расширения!
+									//возможно, это временное решение
 }
 
 function humanFileSize(bytes, si) {
@@ -431,16 +434,9 @@ ui.event_filter_selection = function(event, letter) {
 	}
 }
 
-ui.update_list = function(letter) {
-	var local_list = ui.input[letter];
-	var local_data = data.lists[letter];
-	ui.fill_select_tag_and_select_if_one_option(local_list, local_data);
-	ui.input[letter].prop('disabled', false);
-}
-
 ui.update_filter_list = function(letter) {
 	var local_list = ui.filters[letter];
-	var local_data = data.filters[letter];
+	var local_data = ui.sort_by_name(data.filters[letter], letter);
 	//var selected = ui.fill_select_tag_and_select_if_one_option(local_list, local_data);
 	//ui.filters[letter].prop('disabled', false);
 	local_list.empty();
@@ -456,9 +452,9 @@ ui.update_filter_list = function(letter) {
 }
 
 ui.set_default_filters = function() {
-	//не трогать, говнокод, собран из палок и земли, при прикосновении ломается
-	ui.filters.uploaded.val("ALL_TIME");
-	ui.filters.f.val("1");
+	//ui.filters.uploaded.val("ALL_TIME");
+	//ui.filters.f.val("1");
+	ui.filters.uploaded.val("TODAY");
 	ui.event_filter_selection(null, "f"); //для обновления списка предметов
 	requests.receive_materials(true);
 }
@@ -621,6 +617,7 @@ ui.button_publish_or_edit_click = function(event) {
 				uploading_obj.state = "FINISHED";
 				ui.last_uploaded = query_upload.responseText;
 				uploading_obj.result = "Файл успешно загружен.";
+				requests.receive_materials(true); //!
 			} else {
 				uploading_obj.state = "FINISHED_ERROR";
 				uploading_obj.error = true;
@@ -851,6 +848,11 @@ ui.material_select = function(elem) {
 	ui.fill_info_to_edit();
 }
 
+ui.material_deselect = function() {
+	if (!ui.selected_row_first_elem) return;
+	ui.material_select(ui.selected_row_first_elem);
+}
+
 ui.fill_info_to_edit = function() {
 	var entry = data.materials.find( function(x) {
 		return (x.id == ui.selected_material_id);
@@ -1074,7 +1076,7 @@ requests.get_full_lists_and_relations = function() {
 ui.update_lists = function(letter) {
 	var upd = function(letter) {
 		var local_list = ui.input[letter];
-		var local_data = data.lists[letter];
+		var local_data = ui.sort_by_name(data.lists[letter], letter);
 		local_list.empty();
 		var func = function(i, _, set) {
 			var title = (i == 0) ? "" : data.full_lists[letter][i][(letter == "t") ? 1 : 0];
@@ -1116,7 +1118,7 @@ ui.update_lists = function(letter) {
 		upd("t");
 		//если преподаватель один, выбираем его в списке
 		if (data.lists.t.size == 1) {
-			ui.input["t"].children("option")[1].prop('selected', 'selected'); //?
+			$(ui.input["t"].children("option")[1]).prop('selected', 'selected'); //?
 
 		}
 	} else {
@@ -1146,4 +1148,11 @@ requests.get_filter_list = function(target, f_id, s_id, t_id, function_params) {
 		}
 	}
 	requests.queries_filters[target].send();
+}
+
+ui.sort_by_name = function(list, letter) {
+	list = Array.from(list); //list на входе либо массив, либо множество
+	return list.sort(function(a, b) {
+		return data.full_lists[letter][a][0].localeCompare(data.full_lists[letter][b][0]);
+	});
 }

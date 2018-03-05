@@ -106,9 +106,9 @@
 					<div class="aside2_info_box_button common_button">
 						<p id=button_download class=aside2_info_box_button_text>Скачать</p>
 					</div>
-					<div class="aside2_info_box_button common_button">
+					<!--<div class="aside2_info_box_button common_button">
 						<p class=aside2_info_box_button_text>Изменить</p>
-					</div>
+					</div>-->
 				</div>
 			</div>
 		</aside>
