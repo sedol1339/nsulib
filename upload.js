@@ -553,10 +553,16 @@ ui.recalculate_css = function(event) {
 
 ui.button_publish_or_edit_click = function(event) {
 	
-	if (ui.mode == "publishing") {	
+	if (ui.mode == "editing") {
+		var edit = true;
+	} else if (ui.mode == "publishing") {	
+		var edit = false;
+	} else {
+		console.log("unknown mode! ui.mode = " + ui.mode);
+		return;
+	}
 	
-		if (ui.input.file.prop('files')[0] == null) { window.alert("Не выбран файл"); return; }
-		
+	var check_filled = function() {
 		var blank_fields_exist = false;
 		var error_message = "Не заполнены следующие поля:\n";
 		
@@ -568,72 +574,79 @@ ui.button_publish_or_edit_click = function(event) {
 		
 		if (blank_fields_exist) {
 			window.alert(error_message);
-			return;
+			return false;
 		}
-		
-		//TODO проверка имени файла (на сервере и на клиенте)
-		
-		var formData = new FormData();
-		formData.append('file', ui.input.file.prop('files')[0]);
-		formData.append('f', ui.get_selected_value("f"));
-		formData.append('s', ui.get_selected_value("s"));
-		formData.append('t', ui.get_selected_value("t"));
-		formData.append('type', ui.get_selected_value("type"));
-		formData.append('title', ui.input.title.val());
-		
-		formData.append('author', ui.input.author.val());
-		formData.append('year', ui.get_selected_value("year"));
-		formData.append('description', ui.input.description.val());
-		
-		var query_upload = new XMLHttpRequest();
-		query_upload.open("POST", "uploadScript.php", true);
-		
-		var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "XMLHttpRequest": query_upload, "_state": "UPLOADING", "_state_changed": true};
-		Object.defineProperty(uploading_obj, "state", {
-			set: function (x) { this._state = x; this._state_changed = true; },
-			get: function () { return this._state; }
-		});
-		Object.defineProperty(uploading_obj, "state_changed", {
-			set: function (x) { this._state_changed = x; },
-			get: function () { if (this._state_changed) {this._state_changed = false; return true;} else {return false;} }
-		});
-		data.uploading.add(uploading_obj);
+		return true;
+	}	
+	
+	if (!edit && ui.input.file.prop('files')[0] == null) { window.alert("Не выбран файл"); return; }
+	
+	if (!check_filled()) return;
+	
+	var formData = new FormData();
+	
+	if (!edit) formData.append('file', ui.input.file.prop('files')[0]);
+	
+	formData.append('f', ui.get_selected_value("f"));
+	formData.append('s', ui.get_selected_value("s"));
+	formData.append('t', ui.get_selected_value("t"));
+	formData.append('type', ui.get_selected_value("type"));
+	formData.append('title', ui.input.title.val());
+	
+	formData.append('author', ui.input.author.val());
+	formData.append('year', ui.get_selected_value("year"));
+	formData.append('description', ui.input.description.val());
+	
+	if (edit) formData.append('id', ui.selected_material_id);
+	
+	var query_upload = new XMLHttpRequest();
+	query_upload.open("POST", "uploadScript.php", true);
+	
+	var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "XMLHttpRequest": query_upload, "_state": "UPLOADING", "_state_changed": true, edit: edit};
+	Object.defineProperty(uploading_obj, "state", {
+		set: function (x) { this._state = x; this._state_changed = true; },
+		get: function () { return this._state; }
+	});
+	Object.defineProperty(uploading_obj, "state_changed", {
+		set: function (x) { this._state_changed = x; },
+		get: function () { if (this._state_changed) {this._state_changed = false; return true;} else {return false;} }
+	});
+	data.uploading.add(uploading_obj);
+	ui.update_upload_grid();
+	
+	query_upload.upload.onprogress = function(event) {
+		uploading_obj.uploaded = event.loaded;
+		uploading_obj.total = event.total;
+		console.log(humanFileSize(event.loaded, true) + '/' + humanFileSize(event.total, true));
 		ui.update_upload_grid();
-		
-		query_upload.upload.onprogress = function(event) {
-			uploading_obj.uploaded = event.loaded;
-			uploading_obj.total = event.total;
-			console.log(humanFileSize(event.loaded, true) + '/' + humanFileSize(event.total, true));
-			ui.update_upload_grid();
-		};
-		query_upload.upload.onload = function(event) {
-			console.log("upload.onload");
-			uploading_obj.state = "WAITING_FOR_RESPONSE";
-			ui.update_upload_grid();
-		};
-		query_upload.onload = function(event) {
-			console.log("onload " + query_upload.responseText);
-			if (query_upload.status == 200) {
-				uploading_obj.state = "FINISHED";
-				ui.last_uploaded = query_upload.responseText;
-				uploading_obj.result = "Файл успешно загружен.";
-				requests.receive_materials(true); //!
-			} else {
-				uploading_obj.state = "FINISHED_ERROR";
-				uploading_obj.error = true;
-				uploading_obj.result = query_upload.responseText;
-			}
-			ui.update_upload_grid();
-		};
-		query_upload.onerror = function(event) {
-			console.log("onerror");
+	};
+	query_upload.upload.onload = function(event) {
+		console.log("upload.onload");
+		uploading_obj.state = "WAITING_FOR_RESPONSE";
+		ui.update_upload_grid();
+	};
+	query_upload.onload = function(event) {
+		console.log("onload " + query_upload.responseText);
+		if (query_upload.status == 200) {
+			uploading_obj.state = "FINISHED";
+			ui.last_uploaded = query_upload.responseText;
+			uploading_obj.result = edit ? "Материал успешно отредактирован." : "Файл успешно загружен.";
+			requests.receive_materials(true); //!
+		} else {
 			uploading_obj.state = "FINISHED_ERROR";
 			uploading_obj.error = true;
-			uploading_obj.result = "Ошибка сети";
-			ui.update_upload_grid();
-		};
-		query_upload.send(formData);
-	}
+			uploading_obj.result = query_upload.responseText;
+		}
+		ui.update_upload_grid();
+	};
+	query_upload.onerror = function(event) {
+		console.log("onerror");
+		uploading_obj.state = "FINISHED_ERROR";
+		uploading_obj.error = true;
+		uploading_obj.result = "Ошибка сети";
+		ui.update_upload_grid();
+	};
+	query_upload.send(formData);
 }
 
 ui.button_quit_click = function(event) {
@@ -857,12 +870,24 @@ ui.fill_info_to_edit = function() {
 	var entry = data.materials.find( function(x) {
 		return (x.id == ui.selected_material_id);
 	});
-	//TODO заполнить f, s, t
-	ui.input.type.value = entry.type.substr(0, entry.type.indexOf(':')); 
-	ui.input.title.value = entry.title ? entry.title : "";
-	if (entry.author) { ui.input.author.value = entry.author; }
-	//if (entry.year) { ui.input.year.value = entry.year; }
-	//if (entry.description) { ui.input.description.value = entry.description; }
+	
+	var f = entry.faculty;
+	var s = entry.subject;
+	var t = entry.teacher;
+	
+	ui.input.f.val(f);
+	ui.update_lists("f");
+	ui.input.s.val(s);
+	ui.update_lists("s");
+	ui.input.t.val(t);
+	ui.update_lists("t");
+	//если f, s, t некорректны изначально (нет такой связи)?
+	
+	ui.input.type.val(entry.type.substr(0, entry.type.indexOf(':'))); 
+	ui.input.title.val(entry.title ? entry.title : "");
+	if (entry.author) { ui.input.author.val(entry.author); }
+	if (entry.year) { ui.input.year.val(entry.year); }
+	if (entry.commentary) { ui.input.description.text(entry.commentary); }
 }
 
 ui.material_select_event = function(event) {
