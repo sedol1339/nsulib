@@ -640,7 +640,8 @@ ui.button_publish_or_edit_click = function(event) {
 	var query_upload = new XMLHttpRequest();
 	query_upload.open("POST", "uploadScript.php", true);
 	
-	var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "XMLHttpRequest": query_upload, "_state": "UPLOADING", "_state_changed": true, edit: edit};
+	var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "XMLHttpRequest": query_upload, "_state": "UPLOADING", "_state_changed": true};
+	if (edit) uploading_obj.edit_id = ui.selected_material_id;
 	Object.defineProperty(uploading_obj, "state", {
 		set: function (x) { this._state = x; this._state_changed = true; },
 		get: function () { return this._state; }

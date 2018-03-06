@@ -48,8 +48,21 @@ $type = $_POST["type"];
 $author = $_POST["author"];
 $year = $_POST["year"];
 $description = $_POST["description"];
+$id = $_POST["id"];
 
-if (empty($file)) error("Не отправлен файл");
+
+if (empty($id)) {
+	//новый материал
+	$edit = false;
+	if (empty($file)) error("Не отправлен файл или id");
+} else {
+	//существующий материал
+	$edit = true;
+	if (!is_numeric($id) || $id <= 0) error("Некорректно указан id");
+}
+
+//при редактировании вся информация отправляется заново
+
 if (empty($title)) error("Не заполнено обязательное поле: название");
 if (empty($f)) error("Не заполнено обязательное поле: факультет");
 if (empty($s)) error("Не заполнено обязательное поле: предмет");
@@ -71,10 +84,16 @@ if (!empty($description) && strlen($description)>4000)
 if (!empty($year) && (!is_numeric($year) || $year<1995 || $year>2018))
 	error("Год указан неверно");
 
-if ($file['size'] > 524288000)
-	error("Файл должен быть не больше 500 Мб");
+$type .= ":UNKNOWN";
 
-switch ($file['error']) {
+$uploader = "1";
+
+$ip = "";
+
+if (!$edit) {
+	if ($file['size'] > 524288000)
+		error("Файл должен быть не больше 500 Мб");
+	switch ($file['error']) {
 	case UPLOAD_ERR_OK:
 		break;
 	case UPLOAD_ERR_NO_FILE:
@@ -87,20 +106,14 @@ switch ($file['error']) {
 		error("Загрузка файла прервана");
 	default:
 		internal_error("Внутренняя ошибка сервера: " . $file['error']);
+	}
+	
+	$filesize = $file['size'];
+	$filename = random_str();
+	$path = dirname(__FILE__) . "/files/" . $filename;
+	if (!move_uploaded_file($_FILES['file']['tmp_name'], $path))
+		internal_error("Внутренняя ошибка сервера: move_uploaded_file");
 }
-
-$type .= ":UNKNOWN";
-
-$uploader = "1";
-
-$ip = "";
-
-$filesize = $file['size'];
-
-$filename = random_str();
-$path = dirname(__FILE__) . "/files/" . $filename;
-if (!move_uploaded_file($_FILES['file']['tmp_name'], $path))
-	internal_error("Внутренняя ошибка сервера: move_uploaded_file");
 
 //------------------------------
 
@@ -118,52 +131,81 @@ if (!$mysqli->set_charset("utf8")) {
 
 //------------------------------
 
-$columns = "title";
-$values = "'" . $mysqli->real_escape_string($title) . "'";
+$columns = array();
+$values = array();
 
-$columns .= ", " . "faculty";
-$values .= ", " . "'" . $mysqli->real_escape_string($f) . "'";
+$columns[] = "title";
+$values[] = ("'" . $mysqli->real_escape_string($title) . "'");
 
-$columns .= ", " . "subject";
-$values .= ", " . "'" . $mysqli->real_escape_string($s) . "'";
+$columns[] = "faculty";
+$values[] = "'" . $mysqli->real_escape_string($f) . "'";
 
-$columns .= ", " . "teacher";
-$values .= ", " . "'" . $mysqli->real_escape_string($t) . "'";
+$columns[] = "subject";
+$values[] = "'" . $mysqli->real_escape_string($s) . "'";
 
-$columns .= ", " . "type";
-$values .= ", " . "'" . $mysqli->real_escape_string($type) . "'";
+$columns[] = "teacher";
+$values[] = "'" . $mysqli->real_escape_string($t) . "'";
 
-$columns .= ", " . "author";
-$values .= ", " . "'" . $mysqli->real_escape_string($author) . "'";
+$columns[] = "type";
+$values[] = "'" . $mysqli->real_escape_string($type) . "'";
 
-$columns .= ", " . "year";
-$values .= ", " . "'" . $mysqli->real_escape_string($year) . "'";
+$columns[] = "author";
+$values[] = "'" . $mysqli->real_escape_string($author) . "'";
 
-$columns .= ", " . "commentary";
-$values .= ", " . "'" . $mysqli->real_escape_string($description) . "'";
+$columns[] = "year";
+$values[] = "'" . $mysqli->real_escape_string($year) . "'";
 
-$columns .= ", " . "uploader";
-$values .= ", " . "'" . $mysqli->real_escape_string($uploader) . "'";
+$columns[] = "commentary";
+$values[] = "'" . $mysqli->real_escape_string($description) . "'";
 
-$columns .= ", " . "ip";
-$values .= ", " . "'" . $mysqli->real_escape_string($ip) . "'";
+if (!$edit) {
+	$columns[] = "uploader";
+	$values[] = "'" . $mysqli->real_escape_string($uploader) . "'";
+	
+	$columns[] = "ip";
+	$values[] = "'" . $mysqli->real_escape_string($ip) . "'";
+	
+	$columns[] = "file";
+	$values[] = "'" . $mysqli->real_escape_string($filename) . "'";
 
-$columns .= ", " . "file";
-$values .= ", " . "'" . $mysqli->real_escape_string($filename) . "'";
+	$columns[] = "filesize";
+	$values[] = "'" . $mysqli->real_escape_string($filesize) . "'";
+} else {
+	$columns[] = "edited";
+	$values[] = "NOW()";
+}
 
-$columns .= ", " . "filesize";
-$values .= ", " . "'" . $mysqli->real_escape_string($filesize) . "'";
+if (!$edit) {
+	$sql = "INSERT INTO materials (" . implode(", ", $columns) . ") VALUES (" . implode(", ", $values) . ")";
 
-$sql = "INSERT INTO materials (" . $columns . ") VALUES (" . $values . ")";
+	if (!$result = $mysqli->query($sql))
+		error("MYSQL " . $mysqli->errno . ": " . $mysqli->error);
 
-if (!$result = $mysqli->query($sql))
-	error("MYSQL " . $mysqli->errno . ": " . $mysqli->error);
+	$new_id = $mysqli->insert_id;
 
-$new_id = $mysqli->insert_id;
+	if ($new_id == 0)
+		error("MYSQL: insert_id is 0");
 
-if ($new_id == 0)
-	error("MYSQL: insert_id is 0");
+	send_answer_and_exit($new_id);
+} else {
+	$pairs = array();
+	foreach ($columns as $i => $column) {
+		$pairs[] = $column . "=" . $values[$i];
+	}
+	
+	$sql = "UPDATE materials SET " . implode(", ", $pairs) . " WHERE id=" . $id;
+	
+	if (!$result = $mysqli->query($sql))
+		error("MYSQL " . $mysqli->errno . ": " . $mysqli->error);
+	
+	send_answer_and_exit(0);
+}
 
-send_answer_and_exit($new_id);
+
+
+
+
+
+
 
 ?>
