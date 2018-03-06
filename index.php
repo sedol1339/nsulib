@@ -98,6 +98,7 @@
 			</div>
 			<div id=aside2_info_box style="display:none;">
 				<p id=aside2_info_box_text>
+					<strong>Название:</strong> <span id=title_span></span><br/>
 					<strong>Автор:</strong> <span id=author_span></span><br/>
 					<strong>Описание:</strong> <span id=description_span></span><br/>
 					<strong>Дата загрузки:</strong> <span id=date_span></span><br/>

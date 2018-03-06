@@ -187,6 +187,10 @@ ui.result_selection = function(id, elem) {
 		var result = requests.result_array[id];
 		stub.css('display', 'none');
 		box.css('display', '');
+		
+		var span_title = $('#title_span');
+		span_title.text(result.title);
+		
 		var span_author = $('#author_span');
 		var span_description = $('#description_span');
 		var span_date = $('#date_span');
