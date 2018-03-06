@@ -72,6 +72,10 @@ body {
 	background:#DDDDDD;
 	cursor: pointer;
 }
+.common_button_disabled:hover {
+	background:#E5E5E5 !important;
+	cursor: default !important;
+}
 .common_button:active > p {
 	/*position:relative;
 	top:1px;*/
@@ -83,4 +87,7 @@ body {
 .clickable:hover {
 	cursor: pointer;
 	text-decoration: underline;
+}
+select:disabled, textarea:disabled {
+	background-color: white;
 }

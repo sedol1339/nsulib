@@ -132,9 +132,45 @@ ui.set_uploading_type = function(event, type) {
 	ui.mode = type;
 	if (type == "publishing") {
 		ui.input.file.css('display', "");
+		ui.edit_info.css('display', "none");
 		ui.material_deselect();
+		ui.button_publish_or_edit.text("Опубликовать файл");
+		ui.input_disabled(false);
+		ui.input_clear();
 	} else if (type == "editing") {
 		ui.input.file.css('display', "none");
+		ui.edit_info.css('display', ui.selected_material_id ? "none" : "");
+		ui.input_disabled(ui.selected_material_id ? false : true);
+		ui.input_clear();
+		ui.button_publish_or_edit.text("Отредактировать информацию");
+	}
+}
+
+ui.input_clear = function() {
+	ui.input.f.val(0);
+	ui.input.s.val(0);
+	ui.input.t.val(0);
+	ui.input.type.val("TEACHER");
+	ui.input.title.val("")
+	ui.input.author.val("")
+	ui.input.year.val("2018")
+	ui.input.description.val("")
+}
+
+ui.input_disabled = function(disabled) {
+	ui.input.f.prop('disabled', disabled);
+	ui.input.s.prop('disabled', disabled);
+	ui.input.t.prop('disabled', disabled);
+	ui.input.type.prop('disabled', disabled);
+	ui.input.title.prop('disabled', disabled);
+	ui.input.author.prop('disabled', disabled);
+	ui.input.year.prop('disabled', disabled);
+	ui.input.description.prop('disabled', disabled);
+	ui.button_publish_or_edit_disabled = disabled;
+	if (disabled) {
+		ui.button_publish_or_edit.addClass('common_button_disabled');
+	} else {
+		ui.button_publish_or_edit.removeClass('common_button_disabled');
 	}
 }
 
@@ -553,6 +589,8 @@ ui.recalculate_css = function(event) {
 
 ui.button_publish_or_edit_click = function(event) {
 	
+	if (ui.button_publish_or_edit_disabled) return;
+	
 	if (ui.mode == "editing") {
 		var edit = true;
 	} else if (ui.mode == "publishing") {	
@@ -857,12 +895,15 @@ ui.material_select = function(elem) {
 	}
 	ui.selected_row_first_elem = elem;
 	ui.selected_material_id = elem.attr('data-id');
+	//сохранить порядок следующих двух строк
+	ui.edit_info.css('display', "");
 	ui.set_uploading_type(null, "editing");
 	ui.fill_info_to_edit();
 }
 
 ui.material_deselect = function() {
 	if (!ui.selected_row_first_elem) return;
+	ui.selected_material_id = null;
 	ui.material_select(ui.selected_row_first_elem);
 }
 

@@ -94,7 +94,7 @@
 				<div data-type=editing>Редактирование</div>
 			</div>
 			<input id=input_file type="file" name="file">
-			<div id=edit_info style="display:none;">Внесите изменения и нажмите "Сохранить"</div>
+			<div id=edit_info style="display:none;">Выберите материал для редактирования</div>
 			<div id=main_info>
 				<div class=info_box_wrapper>
 					<div>Факультет:</div>

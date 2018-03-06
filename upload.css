@@ -193,7 +193,7 @@ main {
 }
 #edit_info {
 	font-size: 9pt;
-	color: #666;
+	font-style: italic;
 	padding: 10px;
 	border-bottom:1px solid #CCCCCC;
 }
