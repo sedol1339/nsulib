@@ -849,6 +849,7 @@ ui.show_materials = function(sort) {
 			var div = $("<div>");
 			div.addClass("grid_item");
 			div.mouseover(ui.materials_onmouseover);
+			div.click(ui.material_delete_or_restore_event);
 			div.addClass("delete_button_faint");
 			div.css("grid-row", row_number);
 			div.css("grid-column", "delete");
@@ -864,6 +865,100 @@ ui.show_materials = function(sort) {
 	ui.highlighted_row_first_elem = null;
 	ui.selected_row_first_elem = null;
 	ui.grid.scrollTop(0);
+}
+
+ui.material_delete_or_restore = function(elem, delete_box) {
+	
+	var id = elem.attr('data-id');
+	var entry = data.materials.find( function(x) {
+		return (x.id == id);
+	});
+	var fill_delete_box = {
+		exists: function() {
+			delete_box.empty().append($("<span>").text("удалить"));
+		},
+		deleted: function() {
+			delete_box.empty().append($("<span>").text("восстановить"));
+		},
+		error: function() {
+			delete_box.empty().append($("<span>").css("color", "red").text("ошибка"));
+		},
+	};
+	//state machine
+	if (!entry.deleted_state || entry.deleted_state == "exists") {
+		//удаляем
+		entry.deleted_state = "in_progress";
+		var params = {
+			action: "delete",
+			id: id,
+		};
+		params.on_success = function() {
+			entry.deleted_state = "deleted";
+			fill_delete_box.deleted();
+		};
+		params.on_error = function() {
+			entry.deleted_state = "error";
+			fill_delete_box.error();
+		};
+		params.on_network_error = function() {
+			entry.deleted_state = "exists";
+		};
+		params.on_success.bind(this);
+		params.on_error.bind(this);
+		params.on_network_error.bind(this);
+		requests.delete_material(params);
+	} else if (entry.deleted_state == "deleted") {
+		//восстанавливаем
+		entry.deleted_state = "in_progress";
+		var params = {
+			action: "restore",
+			id: id,
+		};
+		params.on_success = function() {
+			entry.deleted_state = "exists";
+			fill_delete_box.exists();
+		};
+		params.on_error = function() {
+			entry.deleted_state = "error";
+			fill_delete_box.error();
+		};
+		params.on_network_error = function() {
+			entry.deleted_state = "deleted";
+		};
+		params.on_success.bind(this);
+		params.on_error.bind(this);
+		params.on_network_error.bind(this);
+		requests.delete_material(params);
+	} else if (entry.deleted_state == "error") {
+		//ничего не делаем 
+	} else if (entry.deleted_state == "in_progress") {
+		//запрос уже отправлен, результат еще не получен, ничего не делаем
+	}
+}
+
+requests.delete_material = function(params) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "/delete.php", true);
+	
+	var formData = new FormData();
+	formData.append('id', params.id);
+	formData.append('action', params.action);
+	
+	xhr.onload = function(event) {
+		if (xhr.status == 200) {
+			params.on_success();
+		} else {
+			console.log("error while deleting!", );
+			console.log("id = " + params.id);
+			console.log("action = " + params.action);
+			console.log("response code: " + xhr.status);
+			console.log("response: " + xhr.responseText);
+			params.on_error();
+		}
+	};
+	xhr.onerror = params.on_network_error;
+	
+	xhr.send(formData);
 }
 
 ui.material_select = function(elem) {
@@ -934,21 +1029,15 @@ ui.fill_info_to_edit = function() {
 
 ui.material_select_event = function(event) {
 	var elem = $(event.delegateTarget);
-	/*for (var i = 0; i < event.path.length; i++) {
-		if (event.path[i].classList.contains("grid_item")) {
-			elem = event.path[i];
-			break;
-		} else if (event.path[i] == document.documentElement) {
-			break;
-		};
-	};
-	
-	elem = $(elem);*/
-	
 	var sibling = find_first_elem_in_row(elem);
-	
 	ui.material_select(sibling);
 };
+
+ui.material_delete_or_restore_event = function(event) {
+	var elem = $(event.delegateTarget);
+	var sibling = find_first_elem_in_row(elem);
+	ui.material_delete_or_restore(sibling, elem);
+}
 
 ui.selected_row_first_elem = null;
 ui.highlighted_row_first_elem = null;

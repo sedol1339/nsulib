@@ -85,8 +85,7 @@ ui.list_update = function(letter) {
 	var list = ui.list[letter];
 	list.children().slice(1).remove();
 	var dummy = list.children().first();
-	var current_data_list = requests.lists[letter];
-	var data_list = requests.lists[letter]
+	var data_list = ui.sort_by_name(requests.lists[letter], letter);
 	var add = function(id, _, set) {
 		var name = (id == 0) ? ui.default_names[letter] : data.full_lists[letter][id][(letter == "t") ? 1 : 0];
 		var new_elem = dummy.clone();
@@ -416,4 +415,11 @@ requests.get_full_lists_and_relations = function(on_finish) {
 		if (on_finish) on_finish();
 	}
 	xhr.send();
+}
+
+ui.sort_by_name = function(list, letter) {
+	list = Array.from(list); //list на входе либо массив, либо множество
+	return list.sort(function(a, b) {
+		return data.full_lists[letter][a][0].localeCompare(data.full_lists[letter][b][0]);
+	});
 }
