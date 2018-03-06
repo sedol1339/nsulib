@@ -193,19 +193,15 @@ if (!$edit) {
 		$pairs[] = $column . "=" . $values[$i];
 	}
 	
-	$sql = "UPDATE materials SET " . implode(", ", $pairs) . " WHERE id=" . $id;
+	$sql = "UPDATE materials SET " . implode(", ", $pairs) . " WHERE id=" . $mysqli->real_escape_string($id) . " AND deleted=false";
 	
 	if (!$result = $mysqli->query($sql))
 		error("MYSQL " . $mysqli->errno . ": " . $mysqli->error);
 	
+	if ($mysqli->affected_rows == 0)
+		error("Указанный id не существует, либо материал помечен как удаленный");
+	
 	send_answer_and_exit(0);
 }
-
-
-
-
-
-
-
 
 ?>

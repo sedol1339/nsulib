@@ -190,6 +190,12 @@ main > article {
 	font-size: 8pt;
 	margin: auto;
 }
+.selected_result {
+	box-sizing: border-box !important;
+	border-right: 7px #DDD solid !important;
+	font-weight: bold !important;
+	background: #F4F4F4 !important;
+}
 #article_frame {
 	width: 100%;
 	height: 100%;

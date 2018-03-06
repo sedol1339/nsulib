@@ -274,7 +274,7 @@ html {
 	--width_t: 0.8fr;
 	--width_uploader: 0.8fr;
 	--width_uploaded: 1fr;
-	--width_delete: 0.6fr;	
+	--width_delete: 0.9fr;	
 }
 #materials_grid, #materials_grid_header {
 	display:grid;

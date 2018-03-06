@@ -61,7 +61,20 @@ $(document).ready(function init() {
 	ui.results_box.click(ui.results_event_selection);
 	ui.button_download.click(ui.download);
 	requests.get_full_lists_and_relations( function on_finish() {
-		ui.update(initial_f, initial_s, initial_t);
+		var initial_data_correct = data.relations.find( function(x) {
+			return (
+				(initial_f == 0 || x[0] == initial_f) && 
+				(initial_s == 0 || x[1] == initial_s) && 
+				(initial_t == 0 || x[2] == initial_t)
+			);
+		});
+		if (initial_data_correct) {
+			ui.update(initial_f, initial_s, initial_t);
+		} else {
+			window.alert("Указанная информация не может быть отображена.");
+			initial_res = 0;
+			ui.update(0, 0, 0);
+		}
 	});
 });
 
@@ -148,10 +161,20 @@ ui.cancel_all_lists = function() {
 };
 
 ui.results_event_selection = function(event) {
-	ui.result_selection($(event.target).closest("[data-id]").attr('data-id'));
+	var elem = $(event.target).closest("[data-id]");
+	ui.result_selection(elem.attr('data-id'), elem);
 };
 
-ui.result_selection = function(id) {
+ui.selected_result_elem = null;
+ui.result_selection = function(id, elem) {
+	if (id != 0 && !elem) {
+		//ищем элемент, чтобы выделить его
+		elem = ui.results_box.children("[data-id=" + id + "]").first();
+	}
+	if (ui.selected_result_elem) ui.selected_result_elem.removeClass("selected_result");
+	ui.selected_result_elem = elem;
+	if (ui.selected_result_elem) ui.selected_result_elem.addClass("selected_result");
+	
 	var stub = $('#aside2_stub');
 	var box = $('#aside2_info_box');
 	if (id == 0) {
@@ -205,6 +228,7 @@ ui.result_selection = function(id) {
 };
 
 ui.results_update = function() {
+	console.log(requests.result_array);
 	var box = ui.results_box;
 	var noliterature_dummy = $('#dummyNoliterature');
 	var literature_dummy = $('#dummyLiterature');
@@ -255,11 +279,16 @@ ui.results_update = function() {
 					image.addClass("image_abstract");
 					new_elem.insertBefore(literatureHeader);
 				};
-				if (initial_res == id) {
-					initial_res = null;
-					ui.results_update.elem_to_select = new_elem;
-				}
+				console.log(id + "/" + initial_res);
 			}
+			if (initial_res == id) {
+				initial_res = null;
+				ui.results_update.elem_to_select = new_elem;
+			}
+		};
+		if (initial_res) {
+			window.alert("Указанный материал не найден");
+			initial_res = null;
 		};
 		if (literature_exists) {
 			literatureHeader.css('display', '');
@@ -290,6 +319,12 @@ ui.update = function(f_id, s_id, t_id) {
 	ui.button_set_data("f", f_id);
 	ui.button_set_data("s", s_id);
 	ui.button_set_data("t", t_id);
+	/*if (initial_res) {
+		ui.result_selection(initial_res);
+		initial_res = null;
+	} else {
+		ui.result_selection(0);
+	}*/
 	ui.result_selection(0);
 	//ui.update_page_url(f_id, s_id, t_id, 0, false);
 }

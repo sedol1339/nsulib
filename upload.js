@@ -131,12 +131,13 @@ ui.set_uploading_type = function(event, type) {
 	
 	ui.mode = type;
 	if (type == "publishing") {
-		ui.input.file.css('display', "");
-		ui.edit_info.css('display', "none");
+		//не менять порядок следующих двух строк
 		ui.material_deselect();
+		ui.edit_info.css('display', "none");
+		ui.input.file.css('display', "");
+		ui.input_clear();
 		ui.button_publish_or_edit.text("Опубликовать файл");
 		ui.input_disabled(false);
-		ui.input_clear();
 	} else if (type == "editing") {
 		ui.input.file.css('display', "none");
 		ui.edit_info.css('display', ui.selected_material_id ? "none" : "");
@@ -870,15 +871,36 @@ ui.show_materials = function(sort) {
 ui.material_delete_or_restore = function(elem, delete_box) {
 	
 	var id = elem.attr('data-id');
+	
+	if (id == ui.selected_material_id) {
+		ui.material_deselect();
+	}
+	
 	var entry = data.materials.find( function(x) {
 		return (x.id == id);
 	});
-	var fill_delete_box = {
+	var actions = {
 		exists: function() {
 			delete_box.empty().append($("<span>").text("удалить"));
+			var sibling = elem;
+			sibling.removeClass("text_faint_style"); sibling = sibling.next();
+			sibling.removeClass("text_faint_style"); sibling = sibling.next();
+			sibling.removeClass("text_faint_style"); sibling = sibling.next();
+			sibling.removeClass("text_faint_style"); sibling = sibling.next();
+			sibling.removeClass("text_faint_style"); sibling = sibling.next();
+			sibling.removeClass("text_faint_style"); sibling = sibling.next();
+			sibling.removeClass("text_faint_style");
 		},
 		deleted: function() {
 			delete_box.empty().append($("<span>").text("восстановить"));
+			var sibling = elem;
+			sibling.addClass("text_faint_style"); sibling = sibling.next();
+			sibling.addClass("text_faint_style"); sibling = sibling.next();
+			sibling.addClass("text_faint_style"); sibling = sibling.next();
+			sibling.addClass("text_faint_style"); sibling = sibling.next();
+			sibling.addClass("text_faint_style"); sibling = sibling.next();
+			sibling.addClass("text_faint_style"); sibling = sibling.next();
+			sibling.addClass("text_faint_style");
 		},
 		error: function() {
 			delete_box.empty().append($("<span>").css("color", "red").text("ошибка"));
@@ -894,11 +916,11 @@ ui.material_delete_or_restore = function(elem, delete_box) {
 		};
 		params.on_success = function() {
 			entry.deleted_state = "deleted";
-			fill_delete_box.deleted();
+			actions.deleted();
 		};
 		params.on_error = function() {
 			entry.deleted_state = "error";
-			fill_delete_box.error();
+			actions.error();
 		};
 		params.on_network_error = function() {
 			entry.deleted_state = "exists";
@@ -916,11 +938,11 @@ ui.material_delete_or_restore = function(elem, delete_box) {
 		};
 		params.on_success = function() {
 			entry.deleted_state = "exists";
-			fill_delete_box.exists();
+			actions.exists();
 		};
 		params.on_error = function() {
 			entry.deleted_state = "error";
-			fill_delete_box.error();
+			actions.error();
 		};
 		params.on_network_error = function() {
 			entry.deleted_state = "deleted";
@@ -946,6 +968,7 @@ requests.delete_material = function(params) {
 	
 	xhr.onload = function(event) {
 		if (xhr.status == 200) {
+			console.log("response: " + xhr.responseText);
 			params.on_success();
 		} else {
 			console.log("error while deleting!", );
@@ -962,6 +985,13 @@ requests.delete_material = function(params) {
 }
 
 ui.material_select = function(elem) {
+	
+	var id = elem.attr('data-id');
+	var entry = data.materials.find( function(x) {
+		return (x.id == id);
+	});
+	if (entry.deleted_state && entry.deleted_state != "exists") return;
+	
 	if (elem.is(ui.selected_row_first_elem)) {
 		var clear_selection = true;
 	}	
@@ -987,10 +1017,13 @@ ui.material_select = function(elem) {
 	}
 	if (clear_selection) {
 		ui.selected_row_first_elem = null;
+		ui.selected_material_id = null;
+		ui.input_clear();
+		ui.edit_info.css('display', "");
 		return;
 	}
 	ui.selected_row_first_elem = elem;
-	ui.selected_material_id = elem.attr('data-id');
+	ui.selected_material_id = id;
 	//сохранить порядок следующих двух строк
 	ui.edit_info.css('display', "");
 	ui.set_uploading_type(null, "editing");
@@ -999,7 +1032,6 @@ ui.material_select = function(elem) {
 
 ui.material_deselect = function() {
 	if (!ui.selected_row_first_elem) return;
-	ui.selected_material_id = null;
 	ui.material_select(ui.selected_row_first_elem);
 }
 
@@ -1204,6 +1236,7 @@ requests.receive_materials = function(show) {
 		for (var id in response) {
 			var entry = response[id];
 			entry.id = id;
+			entry.deleted_state = "exists";
 			data.materials.push(entry);
 		}
 		if (show) {
