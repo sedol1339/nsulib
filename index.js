@@ -18,6 +18,8 @@ var ui = { //functions and variables about user interface
 	},
 	results_box: $('#aside1_results_box'),
 	article_frame: $('#article_frame'),
+	article_frame_placeholder: $('#article_frame_placeholder'),
+	article_frame_preview: $("#article_frame_preview"),
 	download_frame: $('#download_frame'),
 	button_download: $('#button_download'),
 	dummy: $('#dummy'),
@@ -165,6 +167,47 @@ ui.results_event_selection = function(event) {
 	ui.result_selection(elem.attr('data-id'), elem);
 };
 
+ui.show_preview = function(id, entry) {
+	//hiding elements
+	ui.article_frame_placeholder.hide();
+	ui.article_frame_preview.empty().hide();
+	
+	//selecting type and showing element:
+	
+	//no file
+	if (!id) {
+		ui.article_frame_placeholder.empty().append($('<span>').text("Выберите материал для отображения")).show();
+		return;
+	}
+	
+	if (entry.mime == "application/pdf") {
+		//pdf
+		ui.article_frame_preview.show();
+		PDFObject.embed("/download.php?id=" + id, ui.article_frame_preview[0]);
+	} else if (entry.mime.startsWith("application/vnd.")) {
+		//microsoft office
+		ui.article_frame_preview.show();
+		ui.article_frame_preview.append(
+			$('<iframe>')
+			.prop('src', "http://docs.google.com/gview?embedded=true&url=" + /*window.location.origin*/ "http://nsulib.ru" + "/download.php?id=" + id)
+			.css('width', '100%')
+			.css('height', '100%')
+		);
+	} else {
+		//other
+		ui.article_frame_preview.show();
+		ui.article_frame_preview.append(
+			$('<embed>')
+			.prop('src', "/download.php?plaintext&id=" + id)
+			.prop('type', 'text/plain')
+			.css('width', '100%')
+			.css('height', '100%')
+		);
+	}
+	
+	//ui.article_frame.prop('src', 'about:blank');
+}
+
 ui.selected_result_elem = null;
 ui.result_selection = function(id, elem) {
 	if (id != 0 && !elem) {
@@ -181,8 +224,7 @@ ui.result_selection = function(id, elem) {
 		ui.selected_result = null;
 		stub.css('display', '');
 		box.css('display', 'none');
-		ui.article_frame.css('display', 'none');
-		ui.article_frame.prop('src', 'about:blank');
+		ui.show_preview(null);
 	} else {
 		var result = requests.result_array[id];
 		stub.css('display', 'none');
@@ -214,13 +256,7 @@ ui.result_selection = function(id, elem) {
 		} else {
 			span_date.empty().append($('<span>').addClass('text_faint_style').text('Неизвестно'));
 		};
-		ui.article_frame.css('display', '');
-		//TODO
-		/*if (result.type.split(":")[1] == "PDF") {
-			ui.article_frame.src = "/files/test_pdf.pdf";
-		} else {
-			ui.article_frame.src = "/files/no_preview.html";
-		}*/
+		ui.show_preview(id, result);
 		ui.selected_result = id;
 	}
 	ui.update_page_url(
@@ -232,7 +268,6 @@ ui.result_selection = function(id, elem) {
 };
 
 ui.results_update = function() {
-	console.log(requests.result_array);
 	var box = ui.results_box;
 	var noliterature_dummy = $('#dummyNoliterature');
 	var literature_dummy = $('#dummyLiterature');
@@ -283,7 +318,6 @@ ui.results_update = function() {
 					image.addClass("image_abstract");
 					new_elem.insertBefore(literatureHeader);
 				};
-				console.log(id + "/" + initial_res);
 			}
 			if (initial_res == id) {
 				initial_res = null;

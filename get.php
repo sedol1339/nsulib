@@ -40,7 +40,7 @@
 		
 		$results = array();
 		
-		$sql = "SELECT materials.id AS id, faculty, subject, teacher, type, title, uploaded, materials.uploader AS uploader_id, accounts.name AS uploader, author, commentary, file, year FROM materials, accounts WHERE materials.uploader=accounts.id AND deleted=false";
+		$sql = "SELECT materials.id AS id, faculty, subject, teacher, type, title, uploaded, materials.uploader AS uploader_id, accounts.name AS uploader, author, commentary, file, mime, year FROM materials, accounts WHERE materials.uploader=accounts.id AND deleted=false";
 		
 		if ($f != 0) { $sql .= " AND faculty = $f"; }
 		if ($s != 0) { $sql .= " AND subject = $s"; }
@@ -73,6 +73,7 @@
 				$a["author"] = $row["author"];
 				$a["date"] = $row["uploaded"];
 				$a["file"] = $row["file"];
+				$a["mime"] = $row["mime"];
 				$a["commentary"] = $row["commentary"];
 				$a["year"] = $row["year"];
 				$results[$row["id"]] = $a;

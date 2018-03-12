@@ -11,10 +11,11 @@
 	<link rel="stylesheet" href="header.css" media="all" />
 	<link rel="stylesheet" href="index.css" media="all" />
 	<script src="jquery-3.3.1.min.js" defer></script>
+	<script src="pdfobject.min.js" defer></script>
 	<script src="utils.js" defer></script>
 	<script src="index.js" defer></script>
 	<script>
-		var initial_f = 0, initial_s = 0, initial_t = 0, initial_res = 0;
+		var initial_f = 0, initial_s = 0, initial_t = 0, initial_res = 0; //производительность? файл не кэшируется в браузере
 		<?php
 			if (isset($_GET['f']) && is_numeric($_GET['f'])) { $f = (int) $_GET['f']; echo "initial_f = $f;"; }
 			if (isset($_GET['s']) && is_numeric($_GET['s'])) { $s = (int) $_GET['s']; echo "initial_s = $s;"; }
@@ -87,10 +88,13 @@
 			</div>
 		</aside>
 		<article>
-			<iframe id=article_frame frameborder="0" src="about:blank" style="display:none;">
-			</iframe>
-			<iframe id=download_frame src="about:blank" style="display:none;">
-			</iframe>
+			<div id=article_frame>
+				<div id=article_frame_placeholder style='dislay:none'>
+					<span>Выберите материал для отображения</span>
+				</div>
+				<div id=article_frame_preview></div>
+			</div>
+			<iframe id=download_frame src="about:blank" style="display:none;"></iframe>
 		</article>
 		<aside id=aside2>
 			<div id=aside2_stub>
