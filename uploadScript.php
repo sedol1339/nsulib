@@ -109,9 +109,10 @@ if (!$edit) {
 	}
 	
 	$filesize = $file['size'];
-	$filename = random_str();
+	//$filename = random_str();
+	$filename = md5_file($_FILES['file']['tmp_name']);
 	$path = dirname(__FILE__) . "/files/" . $filename;
-	if (!move_uploaded_file($_FILES['file']['tmp_name'], $path))
+	if (!file_exists($path) && !move_uploaded_file($_FILES['file']['tmp_name'], $path))
 		internal_error("Внутренняя ошибка сервера: move_uploaded_file");
 }
 
