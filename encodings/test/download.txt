@@ -1,0 +1,164 @@
+
+<!-- saved from url=(0038)http://mech.math.msu.su/~zubr/asm.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=KOI8-R">
+
+<title>Ассемблер</title>
+<style type="text/css"></style></head>
+<body>
+<a href="http://mech.math.msu.su/~zubr/linux_teaching.html">Возврат к оглавлению</a><br>
+Далее предлагается очень краткое введение в ассемблер AT&amp;T под Linux. Будет показано как
+писать и компилировать простейшие программы.
+<hr>
+
+Имена регистров в ассемблере  AT&amp;T отличаются от имен регистров в ассемблере Intel:
+<pre>eax
+ebx
+ecx
+edx
+esp
+ebp
+esi
+edi
+eip
+efla
+cs
+ds
+es
+fs
+gs
+</pre>
+Однако они имеют похожую функциональность.
+Размер каждого регистра 32 бита.<br>
+Регистр eip содержит адрес следующей, инструкции подлежащей выполнению.
+Он соответствует регистру IP ассемблера Intel.<br>
+Регистр esp содержит адрес вершины стека.
+Он соответствует регистру SP ассемблера Intel.<br>
+Регистр eflags - это регистр флагов. 
+Он соответствует регистру flags ассемблера Intel.<br>
+Регистры CS, DS, ES, FS, GS - 
+это сегментные регистры.<br>
+Регистры общего назначения eax, ebx, ecx, edx 
+соответсвуют регистрам AX, BX, CX, DX ассемблера Intel. <br>
+
+Для выполнения системного вызова в Unix необходимо поместить в регистр eax
+номер системного вызова, а в регистры ebx, ecx, edx, esi, edi - аргументы этого 
+системного вызова.  После этого необходимо выполнить команду
+<pre>int $0x80
+</pre>
+Эта команда вызывает программное прерывание (programmed exception) с номером 0x80 и обеспечивает переход процессора в 
+привилегированный (kernel) режим работы. При обработке этого прерывания происходит 
+системный вызов. Обработчиком является функция ядра system_call<br>
+Номер системного вызова можно узнать в файле /usr/include/asm/unistd.h. 
+Фрагмент этого файла приведен ниже 
+<pre>#ifndef _ASM_I386_UNISTD_H_
+#define _ASM_I386_UNISTD_H_
+
+/*
+ * This file contains the system call numbers.
+ */
+
+#define __NR_exit                 1
+#define __NR_fork                 2
+#define __NR_read                 3
+#define __NR_write                4
+#define __NR_open                 5
+</pre>
+
+Системный вызов exit имеет номер 1, системный вызов fork - 2, read - 3, write - 4, и.т.д.
+Ознакомиться с описанием системного вызова, включая список его аргументов,
+ функциональность и  ошибки выполнения, можно при помощи команды man. Например,
+<pre>&gt;man 2 write
+</pre>
+Аргумент "2" в команде man добавлен потому, что описание системных вызовов 
+содержаться в разделе 2 документации man.<br>
+Ниже приводится фрагмент описания системного вызова write.
+<pre>NAME
+       write - write to a file descriptor
+
+SYNOPSIS
+       #include &lt;unistd.h&gt;
+
+       ssize_t write(int fd, const void *buf, size_t count);
+
+DESCRIPTION
+       write  writes  up  to  count  bytes  to the file referenced by the file
+       descriptor fd from the buffer starting at buf.  POSIX requires  that  a
+       read()  which  can  be  proved  to  occur  after a write() has returned
+       returns the new data.  Note that not all file systems  are  POSIX  con-
+       forming.
+</pre>
+Напомню, что каждому потоку, открытому в программе, соответствует строка в таблице 
+файловых дескрипторов этого процесса. Номер этой строки и есть файловый дескрптор потока.
+При начале работы процесса три файловых дескриптора уже открыты. Это дескрипторы 0(stdin), 
+1(stdout), 2(stderr).
+
+Далее приводится программа hello.s, которая печатает строку "Hello world!\n" в стандартный поток вывода.
+В этой программе происходит один системный вызов write. В программе директива
+<pre>.section .data
+</pre>
+обозначает начала секции данных. В этой секции содержится данное hello типа строка. Это данное инициализировано
+ как  "Hello  world!\n". Также в этой секции содержится данное hellolen типа long (4 байта).
+Это данное инициализировано выражением вида  ". - hello". Символ "." означает текущий адрес,
+а "hello" означает адрес, начиная с которого лежит данное hello. Тем самым, данное hellolen 
+инициализируется размером данного hello (разность между текущим адресом и адресом, по которому лежит данное hello).
+В секции .data все данные инициализируются.
+
+В программе директива
+<pre>.section .text
+</pre>
+обозначает начало секции кода. Внимательно прочтите комментарии в секции кода.
+Команда movl означает перемещение данного типа long (суффикс l). Команда movb означает перемещение данного типа byte 
+(суффикс b). Команда xorl означает "разделительное или" на данных типа long (суффикс l). Команда incl 
+означает увеличение данного типа long (суффикс l) на 1.
+
+
+
+
+<pre>.section .data
+hello:
+        .ascii  "Hello  world!\n"
+hellolen:
+        .long   . - hello
+.section .text
+.global _start
+
+_start:
+        xorl %ebx, %ebx #помещаем 0 в регистр ebx
+        movl $4, %eax #помещаем номер системного вызова write в регистр eax
+        incl %ebx #увеличиваем значение регистра ebx на 1, номер файлового десккриптора stdout теперь в регистре ebx
+        leal hello, %ecx #помещаем в регистр ecx адрес данного hello
+        movl hellolen, %edx #помещаем в регистр edx  значение данного hellolen
+        int $0x80 #системный вызов write
+
+
+
+        xorl %eax, %eax #помещаем 0 в регистр eax
+        incl %eax  #увеличиваем значение регистра eax на 1, номер системного вызова exit теперь в регистре eax
+        xorl %ebx, %ebx #помещаем 0 в регистр ebx
+        int $0x80 #системный вызов exit
+
+</pre>
+
+Компиляция и сборка выполняется командами
+<pre>as -o hello.o hello.s
+ld -o hello hello.o
+</pre>
+Размер получившегося файла hello равен 1027.<br>
+
+Рассмотрим программу hello_c.c, написанную на языке C.
+<pre>#include<stdio.h>
+int main()
+{
+   printf("Hello world!\n");
+   return 0;
+}
+Компиляция и сборка выполняется командами
+<pre>gcc -o hello_c.o hello_c.o
+gcc hello_c hello_c.o
+</pre>
+Размер получившегося файла hello_c равен 11604.<br>
+
+</stdio.h></pre>
+
+
+</body></html>

@@ -50,15 +50,15 @@
 	
 	$mime = $row["mime"];
 	
-	if (isset($_GET['plaintext']))
-		$mime = "text/plain; charset=" . mb_detect_encoding($file, mb_detect_order(), TRUE);
-	
-	echo mb_detect_encoding($file, "UTF-8, ASCII, KOI8-R", TRUE); exit;
+	include('encodings/detect_encoding.php');
+	if (isset($_GET['plaintext'])) {
+		$charset = detect_encoding($file);
+		//echo $charset; exit;
+		$mime = "text/plain; charset=" . $charset;
+	}
 	
 	if (isset($_GET['octet-stream']))
 		$mime = "application/octet-stream";
-	
-	
 	
 	header('Content-Type: ' . $mime);
 	

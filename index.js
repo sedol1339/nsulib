@@ -271,11 +271,14 @@ function load_preview(id, entry) {
 	} else if (type == "MS-OFFICE") {
 		//microsoft office
 		ui.article_frame_preview.show();
+		loading_img_show();
 		ui.article_frame_preview.append(
 			$('<iframe>')
+			.prop('frameBorder', '0')
 			.prop('src', "http://docs.google.com/gview?embedded=true&url=" + /*window.location.origin*/ "http://nsulib.ru" + "/download.php?id=" + id)
 			.css('width', '100%')
 			.css('height', '100%')
+			.on("load", loading_img_hide)
 		);
 	} else if (type == "TEXT" || type == "UNKNOWN") {
 		if (type == "UNKNOWN") {
