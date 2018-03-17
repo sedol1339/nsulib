@@ -1,5 +1,4 @@
 <!doctype html>
-<!--TODO: выделение материала при его выборе -->
 <html>
 <head>
 	<meta charset=utf-8>

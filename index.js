@@ -225,7 +225,12 @@ function recognize_mime(entry) {
 	if (entry.link) return "LINK";
 	if (!entry.mime) return "UNKNOWN";
 	if (entry.mime == "application/pdf") return "PDF";
-	if (entry.mime.startsWith("application/vnd.")) return "MS-OFFICE";
+	if (
+		entry.mime.startsWith("application/vnd.")
+		|| entry.mime.startsWith("application/ms")
+	) return "MS-OFFICE";
+	if (entry.mime.startsWith("image/")) return "IMAGE";
+	if (entry.mime.startsWith("text/")) return "TEXT";
 	return "UNKNOWN";
 }
 
@@ -274,6 +279,7 @@ function load_preview(id, entry) {
 		loading_img_show();
 		ui.article_frame_preview.append(
 			$('<iframe>')
+			.prop('id', 'content_iframe')
 			.prop('frameBorder', '0')
 			.prop('src', "http://docs.google.com/gview?embedded=true&url=" + /*window.location.origin*/ "http://nsulib.ru" + "/download.php?id=" + id)
 			.css('width', '100%')
@@ -293,11 +299,28 @@ function load_preview(id, entry) {
 		loading_img_show();
 		ui.article_frame_preview.append(
 			$('<iframe>')
+			.prop('id', 'content_iframe')
 			.prop('frameBorder', '0')
 			.prop('src', "/download.php?plaintext&id=" + id)
 			.prop('type', 'text/plain')
 			.css('width', '100%')
 			.css('height', '100%')
+			.on("load", loading_img_hide)
+		);
+	} else if (type == "IMAGE") {
+		ui.article_frame_preview.show();
+		loading_img_show();
+		ui.article_frame_preview.append(
+			$('<iframe>')
+			.prop('id', 'content_iframe')
+			.prop('frameBorder', '0')
+			.css('width', '100%')
+			.css('height', '100%')
+			.prop('src', "/image_viewer.php?src=/download.php?id=" + id)
+			/*.append(
+				$('<img>')
+				.prop('src', "/download.php?id=" + id)
+			)*/
 			.on("load", loading_img_hide)
 		);
 	}
@@ -511,10 +534,7 @@ ui.update_page_url = function(f, s, t, res, push_in_history = true) {
 
 ui.download = function(event) {
 	var id = ui.selected_result;
-	ui.download_frame.prop('src', requests.build_url("/download.php", {
-		"file": encodeURIComponent(requests.result_array[id].file),
-		"filename": encodeURIComponent(requests.result_array[ui.selected_result].title),
-	}));
+	ui.download_frame.prop('src', "/download.php?octet-stream&id=" + id); //octet-stream  для начала скачивания
 }
 
 requests.build_url = function(url, parameters) {

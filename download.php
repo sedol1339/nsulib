@@ -57,12 +57,15 @@
 		$mime = "text/plain; charset=" . $charset;
 	}
 	
-	if (isset($_GET['octet-stream']))
+	if (isset($_GET['octet-stream'])) {
 		$mime = "application/octet-stream";
+		header('Content-Disposition: attachment; filename=' . $title);
+	}
+	
+	//echo $mime; exit;
 	
 	header('Content-Type: ' . $mime);
 	
-	//header('Content-Disposition: attachment; filename=' . $title); //TODO FILENAME
 	//header('Expires: 0');
 	//header('Cache-Control: must-revalidate');
 	//header('Pragma: public');

@@ -43,12 +43,22 @@
 			$weights[$encoding] = $weight / $sum_weight;
 		}
 
-		//var_dump($weights);
+		var_dump($weights);
 
 		/////////////////////////////////////////
-
-		return array_keys($weights, max($weights))[0];
-
+		
+		$max_weight = max($weights);
+		
+		if ($max_weight > 0.15) {
+			$encoding = array_keys($weights, $max_weight)[0];
+			if ($encoding != 'iso8859-5') {
+				return $encoding;
+			} else {
+				return "utf-8";
+			}
+		} else {
+			return "utf-8";
+		}
 	}
 
 ?>
