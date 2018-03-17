@@ -2,26 +2,7 @@
 
 error_reporting(0);
 
-function error($message) {
-	header('HTTP/1.1 400 Bad Request');
-	header('Content-Type: text/html; charset=utf-8');
-	echo $message;
-	exit;
-}
-
-function internal_error($message) {
-	header('HTTP/1.1 500 Internal Server Error');
-	header('Content-Type: text/html; charset=utf-8');
-	echo $message;
-	exit;
-}
-
-function send_answer_and_exit($message) {
-	header('HTTP/1.1 200 OK');
-	header('Content-Type: text/html; charset=utf-8');
-	echo $message;
-	exit;
-}
+include('answers.php');
 
 //send_answer_and_exit("9876");
 
@@ -58,7 +39,7 @@ if (empty($id)) {
 } else {
 	//существующий материал
 	$edit = true;
-	if (!is_numeric($id) || $id <= 0) error("Некорректно указан id");
+	if (!is_numeric($id) || $id <= 0) custom_error("ID_MISSED_OR_MALFORMED", "Некорректно указан id");
 }
 
 //при редактировании вся информация отправляется заново
@@ -185,7 +166,7 @@ if (!$edit) {
 	$new_id = $mysqli->insert_id;
 
 	if ($new_id == 0)
-		error("MYSQL: insert_id is 0");
+		internal_error("MYSQL: insert_id is 0");
 
 	send_answer_and_exit($new_id);
 } else {
@@ -200,7 +181,7 @@ if (!$edit) {
 		error("MYSQL " . $mysqli->errno . ": " . $mysqli->error);
 	
 	if ($mysqli->affected_rows == 0)
-		error("Указанный id не существует, либо материал помечен как удаленный");
+		custom_error("INVALID_ID", "Указанный id не существует или удален");
 	
 	send_answer_and_exit(0);
 }

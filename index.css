@@ -283,12 +283,33 @@ article {
 #article_frame_placeholder {
 	height: 100%;
 	display: flex;
+	flex-flow: column nowrap;
 	align-items: center;
 	justify-content: center;
 }
-#article_frame_placeholder span {
+#article_frame_placeholder * { /* span, p, a */
 	max-width: 90%;
 	font-family: Arial;
 	font-size: 10pt;
 	text-align: center;
+}
+#article_frame_placeholder > a {
+	color: blue;
+}
+#article_frame_placeholder > a:hover {
+	text-decoration: underline;
+}
+#article_frame_placeholder > a:visited {
+	color: #906;
+}
+#article_frame_content_header {
+	width: 100% !important;
+	height: 30px !important;
+	display: flex !important;
+	flex-flow: column nowrap !important;
+	align-items: center !important;
+	justify-content: center !important;
+	/*background: #F4F4F4;*/
+	border-bottom: 1px solid #CCCCCC;
+	color: #987552;
 }

@@ -168,23 +168,107 @@ ui.results_event_selection = function(event) {
 };
 
 ui.show_preview = function(id, entry) {
-	//hiding elements
-	ui.article_frame_placeholder.hide();
 	ui.article_frame_preview.empty().hide();
+	ui.article_frame_placeholder.unbind("click");
 	
-	//selecting type and showing element:
-	
-	//no file
 	if (!id) {
-		ui.article_frame_placeholder.empty().append($('<span>').text("Выберите материал для отображения")).show();
+		ui.article_frame_placeholder
+		.empty()
+		.append(
+			$('<span>').
+			text("Выберите материал для отображения")
+		)
+		.show();
+		return;
+	} else if (entry.link) {
+		ui.article_frame_placeholder
+		.empty()
+		.append(
+			$('<p>').
+			text("Ссылка:")
+		)
+		.append(
+			$('<a>').
+			prop("href", entry.link).
+			prop("target", entry.link).
+			text(entry.link)
+		)
+		.show();
+		return;
+	} else if (preview_is_accessible(entry)) {
+		ui.article_frame_placeholder
+		.empty()
+		.append(
+			$('<span>').
+			text("Нажмите для просмотра файла").
+			css("font-size", "11pt").
+			css("color", "blue").
+			addClass("clickable")
+		).
+		click(function() {
+			load_preview(id, entry);
+		})
+		.show();
+	} else {
+		ui.article_frame_placeholder
+		.empty()
+		.append(
+			$('<span>').
+			text("Файл недоступен для просмотра")
+		)
+		.show();
 		return;
 	}
+}
+
+function recognize_mime(entry) {
+	if (entry.link) return "LINK";
+	if (!entry.mime) return "UNKNOWN";
+	if (entry.mime == "application/pdf") return "PDF";
+	if (entry.mime.startsWith("application/vnd.")) return "MS-OFFICE";
+	return "UNKNOWN";
+}
+
+function preview_is_accessible(entry) {
+	var type = recognize_mime(entry);
+	if (type == "LINK") {
+		console.error("Warning: calling \"preview_is_accessible()\" for LINK type!");
+		return false;
+	}
+	if (type == "UNKNOWN") {
+		if (entry.filesize < 1 * 1024 * 1024) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		return true;
+	}
+}
+
+function load_preview(id, entry) {
+	ui.article_frame_placeholder.hide();
 	
-	if (entry.mime == "application/pdf") {
+	var loading_img_show = function() {
+		ui.article_frame_preview.css("background", "url(../img/loading.gif) center center no-repeat");
+	};
+	var loading_img_hide = function() {
+		checkpoint();
+		ui.article_frame_preview.css("background", "");
+	};
+	
+	var type = recognize_mime(entry);
+	
+	if (type == "PDF") {
 		//pdf
 		ui.article_frame_preview.show();
 		PDFObject.embed("/download.php?id=" + id, ui.article_frame_preview[0]);
-	} else if (entry.mime.startsWith("application/vnd.")) {
+		var embed = ui.article_frame_preview.children("embed").first();
+		if (embed.length) { //exists
+			loading_img_show();
+			embed.on("load", loading_img_hide);
+		}
+	} else if (type == "MS-OFFICE") {
 		//microsoft office
 		ui.article_frame_preview.show();
 		ui.article_frame_preview.append(
@@ -193,19 +277,27 @@ ui.show_preview = function(id, entry) {
 			.css('width', '100%')
 			.css('height', '100%')
 		);
-	} else {
+	} else if (type == "TEXT" || type == "UNKNOWN") {
+		if (type == "UNKNOWN") {
+			ui.article_frame_preview.append(
+				$("<div>")
+				.attr('id',  "article_frame_content_header")
+				.text("Формат файла не распознан. Файл отображен как текстовый.")
+			);
+		}
 		//other
 		ui.article_frame_preview.show();
+		loading_img_show();
 		ui.article_frame_preview.append(
-			$('<embed>')
+			$('<iframe>')
+			.prop('frameBorder', '0')
 			.prop('src', "/download.php?plaintext&id=" + id)
 			.prop('type', 'text/plain')
 			.css('width', '100%')
 			.css('height', '100%')
+			.on("load", loading_img_hide)
 		);
 	}
-	
-	//ui.article_frame.prop('src', 'about:blank');
 }
 
 ui.selected_result_elem = null;

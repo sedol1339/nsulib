@@ -2,42 +2,22 @@
 
 //error_reporting(0);
 
-function error($message) {
-	header('HTTP/1.1 400 Bad Request');
-	header('Content-Type: text/html; charset=utf-8');
-	echo $message;
-	exit;
-}
-
-function internal_error($message) {
-	header('HTTP/1.1 500 Internal Server Error');
-	header('Content-Type: text/html; charset=utf-8');
-	echo $message;
-	exit;
-}
-
-function send_answer_and_exit($message) {
-	header('HTTP/1.1 200 OK');
-	header('Content-Type: text/html; charset=utf-8');
-	echo $message;
-	exit;
-}
+include('answers.php');
 
 if (empty($_POST)) error("Пустой запрос");
 
 $id = $_POST["id"];
 $action = $_POST["action"];
 
-if (empty($action)) error ("action not specified");
-if (empty($id)) error ("id not specified");
-if (!is_numeric($id) || $id <= 0) error("Некорректно указан id");
+if (empty($action)) error("Действие (action) не указано");
+if (empty($id) || !is_numeric($id) || $id <= 0) custom_error("ID_MISSED_OR_MALFORMED", "Некорректно указан id");
 
 if ($action == "delete") {
 	$deleted_val = "true";
 } else if ($action == "restore") {
 	$deleted_val = "false";
 } else {
-	error ("unknown action");
+	error("Действие (action) неизвестно");
 }
 
 //------------------------------
@@ -62,7 +42,7 @@ if (!$result = $mysqli->query($sql))
 		error("MYSQL " . $mysqli->errno . ": " . $mysqli->error);
 	
 if ($mysqli->affected_rows == 0)
-	error("Указанный id не существует");
+	custom_error("INVALID_ID", "Указанный id не существует или удален");
 
 send_answer_and_exit("OK");
 

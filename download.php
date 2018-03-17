@@ -6,8 +6,10 @@
 	
 	// TODO http://localhost:8081/download.php?id=25197 пишет ошибки
 	
+	include('answers.php');
+	
 	if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-		echo "Id not specified or not valid"; exit;
+		custom_error("ID_MISSED_OR_MALFORMED", "Id not specified or not valid");
 	} else {
 		$id = $_GET['id'];
 	}
@@ -35,23 +37,28 @@
 	}
 	
 	if ($result->num_rows == 0) {
-		echo "Указанный id не существует или удален"; exit;
+		custom_error("INVALID_ID", "Указанный id не существует или удален");
 	}
 	
 	$row = $result->fetch_assoc();
 	$title = $row["title"];
+	
 	$file = "files/" . $row["file"];
+	if ($row["file"] == "" || !file_exists($file) || is_dir($file)) {
+		custom_error("FILE_NOT_EXISTS", "Файл не существует");
+	}
+	
 	$mime = $row["mime"];
 	
 	if (isset($_GET['plaintext']))
-		$mime = "text/plain";
+		$mime = "text/plain; charset=" . mb_detect_encoding($file, mb_detect_order(), TRUE);
+	
+	echo mb_detect_encoding($file, "UTF-8, ASCII, KOI8-R", TRUE); exit;
 	
 	if (isset($_GET['octet-stream']))
 		$mime = "application/octet-stream";
 	
-	if (!file_exists($file)) {
-		echo "Файл не существует"; exit;
-	}
+	
 	
 	header('Content-Type: ' . $mime);
 	

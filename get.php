@@ -7,11 +7,11 @@
 	
 	error_reporting(0);
 	
-	if (!isset($_GET['action'])) {
-		echo "Action not specified"; exit;
-	} else {
-		$action = $_GET['action'];
-	}
+	include('answers.php');
+	
+	$action = $_GET["action"];
+
+	if (empty($action)) error("Действие (action) не указано");
 	
 	include('.login_data');
 	
@@ -40,7 +40,7 @@
 		
 		$results = array();
 		
-		$sql = "SELECT materials.id AS id, faculty, subject, teacher, type, title, uploaded, materials.uploader AS uploader_id, accounts.name AS uploader, author, commentary, file, mime, year FROM materials, accounts WHERE materials.uploader=accounts.id AND deleted=false";
+		$sql = "SELECT materials.id AS id, faculty, subject, teacher, type, title, uploaded, materials.uploader AS uploader_id, accounts.name AS uploader, author, commentary, file, filesize, mime, link, year FROM materials, accounts WHERE materials.uploader=accounts.id AND deleted=false";
 		
 		if ($f != 0) { $sql .= " AND faculty = $f"; }
 		if ($s != 0) { $sql .= " AND subject = $s"; }
@@ -54,14 +54,6 @@
 		} else {
 			while ($row = $result->fetch_assoc()) {
 				$a = array();
-				/*$a["faculty"] = $row["faculty"];
-				$a["subject"] = $row["subject"];
-				$a["teacher"] = $row["teacher"];
-				$a["type"] = $row["type"];
-				$a["name"] = $row["title"];
-				$a["author"] = $row["author"];
-				$a["date"] = $row["uploaded"];
-				$a["file"] = $row["file"];*/
 				$a["faculty"] = $row["faculty"];
 				$a["subject"] = $row["subject"];
 				$a["teacher"] = $row["teacher"];
@@ -73,7 +65,9 @@
 				$a["author"] = $row["author"];
 				$a["date"] = $row["uploaded"];
 				$a["file"] = $row["file"];
+				$a["filesize"] = $row["filesize"];
 				$a["mime"] = $row["mime"];
+				$a["link"] = $row["link"];
 				$a["commentary"] = $row["commentary"];
 				$a["year"] = $row["year"];
 				$results[$row["id"]] = $a;
@@ -86,11 +80,9 @@
 		
 	} else if ($action == "list") { //Получить списки (факультетов, преподавателей, предметов)
 		
-		if (isset($_GET['target'])) { 
-			$target = $_GET['target']; }
-		else {
-			echo "Target is undefined"; exit;
-		}
+		$target = $_GET['target'];
+
+		if (empty($target)) error("Целевой столбец (target) не указан");
 		
 		if (isset($_GET['f']) && is_numeric($_GET['f'])) { $f = (int) $_GET['f']; } else { $f = 0; }
 		if (isset($_GET['s']) && is_numeric($_GET['s'])) { $s = (int) $_GET['s']; } else { $s = 0; }
