@@ -215,7 +215,7 @@ ui.show_preview = function(id, entry) {
 		).
 		click(function() {
 			ui.article_frame_placeholder.hide();
-			load_preview(ui.article_frame_preview, id, entry);  //file-utils/preview.js
+			load_preview(ui.article_frame_preview, ui.article_frame_placeholder, id, entry);  //file-utils/preview.js
 		})
 		.show();
 	} else {

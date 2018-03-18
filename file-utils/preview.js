@@ -58,7 +58,9 @@ function preview_is_accessible(entry) {
 	}
 }
 
-function load_preview(frame_preview, id, entry) {
+function load_preview(frame_preview, frame_error, id, entry) {
+	
+	var warning_sign_str = "<img src='/img/warning.png' style='display:inline-block;height:1.5em;margin-right:0.5em;margin-bottom:0.35em;vertical-align:middle;'></img>";
 	
 	var loading_img_show = function() {
 		frame_preview.css("background", "url(../img/loading.gif) center center no-repeat");
@@ -70,12 +72,24 @@ function load_preview(frame_preview, id, entry) {
 	var type = recognize_mime(entry);
 	
 	if (type == "PDF") {
-		frame_preview.show();
-		PDFObject.embed("/download.php?id=" + id, frame_preview[0]);
-		var embed = frame_preview.children("embed").first();
-		if (embed.length) { //exists
+		if (PDFObject.supportsPDFs) {
+			frame_preview.show();
 			loading_img_show();
-			embed.on("load", loading_img_hide);
+			PDFObject.embed("/download.php?id=" + id, frame_preview[0]);
+			var embed = frame_preview.children("embed").first();
+			if (embed.length) { //exists
+				loading_img_show();
+				embed.on("load", loading_img_hide);
+			}
+		} else {
+			frame_error
+			.empty()
+			.append(
+				$('<span>').
+				html(warning_sign_str + "Ваш браузер не позволяет отображать PDF-файлы").
+				css("font-size", "10pt")
+			)
+			.show();
 		}
 	} else if (type == "DJVU") {
 		frame_preview.show();
@@ -100,6 +114,9 @@ function load_preview(frame_preview, id, entry) {
 			.css('width', '100%')
 			.css('height', '100%')
 			.on("load", loading_img_hide)
+			/*.on("error", display_error) НЕ РАБОТАЕТ. Due to cross domain restriction, there's no way to detect whether a page is successfully loaded or if the page can't be loaded due to client errors (HTTP 4xx errors) and server errors (HTTP 5xx errors). 
+			https://stackoverflow.com/questions/12062081/catch-x-frame-options-error-in-javascript
+			https://bugs.chromium.org/p/chromium/issues/detail?id=365457 */
 		);
 	} else if (type == "IMAGE") {
 		frame_preview.show();
@@ -111,13 +128,9 @@ function load_preview(frame_preview, id, entry) {
 			.css('width', '100%')
 			.css('height', '100%')
 			.prop('src', "/image_viewer.php?src=/download.php?id=" + id)
-			/*.append(
-				$('<img>')
-				.prop('src', "/download.php?id=" + id)
-			)*/
 			.on("load", loading_img_hide)
 		);
-	} else { //text, unknown
+	} else {
 		if (type == "UNKNOWN") {
 			frame_preview.append(
 				$("<div>")
@@ -125,7 +138,6 @@ function load_preview(frame_preview, id, entry) {
 				.text("Формат файла не распознан. Файл отображен как текстовый.")
 			);
 		}
-		//other
 		frame_preview.show();
 		loading_img_show();
 		frame_preview.append(

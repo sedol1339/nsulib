@@ -59,8 +59,9 @@
 	
 	if (isset($_GET['octet-stream'])) {
 		$mime = "application/octet-stream";
-		header('Content-Disposition: attachment; filename=' . $title);
 	}
+	
+	header('Content-Disposition: inline; filename=' . $title);
 	
 	//echo $mime; exit;
 	
