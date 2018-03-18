@@ -64,7 +64,6 @@ function load_preview(frame_preview, id, entry) {
 		frame_preview.css("background", "url(../img/loading.gif) center center no-repeat");
 	};
 	var loading_img_hide = function() {
-		checkpoint();
 		frame_preview.css("background", "");
 	};
 	

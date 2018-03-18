@@ -61,6 +61,7 @@ $(document).ready(function init() {
 	ui.list.s.click(function(event) {ui.list_event_selection(event, "s")});
 	ui.list.t.click(function(event) {ui.list_event_selection(event, "t")});
 	ui.results_box.click(ui.results_event_selection);
+	ui.results_box.on("dblclick", ui.results_double_click);
 	ui.button_download.click(ui.download);
 	requests.get_full_lists_and_relations( function on_finish() {
 		var initial_data_correct = data.relations.find( function(x) {
@@ -165,6 +166,13 @@ ui.cancel_all_lists = function() {
 ui.results_event_selection = function(event) {
 	var elem = $(event.target).closest("[data-id]");
 	ui.result_selection(elem.attr('data-id'), elem);
+};
+
+ui.results_double_click = function(event) {
+	var span = ui.article_frame_placeholder.children("span").first();
+	if (span.length) {
+		span.click();
+	}
 };
 
 ui.show_preview = function(id, entry) {
