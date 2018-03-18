@@ -2,8 +2,8 @@
 
 //error_reporting(0);
 
-include($_SERVER['DOCUMENT_ROOT'] . '/.login_data');
-include($_SERVER['DOCUMENT_ROOT'] . '/answers.php');
+include($_SERVER['DOCUMENT_ROOT'] . '/php/.login_data');
+include($_SERVER['DOCUMENT_ROOT'] . '/php/include.php');
 
 if (empty($_GET["pass"]))
 	exit;
