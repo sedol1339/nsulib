@@ -136,7 +136,7 @@ main {
 #materials_filter_image {
 	width:15px;
 	height:15px;
-	content: url("img/filter.png");
+	content: url("images/filter.png");
 	margin-right: 10px;
 	margin-top: 2px;
 }
@@ -235,7 +235,7 @@ main {
     white-space: nowrap;
 }
 .question_mark {
-	background-image: url("img/question_mark.png");
+	background-image: url("images/question_mark.png");
 	background-size: 100%;
 	width: 16px;
 	height: 16px;
@@ -353,7 +353,7 @@ html {
 	vertical-align: middle;
 	width:10px;
 	height:10px;
-	content: url("img/erase.png");
+	content: url("images/erase.png");
 	margin-right: 5px;
 	margin-top: 0px;
 }

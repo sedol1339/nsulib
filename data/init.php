@@ -2,7 +2,11 @@
 
 //error_reporting(0);
 
-include('.login_data');
+include($_SERVER['DOCUMENT_ROOT'] . '/.login_data');
+include($_SERVER['DOCUMENT_ROOT'] . '/answers.php');
+
+if (empty($_GET["pass"]))
+	exit;
 
 $pass = $_GET["pass"];
 

@@ -4,9 +4,7 @@
 	//http://localhost:8081/download.php?id=23450&octet-stream
 	//http://localhost:8081/download.php?id=23450
 	
-	// TODO http://localhost:8081/download.php?id=25197 пишет ошибки
-	
-	include('answers.php');
+	include($_SERVER['DOCUMENT_ROOT'] . '/php/include.php');
 	
 	if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 		custom_error("ID_MISSED_OR_MALFORMED", "Id not specified or not valid");
@@ -14,21 +12,11 @@
 		$id = $_GET['id'];
 	}
 	
-	///////////////////////////////////////
+	//------------------------------
 	
-	include('.login_data');
-	
-	$mysqli = new mysqli($db_host, $db_user, $db_password, $db_schema);
-	
-	if ($mysqli->connect_errno) {
-		echo "Не удалось подключиться к MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error; exit;
-	}
-	
-	if (!$mysqli->set_charset("utf8")) {
-		echo "Ошибка при загрузке набора символов utf8: " . $mysqli->error; exit;
-	}
-	
-	///////////////////////////////////////
+	$mysqli = _mysql_connect();
+
+	//------------------------------
 	
 	$sql = "SELECT title, file, mime FROM materials WHERE id=" . $id . " AND deleted=false";
 	
@@ -43,14 +31,14 @@
 	$row = $result->fetch_assoc();
 	$title = $row["title"];
 	
-	$file = "files/" . $row["file"];
+	$file = $_SERVER['DOCUMENT_ROOT'] . "/data/files/" . $row["file"];
 	if ($row["file"] == "" || !file_exists($file) || is_dir($file)) {
 		custom_error("FILE_NOT_EXISTS", "Файл не существует");
 	}
 	
 	$mime = $row["mime"];
 	
-	include('file-utils/encodings/detect_encoding.php');
+	include($_SERVER['DOCUMENT_ROOT'] . '/filetypes/detect_encoding/detect_encoding.php');
 	if (isset($_GET['plaintext'])) {
 		$charset = detect_encoding($file);
 		//echo $charset; exit;

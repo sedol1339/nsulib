@@ -7,7 +7,7 @@
 			throw new Exception("Файл должен быть не больше 500 Мб");
 		}
 		$filename = strtoupper(md5_file($file_tmp_name));
-		$path = "files/" . $filename;
+		$path = $_SERVER['DOCUMENT_ROOT'] . "/data/files/" . $filename;
 		if (!file_exists($path) && !move_uploaded_file($file_tmp_name, $path)) {
 			throw new Exception("Внутренняя ошибка сервера: move_uploaded_file");
 		}

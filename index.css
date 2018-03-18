@@ -73,11 +73,11 @@ main > article {
 	width: 12px;
 	height: 12px;
 	margin-left: 5px;
-	content:url("img/erase.png");
+	content:url("images/erase.png");
 }
 .erase_image:hover {
 	cursor: pointer;
-	content:url("img/erase_dark.png");
+	content:url("images/erase_dark.png");
 }
 #aside1_results_box {
 	width: 220px;
@@ -118,7 +118,7 @@ main > article {
 	display:inline-block;
 	vertical-align:-20%;
 	margin-right:3px;
-	content:url("img/logo_teacher.png");
+	content:url("images/logo_teacher.png");
 }
 .result > p {
 	text-overflow: ellipsis;
@@ -147,7 +147,7 @@ main > article {
 	width: 15px;
 	height: 15px;
 	margin: 3px;
-	content:url("img/logo_methodic.png");
+	content:url("images/logo_methodic.png");
 }
 .image_abstract {
 	flex: 0 0 auto;
@@ -155,7 +155,7 @@ main > article {
 	width: 15px;
 	height: 15px;
 	margin: 3px;
-	content:url("img/logo_abstract.png");
+	content:url("images/logo_abstract.png");
 }
 #result_literature_header {
 	flex: 0 0 auto;

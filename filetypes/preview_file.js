@@ -60,10 +60,10 @@ function preview_is_accessible(entry) {
 
 function load_preview(frame_preview, frame_error, id, entry) {
 	
-	var warning_sign_str = "<img src='/img/warning.png' style='display:inline-block;height:1.5em;margin-right:0.5em;margin-bottom:0.35em;vertical-align:middle;'></img>";
+	var warning_sign_str = "<img src='/images/warning.png' style='display:inline-block;height:1.5em;margin-right:0.5em;margin-bottom:0.35em;vertical-align:middle;'></img>";
 	
 	var loading_img_show = function() {
-		frame_preview.css("background", "url(../img/loading.gif) center center no-repeat");
+		frame_preview.css("background", "url(/images/loading.gif) center center no-repeat");
 	};
 	var loading_img_hide = function() {
 		frame_preview.css("background", "");
@@ -75,7 +75,7 @@ function load_preview(frame_preview, frame_error, id, entry) {
 		if (PDFObject.supportsPDFs) {
 			frame_preview.show();
 			loading_img_show();
-			PDFObject.embed("/download.php?id=" + id, frame_preview[0]);
+			PDFObject.embed("/php/download.php?id=" + id, frame_preview[0]);
 			var embed = frame_preview.children("embed").first();
 			if (embed.length) { //exists
 				loading_img_show();
@@ -98,7 +98,7 @@ function load_preview(frame_preview, frame_error, id, entry) {
 			$('<iframe>')
 			.prop('id', 'content_iframe')
 			.prop('frameBorder', '0')
-			.prop('src', "/djvu-viewer/djvu-viewer.php?src=" + encodeURIComponent("/download.php?id=" + id))
+			.prop('src', "/filetypes/preview-djvu/djvu-viewer.php?src=" + encodeURIComponent("/php/download.php?id=" + id))
 			.css('width', '100%')
 			.css('height', '100%')
 			.on("load", loading_img_hide)
@@ -110,7 +110,7 @@ function load_preview(frame_preview, frame_error, id, entry) {
 			$('<iframe>')
 			.prop('id', 'content_iframe')
 			.prop('frameBorder', '0')
-			.prop('src', "http://docs.google.com/gview?embedded=true&url=" + /*window.location.origin*/ encodeURIComponent("http://nsulib.ru" + "/download.php?id=" + id))
+			.prop('src', "http://docs.google.com/gview?embedded=true&url=" + /*window.location.origin*/ encodeURIComponent("http://nsulib.ru" + "/php/download.php?id=" + id))
 			.css('width', '100%')
 			.css('height', '100%')
 			.on("load", loading_img_hide)
@@ -127,7 +127,7 @@ function load_preview(frame_preview, frame_error, id, entry) {
 			.prop('frameBorder', '0')
 			.css('width', '100%')
 			.css('height', '100%')
-			.prop('src', "/image_viewer.php?src=/download.php?id=" + id)
+			.prop('src', "/filetypes/preview-img/image_viewer.php?src=/php/download.php?id=" + id)
 			.on("load", loading_img_hide)
 		);
 	} else {
@@ -144,7 +144,7 @@ function load_preview(frame_preview, frame_error, id, entry) {
 			$('<iframe>')
 			.prop('id', 'content_iframe')
 			.prop('frameBorder', '0')
-			.prop('src', "/download.php?plaintext&id=" + id)
+			.prop('src', "/php/download.php?plaintext&id=" + id)
 			.prop('type', 'text/plain')
 			.css('width', '100%')
 			.css('height', '100%')

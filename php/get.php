@@ -3,27 +3,17 @@
 	//get.php?action=materials?s=9&t=325
 	//get.php?action=list&target=t&s=32
 	
-	//Определение действия, подготовка соединения с БД
-	
-	error_reporting(0);
-	
-	include('answers.php');
+	include($_SERVER['DOCUMENT_ROOT'] . '/php/include.php');
 	
 	$action = $_GET["action"];
 
 	if (empty($action)) error("Действие (action) не указано");
 	
-	include('.login_data');
-	
-	$mysqli = new mysqli($db_host, $db_user, $db_password, $db_schema);
-	
-	if ($mysqli->connect_errno) {
-		echo "Не удалось подключиться к MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error; exit;
-	}
-	
-	if (!$mysqli->set_charset("utf8")) {
-		echo "Ошибка при загрузке набора символов utf8: " . $mysqli->error; exit;
-	}
+	//------------------------------
+		
+	$mysqli = _mysql_connect();
+
+	//------------------------------
 	
 	//Действия
 	
@@ -48,7 +38,6 @@
 	
 		if ($uploaded == 'TODAY') { $sql .= " AND uploaded >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)"; }
 		else if ($uploaded == 'THIS_WEEK') { $sql .= " AND uploaded >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"; }
-		
 		if (!$result = $mysqli->query($sql)) {
 			echo "Запрос $sql не удался: (" . $mysqli->errno . ") " . $mysqli->error; exit;
 		} else {

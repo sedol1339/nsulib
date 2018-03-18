@@ -5,14 +5,14 @@
 	<title>NSU Online Library</title>
 	<meta name="description" content="" />
 	<meta name="Keywords" content="" />
-	<link rel="shortcut icon" href="img/favicon.ico" />
+	<link rel="shortcut icon" href="/images/favicon.ico" />
 	<link rel="stylesheet" href="common.css" media="all" />
 	<link rel="stylesheet" href="header.css" media="all" />
 	<link rel="stylesheet" href="index.css" media="all" />
-	<script src="jquery-3.3.1.min.js" defer></script>
-	<script src="pdfobject.min.js" defer></script>
-	<script src="file-utils/preview.js" defer></script>
-	<script src="utils.js" defer></script>
+	<script src="/js/jquery-3.3.1.min.js" defer></script>
+	<script src="/filetypes/preview-pdf/pdfobject.min.js" defer></script>
+	<script src="/filetypes/preview_file.js" defer></script>
+	<script src="/js/utils.js" defer></script>
 	<script src="index.js" defer></script>
 	<script>
 		var initial_f = 0, initial_s = 0, initial_t = 0, initial_res = 0; //производительность? файл не кэшируется в браузере

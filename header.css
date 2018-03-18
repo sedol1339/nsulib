@@ -16,7 +16,7 @@ header {
 	margin: 0px 10px 0px 0px;
 	width:40px;
 	height:40px;
-	content: url("img/logo_coffee.png");
+	content: url("images/logo_coffee.png");
 }
 #account_text {
 	font-family: "Segoe UI";
@@ -38,8 +38,8 @@ header {
 	cursor: pointer;
 }
 #account_button_vk {
-	content: url("img/logo_vk.png");
+	content: url("images/logo_vk.png");
 }
 #account_button_google {
-	content: url("img/logo_google.png");
+	content: url("images/logo_google.png");
 }

@@ -639,7 +639,7 @@ ui.button_publish_or_edit_click = function(event) {
 	if (edit) formData.append('id', ui.selected_material_id);
 	
 	var query_upload = new XMLHttpRequest();
-	query_upload.open("POST", "uploadScript.php", true);
+	query_upload.open("POST", "php/uploadScript.php", true);
 	
 	var uploading_obj = {"title": formData.get("title"), "uploaded": 0, "XMLHttpRequest": query_upload, "_state": "UPLOADING", "_state_changed": true};
 	if (edit) uploading_obj.edit_id = ui.selected_material_id;
@@ -960,7 +960,7 @@ ui.material_delete_or_restore = function(elem, delete_box) {
 
 requests.delete_material = function(params) {
 	var xhr = new XMLHttpRequest();
-	xhr.open("POST", "/delete.php", true);
+	xhr.open("POST", "/php/delete.php", true);
 	
 	var formData = new FormData();
 	formData.append('id', params.id);
@@ -1228,7 +1228,7 @@ requests.receive_materials = function(show) {
 	if (requests.query_get_materials != null) requests.query_get_materials.abort();
 	requests.query_get_materials = new XMLHttpRequest();
 	
-	var _url = requests.build_url("/get.php", url_params);
+	var _url = requests.build_url("/php/get.php", url_params);
 	requests.query_get_materials.open("GET", _url, true);
 	requests.query_get_materials.onload = function() {
 		var response = JSON.parse(requests.query_get_materials.responseText);
@@ -1250,7 +1250,7 @@ requests.receive_materials = function(show) {
 
 requests.get_full_lists_and_relations = function() {
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "/init.json", true);
+	xhr.open("GET", "/data/init.json", true);
 	xhr.onload = function() {
 		var response = JSON.parse(xhr.responseText);
 		data.full_lists.f = response.faculties;
@@ -1324,7 +1324,7 @@ requests.get_filter_list = function(target, f_id, s_id, t_id, function_params) {
 	if (requests.queries_filters[target] != null) requests.queries_filters[target].abort();
 	requests.queries_filters[target] = new XMLHttpRequest();
 	
-	var _url = requests.build_url("/get.php", url_params);
+	var _url = requests.build_url("/php/get.php", url_params);
 	requests.queries_filters[target].open("GET", _url, true);
 	requests.queries_filters[target].onload = function() {
 		data.filters[target] = JSON.parse(requests.queries_filters[target].responseText);

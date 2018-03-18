@@ -6,12 +6,12 @@
 	<meta name="description" content="" />
 	<meta name="Keywords" content="" />
 	<meta name="Robots" content="noindex,nofollow" />
-	<link rel="shortcut icon" href="img/favicon.ico" />
+	<link rel="shortcut icon" href="/images/favicon.ico" />
 	<link rel="stylesheet" href="common.css" media="all" />
 	<link rel="stylesheet" href="header.css" media="all" />
 	<link rel="stylesheet" href="upload.css" media="all" />
-	<script src="jquery-3.3.1.min.js" defer></script>
-	<script src="utils.js" defer></script>
+	<script src="/js/jquery-3.3.1.min.js" defer></script>
+	<script src="/js/utils.js" defer></script>
 	<script src="upload.js" defer></script>
 </head>
 <body>

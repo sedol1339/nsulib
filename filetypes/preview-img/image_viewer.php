@@ -3,7 +3,7 @@
 <head>
 	<meta charset=utf-8>
 	<title>Image viewer</title>
-	<script src="jquery-3.3.1.min.js"></script>
+	<script src="/jquery-3.3.1.min.js"></script>
 	<script>
 		$(document).ready(function() {
 			var width_default = window.innerWidth - 33;
@@ -82,12 +82,12 @@
 			transform: scale(1.1, 1.1);
 		}
 		.arrow_left {
-			background-image:url('/img/rotate_left.png');
+			background-image:url('/images/rotate_left.png');
 			top:15px;
 			right:50px;
 		}
 		.arrow_right {
-			background-image:url('/img/rotate_right.png');
+			background-image:url('/images/rotate_right.png');
 			top:15px;
 			right:15px;
 		}

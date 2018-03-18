@@ -1,7 +1,7 @@
-.login_data
+include/.login_data
 *.cmd
 *.lnk
 *.bat
 *.ftp
-files/
-!files/.htaccess
+data/files/
+!data/files/.htaccess

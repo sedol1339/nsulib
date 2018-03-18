@@ -1,0 +1,7 @@
+<?php
+	$db_host = "vh216217.eurodir.ru:3306";
+	$db_user = "vh216217_user";
+	$db_password = "3uvtv73204m348t";
+	$db_schema = "vh216217_library";
+	$rel_pass = "v3ty73yt794v4b57h";
+?>

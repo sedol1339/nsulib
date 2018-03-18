@@ -438,7 +438,7 @@ ui.update_page_url = function(f, s, t, res, push_in_history = true) {
 
 ui.download = function(event) {
 	var id = ui.selected_result;
-	ui.download_frame.prop('src', "/download.php?octet-stream&id=" + id); //octet-stream  для начала скачивания
+	ui.download_frame.prop('src', "/php/download.php?octet-stream&id=" + id); //octet-stream  для начала скачивания
 }
 
 requests.build_url = function(url, parameters) {
@@ -461,7 +461,7 @@ requests.get_materials = function(f_id, s_id, t_id) {
 	if (t_id != undefined) params["t"] = t_id;
 	if (requests.query_materials != null) requests.query_materials.abort();
 	requests.query_materials = new XMLHttpRequest();
-	var _url = requests.build_url("/get.php", params);
+	var _url = requests.build_url("/php/get.php", params);
 	requests.query_materials.open("GET", _url, true);
 	requests.query_materials.onload = function() {
 		//console.log("readyState = " + requests.query_materials.readyState);
@@ -479,7 +479,7 @@ requests.get_list = function(target, f_id, s_id, t_id) {
 	if (t_id != undefined) params["t"] = t_id;
 	if (requests.queries_lists[target] != null) requests.queries_lists[target].abort();
 	requests.queries_lists[target] = new XMLHttpRequest();
-	var _url = requests.build_url("/get.php", params);
+	var _url = requests.build_url("/php/get.php", params);
 	requests.queries_lists[target].open("GET", _url, true);
 	requests.queries_lists[target].onload = function() {
 		requests.lists[target] = JSON.parse(requests.queries_lists[target].responseText);
@@ -497,7 +497,7 @@ requests.get_list = function(target, f_id, s_id, t_id) {
 
 requests.get_full_lists_and_relations = function(on_finish) {
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "/init.json", true);
+	xhr.open("GET", "/data/init.json", true);
 	xhr.onload = function() {
 		var response = JSON.parse(xhr.responseText);
 		data.full_lists.f = response.faculties;
