@@ -240,7 +240,7 @@ ui.update_upload_grid = function() {
 			if (!entry.state_changed) return;
 			div.empty();
 			var span = $('<span>');
-			span.text("Ожидание ответа от сервера...");
+			span.text("Обработка файла на сервере...");
 			span.css("display", "inline-block");
 			div.append(span);
 			div.next().empty().append($('<div>').addClass('uploading_erase').click(ui.upload_erase));

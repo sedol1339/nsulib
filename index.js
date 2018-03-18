@@ -236,9 +236,27 @@ function recognize_mime(entry) {
 		|| entry.mime == "image/png"
 		|| entry.mime == "image/tiff"
 		|| entry.mime == "image/webp"
+		|| entry.mime == "image/vnd.microsoft.icon"
+		|| entry.mime == "image/x-icon"
 	) return "IMAGE";
 	if (entry.mime == "image/vnd.djvu") return "DJVU";
 	if (entry.mime.startsWith("text/")) return "TEXT";
+	if (
+		entry.mime == "application/zip"
+		|| entry.mime == "application/gzip"
+		|| entry.mime == "application/x-rar-compressed"
+		|| entry.mime == "application/x-tar"
+		|| entry.mime == "application/x-bzip2"
+		|| entry.mime == "application/x-7z-compressed"
+		|| entry.mime == "application/vnd.android.package-archive"
+		|| entry.mime == "application/x-gtar"
+	) return "ARCHIVE";
+	if (
+		entry.mime == "application/x-msdownload"
+		|| entry.mime == "application/x-msdos-program"
+		|| entry.mime == "application/x-ms-installer"
+		|| entry.mime == "application/x-elf"
+	) return "EXECUTABLE";
 	return "UNKNOWN";
 }
 
@@ -252,6 +270,8 @@ function preview_is_accessible(entry) {
 	if (type == "MS-OFFICE") return true;
 	if (type == "IMAGE") return true;
 	if (type == "DJVU") return true;
+	if (type == "ARCHIVE") return false;
+	if (type == "EXECUTABLE") return false;
 	
 	//text, djvu, unknown
 	if (entry.filesize < 1 * 1024 * 1024) {
