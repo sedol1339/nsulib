@@ -229,7 +229,15 @@ function recognize_mime(entry) {
 		entry.mime.startsWith("application/vnd.")
 		|| entry.mime.startsWith("application/ms")
 	) return "MS-OFFICE";
-	if (entry.mime.startsWith("image/")) return "IMAGE";
+	if (
+		entry.mime == "image/gif"
+		|| entry.mime == "image/jpeg"
+		|| entry.mime == "image/pjpeg"
+		|| entry.mime == "image/png"
+		|| entry.mime == "image/tiff"
+		|| entry.mime == "image/webp"
+	) return "IMAGE";
+	if (entry.mime == "image/vnd.djvu") return "DJVU";
 	if (entry.mime.startsWith("text/")) return "TEXT";
 	return "UNKNOWN";
 }
@@ -240,14 +248,16 @@ function preview_is_accessible(entry) {
 		console.error("Warning: calling \"preview_is_accessible()\" for LINK type!");
 		return false;
 	}
-	if (type == "UNKNOWN") {
-		if (entry.filesize < 1 * 1024 * 1024) {
-			return true;
-		} else {
-			return false;
-		}
-	} else {
+	if (type == "PDF") return true;
+	if (type == "MS-OFFICE") return true;
+	if (type == "IMAGE") return true;
+	if (type == "DJVU") return true;
+	
+	//text, djvu, unknown
+	if (entry.filesize < 1 * 1024 * 1024) {
 		return true;
+	} else {
+		return false;
 	}
 }
 
@@ -265,7 +275,6 @@ function load_preview(id, entry) {
 	var type = recognize_mime(entry);
 	
 	if (type == "PDF") {
-		//pdf
 		ui.article_frame_preview.show();
 		PDFObject.embed("/download.php?id=" + id, ui.article_frame_preview[0]);
 		var embed = ui.article_frame_preview.children("embed").first();
@@ -273,36 +282,26 @@ function load_preview(id, entry) {
 			loading_img_show();
 			embed.on("load", loading_img_hide);
 		}
-	} else if (type == "MS-OFFICE") {
-		//microsoft office
+	} else if (type == "DJVU") {
 		ui.article_frame_preview.show();
 		loading_img_show();
 		ui.article_frame_preview.append(
 			$('<iframe>')
 			.prop('id', 'content_iframe')
 			.prop('frameBorder', '0')
-			.prop('src', "http://docs.google.com/gview?embedded=true&url=" + /*window.location.origin*/ "http://nsulib.ru" + "/download.php?id=" + id)
+			.prop('src', "/djvu-viewer/djvu-viewer.php?src=" + encodeURIComponent("/download.php?id=" + id))
 			.css('width', '100%')
 			.css('height', '100%')
 			.on("load", loading_img_hide)
 		);
-	} else if (type == "TEXT" || type == "UNKNOWN") {
-		if (type == "UNKNOWN") {
-			ui.article_frame_preview.append(
-				$("<div>")
-				.attr('id',  "article_frame_content_header")
-				.text("Формат файла не распознан. Файл отображен как текстовый.")
-			);
-		}
-		//other
+	} else if (type == "MS-OFFICE") {
 		ui.article_frame_preview.show();
 		loading_img_show();
 		ui.article_frame_preview.append(
 			$('<iframe>')
 			.prop('id', 'content_iframe')
 			.prop('frameBorder', '0')
-			.prop('src', "/download.php?plaintext&id=" + id)
-			.prop('type', 'text/plain')
+			.prop('src', "http://docs.google.com/gview?embedded=true&url=" + /*window.location.origin*/ encodeURIComponent("http://nsulib.ru" + "/download.php?id=" + id))
 			.css('width', '100%')
 			.css('height', '100%')
 			.on("load", loading_img_hide)
@@ -323,7 +322,28 @@ function load_preview(id, entry) {
 			)*/
 			.on("load", loading_img_hide)
 		);
-	}
+	} else { //text, unknown
+		if (type == "UNKNOWN") {
+			ui.article_frame_preview.append(
+				$("<div>")
+				.attr('id',  "article_frame_content_header")
+				.text("Формат файла не распознан. Файл отображен как текстовый.")
+			);
+		}
+		//other
+		ui.article_frame_preview.show();
+		loading_img_show();
+		ui.article_frame_preview.append(
+			$('<iframe>')
+			.prop('id', 'content_iframe')
+			.prop('frameBorder', '0')
+			.prop('src', "/download.php?plaintext&id=" + id)
+			.prop('type', 'text/plain')
+			.css('width', '100%')
+			.css('height', '100%')
+			.on("load", loading_img_hide)
+		);
+	} 
 }
 
 ui.selected_result_elem = null;
