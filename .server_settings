@@ -3,6 +3,7 @@
 php.ini:
 upload_max_filesize = 1000M
 post_max_size = 1000M
+extension=php_fileinfo.dll
 
 httpd.conf:
 AddDefaultCharset utf-8 // надо ли?

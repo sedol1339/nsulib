@@ -4,20 +4,6 @@ error_reporting(0);
 
 include('answers.php');
 
-//send_answer_and_exit("9876");
-
-function random_str($length = 24) {
-    $characters = '0123456789ABCDEF';
-    $charactersLength = strlen($characters);
-    $randomString = '';
-    for ($i = 0; $i < $length; $i++) {
-        $randomString .= $characters[rand(0, $charactersLength - 1)];
-		if ($i > 0 && $i % 6 == 0)
-			$randomString .= "-";
-    }
-    return $randomString;
-}
-
 if (empty($_POST)) error("Пустой запрос");
 
 $file = $_FILES['file'];
@@ -72,15 +58,15 @@ $uploader = "1";
 $ip = "";
 
 if (!$edit) {
-	if ($file['size'] > 524288000)
-		error("Файл должен быть не больше 500 Мб");
+	include('file-utils/check_file.php');
+	
 	switch ($file['error']) {
 	case UPLOAD_ERR_OK:
 		break;
 	case UPLOAD_ERR_NO_FILE:
 		error("Не отправлен файл");
 	case UPLOAD_ERR_INI_SIZE:
-		error("Файл должен быть не больше 500 Мб");
+		error("Размер файла превысил максимальное значение, указанное в php.ini");
 	case UPLOAD_ERR_FORM_SIZE:
 		error("Размер загружаемого файла превысил значение MAX_FILE_SIZE, указанное в HTML-форме");
 	case UPLOAD_ERR_PARTIAL:
@@ -89,12 +75,11 @@ if (!$edit) {
 		internal_error("Внутренняя ошибка сервера: " . $file['error']);
 	}
 	
-	$filesize = $file['size'];
-	//$filename = random_str();
-	$filename = md5_file($_FILES['file']['tmp_name']);
-	$path = dirname(__FILE__) . "/files/" . $filename;
-	if (!file_exists($path) && !move_uploaded_file($_FILES['file']['tmp_name'], $path))
-		internal_error("Внутренняя ошибка сервера: move_uploaded_file");
+	try {
+		$file_params = validate_and_move_file($_FILES['file']['tmp_name']);
+	} catch (Exception $e) {
+		error($e->getMessage());
+	}
 }
 
 //------------------------------
@@ -104,10 +89,12 @@ include('.login_data');
 $mysqli = new mysqli($db_host, $db_user, $db_password, $db_schema);
 
 if ($mysqli->connect_errno) {
+	unlink($file_params["path"]);
 	echo "Не удалось подключиться к MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error; exit;
 }
 
 if (!$mysqli->set_charset("utf8")) {
+	unlink($file_params["path"]);
 	echo "Ошибка при загрузке набора символов utf8: " . $mysqli->error; exit;
 }
 
@@ -148,10 +135,15 @@ if (!$edit) {
 	$values[] = "'" . $mysqli->real_escape_string($ip) . "'";
 	
 	$columns[] = "file";
-	$values[] = "'" . $mysqli->real_escape_string($filename) . "'";
+	$values[] = "'" . $mysqli->real_escape_string($file_params["name"]) . "'";
 
 	$columns[] = "filesize";
-	$values[] = "'" . $mysqli->real_escape_string($filesize) . "'";
+	$values[] = "'" . $mysqli->real_escape_string($file_params["size"]) . "'";
+
+	if (!empty($file_params["mime"])) {
+		$columns[] = "mime";
+		$values[] = "'" . $mysqli->real_escape_string($file_params["mime"]) . "'";
+	}
 } else {
 	$columns[] = "edited";
 	$values[] = "NOW()";
@@ -160,14 +152,19 @@ if (!$edit) {
 if (!$edit) {
 	$sql = "INSERT INTO materials (" . implode(", ", $columns) . ") VALUES (" . implode(", ", $values) . ")";
 
-	if (!$result = $mysqli->query($sql))
-		error("MYSQL " . $mysqli->errno . ": " . $mysqli->error);
+	if (!$result = $mysqli->query($sql)) {
+		unlink($file_params["path"]);
+		error("MYSQL " . $mysqli->errno . ": " . $mysqli->error); exit;
+	}
 
 	$new_id = $mysqli->insert_id;
 
-	if ($new_id == 0)
+	if ($new_id == 0) {
+		unlink($file_params["path"]);
 		internal_error("MYSQL: insert_id is 0");
+	}
 
+	var_dump($file_params); //debug
 	send_answer_and_exit($new_id);
 } else {
 	$pairs = array();

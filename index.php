@@ -11,6 +11,7 @@
 	<link rel="stylesheet" href="index.css" media="all" />
 	<script src="jquery-3.3.1.min.js" defer></script>
 	<script src="pdfobject.min.js" defer></script>
+	<script src="file-utils/preview.js" defer></script>
 	<script src="utils.js" defer></script>
 	<script src="index.js" defer></script>
 	<script>

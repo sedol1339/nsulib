@@ -50,7 +50,7 @@
 	
 	$mime = $row["mime"];
 	
-	include('encodings/detect_encoding.php');
+	include('file-utils/encodings/detect_encoding.php');
 	if (isset($_GET['plaintext'])) {
 		$charset = detect_encoding($file);
 		//echo $charset; exit;
