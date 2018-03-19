@@ -68,6 +68,13 @@ function load_preview(frame_preview, frame_error, id, entry) {
 	var loading_img_hide = function() {
 		frame_preview.css("background", "");
 	};
+	var show_header_text = function(str) {
+		frame_preview.append(
+			$("<div>")
+			.attr('id',  "article_frame_content_header")
+			.text(str)
+		);
+	};
 	
 	var type = recognize_mime(entry);
 	
@@ -132,23 +139,52 @@ function load_preview(frame_preview, frame_error, id, entry) {
 		);
 	} else {
 		if (type == "UNKNOWN") {
-			frame_preview.append(
-				$("<div>")
-				.attr('id',  "article_frame_content_header")
-				.text("Формат файла не распознан. Файл отображен как текстовый.")
-			);
+			show_header_text("Формат файла не распознан, файл отображен как текстовый");
 		}
-		frame_preview.show();
-		loading_img_show();
-		frame_preview.append(
-			$('<iframe>')
-			.prop('id', 'content_iframe')
-			.prop('frameBorder', '0')
-			.prop('src', "/php/download.php?plaintext&id=" + id)
-			.prop('type', 'text/plain')
-			.css('width', '100%')
-			.css('height', '100%')
-			.on("load", loading_img_hide)
-		);
+		ui.syntax_highlight = false;
+		ui.syntax_highlight_size_limit = 150000;
+		if (!ui.syntax_highlight || entry.filesize > ui.syntax_highlight_size_limit) {
+			frame_preview.show();
+			loading_img_show();
+			frame_preview.append(
+				$('<iframe>')
+				.prop('id', 'content_iframe')
+				.prop('frameBorder', '0')
+				.prop('src', "/php/download.php?plaintext&id=" + id)
+				.prop('type', 'text/plain')
+				.css('width', '100%')
+				.css('height', '100%')
+				.on("load", loading_img_hide)
+			);
+		} else {
+			frame_preview.show();
+			loading_img_show();
+			$.ajax({
+				url: "/php/download.php?plaintext&id=" + id,
+				dataType : "text",
+				success: function (data, textStatus) {
+					loading_img_hide();
+					var code = $('<code>').text(data);
+					frame_preview
+					.append(
+						$('<div>')
+						.css("word-wrap", "break-word")
+						.css("word-break", "break-all")
+						.css("overflow", "hidden")
+						.css("margin", "5px")
+						.css("text-overflow", "clip")
+						.css("overflow-x", "hidden")
+						.css("overflow-y", "auto")
+						.append(
+							$('<pre>')
+							.css("margin", "0px")
+							.css("white-space", "pre-wrap")
+							.append(code)
+						)
+					);
+					hljs.highlightBlock(code[0]);
+				} 
+			});
+		}
 	} 
 }

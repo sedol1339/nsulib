@@ -9,9 +9,11 @@
 	<link rel="stylesheet" href="common.css" media="all" />
 	<link rel="stylesheet" href="header.css" media="all" />
 	<link rel="stylesheet" href="index.css" media="all" />
+	<!--<link rel="stylesheet" href="/filetypes/preview-text/styles/default.css" media="all" />-->
 	<script src="/js/jquery-3.3.1.min.js" defer></script>
 	<script src="/filetypes/preview-pdf/pdfobject.min.js" defer></script>
 	<script src="/filetypes/preview_file.js" defer></script>
+	<!--<script src="/filetypes/preview-text/highlight.pack.js" async></script>-->
 	<script src="/js/utils.js" defer></script>
 	<script src="index.js" defer></script>
 	<script>

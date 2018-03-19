@@ -288,6 +288,11 @@ article {
 	align-items: center;
 	justify-content: center;
 }
+#article_frame_preview {
+	height: 100%;
+	display: flex;
+	flex-flow: column nowrap;
+}
 #article_frame_placeholder * { /* span, p, a */
 	max-width: 90%;
 	font-family: Arial;
