@@ -3,7 +3,7 @@
 <head>
 	<meta charset=utf-8>
 	<title>Image viewer</title>
-	<script src="/jquery-3.3.1.min.js"></script>
+	<script src="/js/jquery-3.3.1.min.js"></script>
 	<script>
 		$(document).ready(function() {
 			var width_default = window.innerWidth - 33;
@@ -70,23 +70,22 @@
 			height: auto;
 			margin: 8px;
 		}
-		.body_zoom_out
-		.arrow {
+		.rotate {
 			width:30px;
 			height:30px;
 			background-size:100%;
 			position:fixed;
 			opacity: 0.2;
 		}
-		.arrow:hover {
+		.rotate:hover {
 			transform: scale(1.1, 1.1);
 		}
-		.arrow_left {
+		#rotate_left {
 			background-image:url('/images/rotate_left.png');
 			top:15px;
 			right:50px;
 		}
-		.arrow_right {
+		#rotate_right {
 			background-image:url('/images/rotate_right.png');
 			top:15px;
 			right:15px;
@@ -95,6 +94,6 @@
 </head>
 <body>
 	<img id=image src="<?php if (isset($_GET['src'])) {echo $_GET['src'];} else {echo "null";} ?>"></img>
-	<div id=rotate_left class="arrow arrow_left"></div>
-	<div id=rotate_right class="arrow arrow_right"></div>
+	<div id=rotate_left class="rotate arrow_left"></div>
+	<div id=rotate_right class="rotate arrow_right"></div>
 </body>

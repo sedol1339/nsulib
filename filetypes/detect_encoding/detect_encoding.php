@@ -43,7 +43,7 @@
 			$weights[$encoding] = $weight / $sum_weight;
 		}
 
-		var_dump($weights);
+		//var_dump($weights);
 
 		/////////////////////////////////////////
 		

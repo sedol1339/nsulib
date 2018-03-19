@@ -1,4 +1,4 @@
-include/.login_data
+php/.login_data
 *.cmd
 *.lnk
 *.bat
